@@ -1,0 +1,56 @@
+{
+  "workers": 4,
+  "sample": 3,
+  "repeats": 7,
+  "batch_wall": 24.63422048999928,
+  "wall_per_replay": 3.5191743557141826,
+  "cpu_per_replay": 13.928571428571429,
+  "load_before": {
+    "loadavg": [
+      3.29248046875,
+      3.41064453125,
+      2.8984375
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.33 total=233225835\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "canonical_sha256": "db4b0ae1dc2f35de70c3094d90eff092c1a8bcf9fcbfe65f78606d2d1a57327c",
+  "perf": false,
+  "workers_data": [
+    {
+      "worker": 0,
+      "cpu": 0,
+      "directions": 46,
+      "warm_seconds": 3.2837354139992385,
+      "wall_seconds": 24.619406952995632,
+      "cpu_seconds": 24.61,
+      "placement_count": 3174
+    },
+    {
+      "worker": 1,
+      "cpu": 1,
+      "directions": 45,
+      "warm_seconds": 3.2972468759980984,
+      "wall_seconds": 23.843378170000506,
+      "cpu_seconds": 23.83,
+      "placement_count": 3105
+    },
+    {
+      "worker": 2,
+      "cpu": 2,
+      "directions": 45,
+      "warm_seconds": 3.3078203959958046,
+      "wall_seconds": 24.6336772020004,
+      "cpu_seconds": 24.64,
+      "placement_count": 3105
+    },
+    {
+      "worker": 3,
+      "cpu": 3,
+      "directions": 45,
+      "warm_seconds": 3.3103265569952782,
+      "wall_seconds": 24.4406064529976,
+      "cpu_seconds": 24.42,
+      "placement_count": 3105
+    }
+  ]
+}

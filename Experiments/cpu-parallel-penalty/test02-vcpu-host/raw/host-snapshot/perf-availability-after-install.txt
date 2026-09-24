@@ -1,0 +1,21 @@
+2026-09-24T01:53:31+02:00
+perf_path=/usr/bin/perf
+perf_version=perf version 6.12.107
+perf_event_paranoid=4
+
+PMU devices:
+amd_iommu_0
+breakpoint
+cpu
+ibs_fetch
+ibs_op
+kprobe
+msr
+power
+power_core
+software
+tracepoint
+uprobe
+
+UMC/DF PMU details:
+perf_list_exit_code=0

@@ -1,0 +1,164 @@
+{
+  "workers": 16,
+  "sample": 1,
+  "repeats": 14,
+  "batch_wall": 22.255089542995847,
+  "wall_per_replay": 1.589649253071132,
+  "cpu_per_replay": 20.337142857142855,
+  "load_before": {
+    "loadavg": [
+      6.5380859375,
+      4.4384765625,
+      3.31884765625
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.22 total=233340280\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "canonical_sha256": "db4b0ae1dc2f35de70c3094d90eff092c1a8bcf9fcbfe65f78606d2d1a57327c",
+  "perf": false,
+  "workers_data": [
+    {
+      "worker": 0,
+      "cpu": 0,
+      "directions": 12,
+      "warm_seconds": 0.9770473949974985,
+      "wall_seconds": 13.116740845005552,
+      "cpu_seconds": 13.049999999999999,
+      "placement_count": 828
+    },
+    {
+      "worker": 1,
+      "cpu": 1,
+      "directions": 12,
+      "warm_seconds": 1.5926922209982877,
+      "wall_seconds": 20.858523290997255,
+      "cpu_seconds": 20.84,
+      "placement_count": 828
+    },
+    {
+      "worker": 2,
+      "cpu": 2,
+      "directions": 12,
+      "warm_seconds": 1.6005975320003927,
+      "wall_seconds": 20.80079690000275,
+      "cpu_seconds": 20.74,
+      "placement_count": 828
+    },
+    {
+      "worker": 3,
+      "cpu": 3,
+      "directions": 12,
+      "warm_seconds": 1.681407689997286,
+      "wall_seconds": 22.253875806993165,
+      "cpu_seconds": 22.18,
+      "placement_count": 828
+    },
+    {
+      "worker": 4,
+      "cpu": 4,
+      "directions": 12,
+      "warm_seconds": 1.1717525589992874,
+      "wall_seconds": 16.198729869996896,
+      "cpu_seconds": 16.14,
+      "placement_count": 828
+    },
+    {
+      "worker": 5,
+      "cpu": 5,
+      "directions": 11,
+      "warm_seconds": 1.6258397599958698,
+      "wall_seconds": 21.383940783998696,
+      "cpu_seconds": 21.34,
+      "placement_count": 759
+    },
+    {
+      "worker": 6,
+      "cpu": 6,
+      "directions": 11,
+      "warm_seconds": 1.6124842490025912,
+      "wall_seconds": 20.127322624000954,
+      "cpu_seconds": 20.08,
+      "placement_count": 759
+    },
+    {
+      "worker": 7,
+      "cpu": 7,
+      "directions": 11,
+      "warm_seconds": 1.5931868190018577,
+      "wall_seconds": 21.406976330006728,
+      "cpu_seconds": 21.31,
+      "placement_count": 759
+    },
+    {
+      "worker": 8,
+      "cpu": 8,
+      "directions": 11,
+      "warm_seconds": 1.5690888859971892,
+      "wall_seconds": 14.624782159997267,
+      "cpu_seconds": 14.600000000000001,
+      "placement_count": 759
+    },
+    {
+      "worker": 9,
+      "cpu": 9,
+      "directions": 11,
+      "warm_seconds": 1.6111408630022197,
+      "wall_seconds": 21.25883111800067,
+      "cpu_seconds": 21.24,
+      "placement_count": 759
+    },
+    {
+      "worker": 10,
+      "cpu": 10,
+      "directions": 11,
+      "warm_seconds": 1.0840090959973168,
+      "wall_seconds": 14.860507625999162,
+      "cpu_seconds": 14.78,
+      "placement_count": 759
+    },
+    {
+      "worker": 11,
+      "cpu": 11,
+      "directions": 11,
+      "warm_seconds": 1.082370012998581,
+      "wall_seconds": 14.5898983579973,
+      "cpu_seconds": 14.53,
+      "placement_count": 759
+    },
+    {
+      "worker": 12,
+      "cpu": 12,
+      "directions": 11,
+      "warm_seconds": 1.0817264459983562,
+      "wall_seconds": 14.632204084999103,
+      "cpu_seconds": 14.61,
+      "placement_count": 759
+    },
+    {
+      "worker": 13,
+      "cpu": 13,
+      "directions": 11,
+      "warm_seconds": 1.0949590960008209,
+      "wall_seconds": 14.5302418939973,
+      "cpu_seconds": 14.52,
+      "placement_count": 759
+    },
+    {
+      "worker": 14,
+      "cpu": 14,
+      "directions": 11,
+      "warm_seconds": 1.1168987069977447,
+      "wall_seconds": 14.695599713995762,
+      "cpu_seconds": 14.63,
+      "placement_count": 759
+    },
+    {
+      "worker": 15,
+      "cpu": 15,
+      "directions": 11,
+      "warm_seconds": 1.0843931050039828,
+      "wall_seconds": 20.1505095600005,
+      "cpu_seconds": 20.130000000000003,
+      "placement_count": 759
+    }
+  ]
+}

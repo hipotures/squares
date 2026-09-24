@@ -1,0 +1,46 @@
+{
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "cgroups": [
+    {
+      "path": "/sys/fs/cgroup",
+      "cpu.max": null,
+      "cpu.stat": "usage_usec 67728701075\nuser_usec 62453851594\nsystem_usec 5274849481\nnice_usec 822878\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+      "cpuset.cpus.effective": "0-15"
+    },
+    {
+      "path": "/sys/fs/cgroup/user.slice",
+      "cpu.max": "max 100000",
+      "cpu.stat": "usage_usec 67778082001\nuser_usec 62809210909\nsystem_usec 4968871092\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+      "cpuset.cpus.effective": "0-15"
+    },
+    {
+      "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+      "cpu.max": "max 100000",
+      "cpu.stat": "usage_usec 67681186302\nuser_usec 62778737993\nsystem_usec 4902448309\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+      "cpuset.cpus.effective": null
+    },
+    {
+      "path": "/sys/fs/cgroup/user.slice/user-1000.slice/session-3.scope",
+      "cpu.max": "max 100000",
+      "cpu.stat": "usage_usec 67565611299\nuser_usec 62744628104\nsystem_usec 4820983194\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+      "cpuset.cpus.effective": null
+    }
+  ]
+}

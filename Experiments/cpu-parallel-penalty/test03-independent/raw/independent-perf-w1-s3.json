@@ -1,0 +1,29 @@
+{
+  "workers": 1,
+  "sample": 3,
+  "repeats": 3,
+  "batch_wall": 32.124627397999575,
+  "wall_per_replay": 10.708209132666525,
+  "cpu_per_replay": 10.693333333333333,
+  "load_before": {
+    "loadavg": [
+      2.8037109375,
+      4.744140625,
+      3.72705078125
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.36 avg300=0.59 total=236050779\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "canonical_sha256": "db4b0ae1dc2f35de70c3094d90eff092c1a8bcf9fcbfe65f78606d2d1a57327c",
+  "perf": true,
+  "workers_data": [
+    {
+      "worker": 0,
+      "cpu": 0,
+      "directions": 181,
+      "warm_seconds": 10.011366232,
+      "wall_seconds": 32.118370022995805,
+      "cpu_seconds": 32.08,
+      "placement_count": 12489
+    }
+  ]
+}

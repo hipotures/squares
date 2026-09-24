@@ -1,0 +1,2121 @@
+{
+  "workers": 8,
+  "sample": 2,
+  "repeats": 8,
+  "batch_wall": 21.810372749001544,
+  "wall_per_replay": 2.726296593625193,
+  "per_replay": {
+    "user": 19.29875,
+    "system": 1.005,
+    "minor_faults": 322732.875,
+    "migrations": 1.0,
+    "sched_run": 20.304418283875002,
+    "sched_wait": 0.004814014625,
+    "voluntary_ctxt_switches": 1640.75,
+    "nonvoluntary_ctxt_switches": 41.25
+  },
+  "load_before": {
+    "utc": "2026-09-23T23:43:59Z",
+    "loadavg": [
+      4.73046875,
+      2.0341796875,
+      0.9736328125
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=225854753\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "pids": [
+    202585,
+    202588,
+    202589,
+    202590,
+    202591,
+    202592,
+    202593,
+    202594
+  ],
+  "affinity": {
+    "202585": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "202588": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "202589": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "202590": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "202591": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "202592": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "202593": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "202594": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  "warmup": 3.032240427004581,
+  "replays": [
+    {
+      "wall_seconds": 2.5958708229954937,
+      "worker_wait_seconds": 2.427728481925442,
+      "parent_process_seconds": 0.14899393812083872,
+      "dispatch_seconds": 0.015354198003478814,
+      "site_weights_seconds": 0.00038299000152619556,
+      "other_seconds": 0.003411214944208041,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.4435730990007869,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.42925893092615297,
+          "parent_process_seconds": 0.013573320000432432,
+          "parent_dispatch_seconds": 0.0004213089996483177
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.023771072999807075,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.015735086984932423,
+          "parent_process_seconds": 0.006504914024844766,
+          "parent_dispatch_seconds": 0.001444323999749031
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.021855000995856244,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.013882980943890288,
+          "parent_process_seconds": 0.006916065976838581,
+          "parent_dispatch_seconds": 0.0009631069988245144
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.018334933003643528,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.008807124970189761,
+          "parent_process_seconds": 0.008774645029916428,
+          "parent_dispatch_seconds": 0.0006340670006466098
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.023740143005852588,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.016059732966823503,
+          "parent_process_seconds": 0.006894233069033362,
+          "parent_dispatch_seconds": 0.0006539969981531613
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.021569640994130168,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.011858129008032847,
+          "parent_process_seconds": 0.009134225016168784,
+          "parent_dispatch_seconds": 0.0004614690042217262
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.024827020002703648,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.01841247901029419,
+          "parent_process_seconds": 0.005963810013781767,
+          "parent_dispatch_seconds": 0.00038864900125190616
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.03428225399693474,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.02800444304011762,
+          "parent_process_seconds": 0.005835334035509732,
+          "parent_dispatch_seconds": 0.0003837289987131953
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.0403094829962356,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.03546578805253375,
+          "parent_process_seconds": 0.004426836007041857,
+          "parent_dispatch_seconds": 0.00035887899866793305
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.06653743599599693,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.059915427926171105,
+          "parent_process_seconds": 0.006108944020525087,
+          "parent_dispatch_seconds": 0.00040801899740472436
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.09542394200252602,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.08894378902186872,
+          "parent_process_seconds": 0.005882345009013079,
+          "parent_dispatch_seconds": 0.00046836899855406955
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.08847203700133832,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.08067839700379409,
+          "parent_process_seconds": 0.006861950954771601,
+          "parent_dispatch_seconds": 0.000801756999862846
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.12637883800198324,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.11660266199760372,
+          "parent_process_seconds": 0.009027249914652202,
+          "parent_dispatch_seconds": 0.0005486779991770163
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.1611134819977451,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.14926876203389838,
+          "parent_process_seconds": 0.011066418999689631,
+          "parent_dispatch_seconds": 0.0004794490014319308
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.09704523500113282,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.08553098795528058,
+          "parent_process_seconds": 0.010792831992148422,
+          "parent_dispatch_seconds": 0.0005351380023057573
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.13463672700163443,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.12467298103001667,
+          "parent_process_seconds": 0.008495339985529426,
+          "parent_dispatch_seconds": 0.0012406160021782853
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.19111895199603168,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.1797462619651924,
+          "parent_process_seconds": 0.010167227977945004,
+          "parent_dispatch_seconds": 0.0008812270025373437
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.17807307000475703,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.1712463160729385,
+          "parent_process_seconds": 0.006122931961726863,
+          "parent_dispatch_seconds": 0.00048582800081931055
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.12160596399917267,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.11737661404185928,
+          "parent_process_seconds": 0.0035341880575288087,
+          "parent_dispatch_seconds": 0.000555429003725294
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.17989171299996087,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.1776927869868814,
+          "parent_process_seconds": 0.0014470520400209352,
+          "parent_dispatch_seconds": 0.0005322290016920306
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.1680865160014946,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.16575753898359835,
+          "parent_process_seconds": 0.0009171620331471786,
+          "parent_dispatch_seconds": 0.0012161749982624315
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.15696228700107895,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.1551816160135786,
+          "parent_process_seconds": 0.0004955510084982961,
+          "parent_dispatch_seconds": 0.0010929650015896186
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.1781757880016812,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.17762964498979272,
+          "parent_process_seconds": 5.136099207447842e-05,
+          "parent_dispatch_seconds": 0.0003987889940617606
+        }
+      ]
+    },
+    {
+      "wall_seconds": 2.8084710230032215,
+      "worker_wait_seconds": 2.609436909253418,
+      "parent_process_seconds": 0.1806862770827138,
+      "dispatch_seconds": 0.014884145006362814,
+      "site_weights_seconds": 0.00038403301005018875,
+      "other_seconds": 0.00307965865067672,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.4571800479970989,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.44413501500093844,
+          "parent_process_seconds": 0.012437815981684253,
+          "parent_dispatch_seconds": 0.0004949479989591055
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.022905707002792042,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.015464856012840755,
+          "parent_process_seconds": 0.006375350953021552,
+          "parent_dispatch_seconds": 0.0009983859999920242
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.022566277999430895,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.013934706046711653,
+          "parent_process_seconds": 0.00796261103823781,
+          "parent_dispatch_seconds": 0.0006024579997756518
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.01774176499748137,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.007689261015912052,
+          "parent_process_seconds": 0.008949801027483772,
+          "parent_dispatch_seconds": 0.001006587001029402
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.02286417599680135,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.014913888997398317,
+          "parent_process_seconds": 0.007493941964639816,
+          "parent_dispatch_seconds": 0.0003873980022035539
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.021628832000715192,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.013838094957463909,
+          "parent_process_seconds": 0.007352569060458336,
+          "parent_dispatch_seconds": 0.00037262799742165953
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.0246911300055217,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.017837594030424953,
+          "parent_process_seconds": 0.00645628992060665,
+          "parent_dispatch_seconds": 0.0003372390056028962
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.03451712399692042,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.027682306041242555,
+          "parent_process_seconds": 0.006420977042580489,
+          "parent_dispatch_seconds": 0.00035017900518141687
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.04128920899529476,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.034031421040708665,
+          "parent_process_seconds": 0.006780944000638556,
+          "parent_dispatch_seconds": 0.0004099990037502721
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.07760193599824561,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.06804851998458616,
+          "parent_process_seconds": 0.00891869901533937,
+          "parent_dispatch_seconds": 0.0005690089965355583
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.10064898199925665,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.0874000170515501,
+          "parent_process_seconds": 0.012692362026427872,
+          "parent_dispatch_seconds": 0.00040502799674868584
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.09249135099526029,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.08144960895879194,
+          "parent_process_seconds": 0.0099451340502128,
+          "parent_dispatch_seconds": 0.0009302160033257678
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.13864508499682415,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.1263837180522387,
+          "parent_process_seconds": 0.011629717984760646,
+          "parent_dispatch_seconds": 0.0005299580006976612
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.15511902399885003,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.1452440600041882,
+          "parent_process_seconds": 0.008970030969067011,
+          "parent_dispatch_seconds": 0.0007284969979082234
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.10102085000107763,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.0889910390105797,
+          "parent_process_seconds": 0.011351835972163826,
+          "parent_dispatch_seconds": 0.0005024589991080575
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.1370019690002664,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.12749645199801307,
+          "parent_process_seconds": 0.008638411040010396,
+          "parent_dispatch_seconds": 0.0005786469992017373
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.18946699800289935,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.17544002795330016,
+          "parent_process_seconds": 0.012906634947285056,
+          "parent_dispatch_seconds": 0.0008291769991046749
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.2171049460012,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.20650757195835467,
+          "parent_process_seconds": 0.009148267017735634,
+          "parent_dispatch_seconds": 0.001313445005507674
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.1797050829991349,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.16629886699956842,
+          "parent_process_seconds": 0.011985396027739625,
+          "parent_dispatch_seconds": 0.0010810859967023134
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.23626967600284843,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.23460421702475287,
+          "parent_process_seconds": 0.0009733709957799874,
+          "parent_dispatch_seconds": 0.00048819900257512927
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.17212658999778796,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.16918511203402886,
+          "parent_process_seconds": 0.00206166401039809,
+          "parent_dispatch_seconds": 0.0006461769953602925
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.16814102599892067,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.16599737809883663,
+          "parent_process_seconds": 0.0011183520618942566,
+          "parent_dispatch_seconds": 0.0008142459992086515
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.17765107200102648,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.1768631769809872,
+          "parent_process_seconds": 0.00011609997454797849,
+          "parent_dispatch_seconds": 0.0005081790004624054
+        }
+      ]
+    },
+    {
+      "wall_seconds": 2.874368043994764,
+      "worker_wait_seconds": 2.6809584082875517,
+      "parent_process_seconds": 0.17280734999803826,
+      "dispatch_seconds": 0.016598019981756806,
+      "site_weights_seconds": 0.00041424098162679,
+      "other_seconds": 0.003590024745790288,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.5131515730026877,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.49931287302752025,
+          "parent_process_seconds": 0.013057964992185589,
+          "parent_dispatch_seconds": 0.00048491800407646224
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.021600360996671952,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.012634633996640332,
+          "parent_process_seconds": 0.007660882009076886,
+          "parent_dispatch_seconds": 0.0012218159972690046
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.024681798997335136,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.018173688986280467,
+          "parent_process_seconds": 0.006071651958336588,
+          "parent_dispatch_seconds": 0.0003611389984143898
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.019991076995211188,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.009282812010496855,
+          "parent_process_seconds": 0.009749738012033049,
+          "parent_dispatch_seconds": 0.0008615369952167384
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.024887608997232746,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.017004899935272988,
+          "parent_process_seconds": 0.0074335209937999025,
+          "parent_dispatch_seconds": 0.00036206799995852634
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.02261244699911913,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.014577814050426241,
+          "parent_process_seconds": 0.007528870031819679,
+          "parent_dispatch_seconds": 0.00042782799573615193
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.025627306000387762,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.016148078015248757,
+          "parent_process_seconds": 0.00903822499094531,
+          "parent_dispatch_seconds": 0.0003600089985411614
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.03924876599921845,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.031458996010769624,
+          "parent_process_seconds": 0.007267327040608507,
+          "parent_dispatch_seconds": 0.00042403899715282023
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.050825774000259116,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.04343749301915523,
+          "parent_process_seconds": 0.006362384992826264,
+          "parent_dispatch_seconds": 0.0009270860027754679
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.07130268900073133,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.06267802203365136,
+          "parent_process_seconds": 0.00810857296892209,
+          "parent_dispatch_seconds": 0.00041103799594566226
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.10411946900421754,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.09038254201004747,
+          "parent_process_seconds": 0.01302859100542264,
+          "parent_dispatch_seconds": 0.0004947289999108762
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.08918657399772201,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.08007384699885733,
+          "parent_process_seconds": 0.00814536201505689,
+          "parent_dispatch_seconds": 0.0007966769990161993
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.12601320999965537,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.11589499800174963,
+          "parent_process_seconds": 0.009274624964746181,
+          "parent_dispatch_seconds": 0.0006714580013067462
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.1381235450025997,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.12793071501801023,
+          "parent_process_seconds": 0.00899838499026373,
+          "parent_dispatch_seconds": 0.0010871169943129644
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.09284492200094974,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.08334473997820169,
+          "parent_process_seconds": 0.009050710053998046,
+          "parent_dispatch_seconds": 0.0003748780000023544
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.13976956799888285,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.12878277506388258,
+          "parent_process_seconds": 0.00987903198983986,
+          "parent_dispatch_seconds": 0.0008816859990474768
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.18822595199890202,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.17723693402513163,
+          "parent_process_seconds": 0.009933173998433631,
+          "parent_dispatch_seconds": 0.0009539770035189576
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.2174228750009206,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.2088847770501161,
+          "parent_process_seconds": 0.007209163006336894,
+          "parent_dispatch_seconds": 0.0011441550013842061
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.19185944800119614,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.1837151340514538,
+          "parent_process_seconds": 0.007271798953297548,
+          "parent_dispatch_seconds": 0.0005995579995214939
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.24806190399976913,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.24123430804320378,
+          "parent_process_seconds": 0.00492193905665772,
+          "parent_dispatch_seconds": 0.0014290859980974346
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.17101038600230822,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.16779417597717838,
+          "parent_process_seconds": 0.001992612007597927,
+          "parent_dispatch_seconds": 0.0008870259989635088
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.17453613199904794,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.17287089901219588,
+          "parent_process_seconds": 0.0006556160369655117,
+          "parent_dispatch_seconds": 0.0007530869988841005
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.17916082499868935,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.17810325197206112,
+          "parent_process_seconds": 0.00016720392886782065,
+          "parent_dispatch_seconds": 0.0006831080027041025
+        }
+      ]
+    },
+    {
+      "wall_seconds": 2.721152632999292,
+      "worker_wait_seconds": 2.566616922202229,
+      "parent_process_seconds": 0.13852066494291648,
+      "dispatch_seconds": 0.013300892984261736,
+      "site_weights_seconds": 0.00039812701288610697,
+      "other_seconds": 0.002316025856998749,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.49564869800087763,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.48242456696607405,
+          "parent_process_seconds": 0.012656019956921227,
+          "parent_dispatch_seconds": 0.0004537879940471612
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.022157958999741822,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.01498259306390537,
+          "parent_process_seconds": 0.006438465941755567,
+          "parent_dispatch_seconds": 0.0006688169960398227
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.02138078099960694,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.014944548027415294,
+          "parent_process_seconds": 0.00598497100872919,
+          "parent_dispatch_seconds": 0.00039166799979284406
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.01795519499864895,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.010886909039982129,
+          "parent_process_seconds": 0.006615268051973544,
+          "parent_dispatch_seconds": 0.0003983689966844395
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.02249157800542889,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.015255299003911205,
+          "parent_process_seconds": 0.006596514918783214,
+          "parent_dispatch_seconds": 0.000579317995288875
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.02045355500013102,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.013026465014263522,
+          "parent_process_seconds": 0.006717608026519883,
+          "parent_dispatch_seconds": 0.0006533670020871796
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.02509275799820898,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.0179783500279882,
+          "parent_process_seconds": 0.006719165940012317,
+          "parent_dispatch_seconds": 0.0003339789982419461
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.03653009700065013,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.03055430194217479,
+          "parent_process_seconds": 0.005561167003179435,
+          "parent_dispatch_seconds": 0.0003552190028131008
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.04098860100202728,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.033790724985010456,
+          "parent_process_seconds": 0.006667409026704263,
+          "parent_dispatch_seconds": 0.0004588779993355274
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.06660532500245608,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.05946183704509167,
+          "parent_process_seconds": 0.006669597947620787,
+          "parent_dispatch_seconds": 0.0004093790048500523
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.09405557600257453,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.08640431503590662,
+          "parent_process_seconds": 0.007182487992395181,
+          "parent_dispatch_seconds": 0.0003548480017343536
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.08399746399663854,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.07281819200579775,
+          "parent_process_seconds": 0.010053847938252147,
+          "parent_dispatch_seconds": 0.0009076970018213615
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.12660775699623628,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.11832495902490336,
+          "parent_process_seconds": 0.0075184700326644816,
+          "parent_dispatch_seconds": 0.0006585379960597493
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.15397503800340928,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.14692602399736643,
+          "parent_process_seconds": 0.006105237036535982,
+          "parent_dispatch_seconds": 0.0008606569972471334
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.09599867799988715,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.08903496202401584,
+          "parent_process_seconds": 0.006535612061270513,
+          "parent_dispatch_seconds": 0.00036654799623647705
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.10546807399805402,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.10047240895801224,
+          "parent_process_seconds": 0.003888842009473592,
+          "parent_dispatch_seconds": 0.0010379459999967366
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.18088452900701668,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.17231560197251383,
+          "parent_process_seconds": 0.007669714032090269,
+          "parent_dispatch_seconds": 0.0008046770017244853
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.21841143100027693,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.21061080999061232,
+          "parent_process_seconds": 0.007232648000353947,
+          "parent_dispatch_seconds": 0.00047757800348335877
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.16000619599799393,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.1549508289754158,
+          "parent_process_seconds": 0.004084272972249892,
+          "parent_dispatch_seconds": 0.0008785879981587641
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.21048082999914186,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.20627822307142196,
+          "parent_process_seconds": 0.003465919988229871,
+          "parent_dispatch_seconds": 0.0005586490005953237
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.17198684100003447,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.16815662100270856,
+          "parent_process_seconds": 0.002847891017154325,
+          "parent_dispatch_seconds": 0.0006618979969061911
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.16953104099957272,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.16757654195680516,
+          "parent_process_seconds": 0.0011430600425228477,
+          "parent_dispatch_seconds": 0.0005000189994461834
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.18037118099891813,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.17944183907093247,
+          "parent_process_seconds": 0.00016647399752400815,
+          "parent_dispatch_seconds": 0.0005304680016706698
+        }
+      ]
+    },
+    {
+      "wall_seconds": 2.775206715996319,
+      "worker_wait_seconds": 2.565466951818962,
+      "parent_process_seconds": 0.19094387295626802,
+      "dispatch_seconds": 0.01503995400707936,
+      "site_weights_seconds": 0.00045006899745203555,
+      "other_seconds": 0.0033058682165574282,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.5054527429965674,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.48718695290153846,
+          "parent_process_seconds": 0.017476622961112298,
+          "parent_dispatch_seconds": 0.0006598279942409135
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.0234799940008088,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.01398416493611876,
+          "parent_process_seconds": 0.008774023983278312,
+          "parent_dispatch_seconds": 0.0006226780024007894
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.023214445005578455,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.014120432984782383,
+          "parent_process_seconds": 0.00866877499356633,
+          "parent_dispatch_seconds": 0.00034457899892004207
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.018536892006522976,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.005930187944613863,
+          "parent_process_seconds": 0.011733407009160146,
+          "parent_dispatch_seconds": 0.0007867570020607673
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.02482109000266064,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.015846172034798656,
+          "parent_process_seconds": 0.00847612603683956,
+          "parent_dispatch_seconds": 0.000415817994507961
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.022228078996704426,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.010703103042033035,
+          "parent_process_seconds": 0.010649596006260253,
+          "parent_dispatch_seconds": 0.0007885370068834163
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.024696899999980815,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.014179542013152968,
+          "parent_process_seconds": 0.009890660032397136,
+          "parent_dispatch_seconds": 0.0005160180007806048
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.037169823997828644,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.026390394974441733,
+          "parent_process_seconds": 0.010188332984398585,
+          "parent_dispatch_seconds": 0.0004669879999710247
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.04429679799795849,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.03643818499404006,
+          "parent_process_seconds": 0.0070255400278256275,
+          "parent_dispatch_seconds": 0.0006722079997416586
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.07062284199491842,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.05971346099249786,
+          "parent_process_seconds": 0.009327292020316236,
+          "parent_dispatch_seconds": 0.0015097350042196922
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.10118248000071617,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.08877717000723351,
+          "parent_process_seconds": 0.011933026995393448,
+          "parent_dispatch_seconds": 0.00037748900649603456
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.08996590100286994,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.07736445504269795,
+          "parent_process_seconds": 0.011328445929393638,
+          "parent_dispatch_seconds": 0.0012012160004815087
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.13313160400139168,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.12095604897331214,
+          "parent_process_seconds": 0.010861109985853545,
+          "parent_dispatch_seconds": 0.0012398760009091347
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.15750816400395706,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.14602721801202279,
+          "parent_process_seconds": 0.01093224298529094,
+          "parent_dispatch_seconds": 0.00035955799830844626
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.08231806899857474,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.07468123696162365,
+          "parent_process_seconds": 0.006750660984835122,
+          "parent_dispatch_seconds": 0.000756266999815125
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.1402246270008618,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.13275755599170225,
+          "parent_process_seconds": 0.006767625025531743,
+          "parent_dispatch_seconds": 0.000534228005562909
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.18840729200019268,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.17815949002397247,
+          "parent_process_seconds": 0.009401654009707272,
+          "parent_dispatch_seconds": 0.0006330780015559867
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.20369909500004724,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.19415436399867758,
+          "parent_process_seconds": 0.008667922011227347,
+          "parent_dispatch_seconds": 0.0005477279992192052
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.16705201899458189,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.16112081104074605,
+          "parent_process_seconds": 0.005241208978986833,
+          "parent_dispatch_seconds": 0.00048813800094649196
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.22897719200409483,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.22585230103868525,
+          "parent_process_seconds": 0.0023109349858714268,
+          "parent_dispatch_seconds": 0.0005248779998510145
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.1610136719973525,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.1577073539083358,
+          "parent_process_seconds": 0.002529106983274687,
+          "parent_dispatch_seconds": 0.00048487799358554184
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.17265477899491088,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.16987751702981768,
+          "parent_process_seconds": 0.0018486160406609997,
+          "parent_dispatch_seconds": 0.0005863479964318685
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.15444860600109678,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.15353883297211723,
+          "parent_process_seconds": 0.0001609419850865379,
+          "parent_dispatch_seconds": 0.0005231260001892224
+        }
+      ]
+    },
+    {
+      "wall_seconds": 2.638347725995118,
+      "worker_wait_seconds": 2.4635845579905435,
+      "parent_process_seconds": 0.1576264130490017,
+      "dispatch_seconds": 0.013906739994126838,
+      "site_weights_seconds": 0.00037153898301767185,
+      "other_seconds": 0.0028584759784280322,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.33023284299997613,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.3196741389692761,
+          "parent_process_seconds": 0.009729691992106382,
+          "parent_dispatch_seconds": 0.0006290969977271743
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.02579888600303093,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.018631222010299098,
+          "parent_process_seconds": 0.006638205974013545,
+          "parent_dispatch_seconds": 0.000453708998975344
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.023823782001272775,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.012699580016487744,
+          "parent_process_seconds": 0.010671931013348512,
+          "parent_dispatch_seconds": 0.00036829800228588283
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.02028957499715034,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.012882825998531189,
+          "parent_process_seconds": 0.006959733014809899,
+          "parent_dispatch_seconds": 0.00038818900065962225
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.02490111900260672,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.01720848098193528,
+          "parent_process_seconds": 0.007148961027269252,
+          "parent_dispatch_seconds": 0.0004322079985286109
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.020144426998740528,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.01258271205733763,
+          "parent_process_seconds": 0.00668839300487889,
+          "parent_dispatch_seconds": 0.0007709170022280887
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.02620575400214875,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.01632148899807362,
+          "parent_process_seconds": 0.008901669047190808,
+          "parent_dispatch_seconds": 0.0008675270000821911
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.036334737997094635,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.025379741047800053,
+          "parent_process_seconds": 0.010195335999014787,
+          "parent_dispatch_seconds": 0.0006626780013903044
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.04535087499971269,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.035880014052963816,
+          "parent_process_seconds": 0.00829704906209372,
+          "parent_dispatch_seconds": 0.001049755999702029
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.07772854500217363,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.07060965900018346,
+          "parent_process_seconds": 0.006522481016872916,
+          "parent_dispatch_seconds": 0.0004921490035485476
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.09645714799989946,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.08816583100269781,
+          "parent_process_seconds": 0.007564835985249374,
+          "parent_dispatch_seconds": 0.000609618000453338
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.08976980300212745,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.08185782500368077,
+          "parent_process_seconds": 0.007461102046363521,
+          "parent_dispatch_seconds": 0.00036591800017049536
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.13867619299708167,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.1269638219891931,
+          "parent_process_seconds": 0.011178823064255994,
+          "parent_dispatch_seconds": 0.0004441979981493205
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.15629258900298737,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.14744972896005493,
+          "parent_process_seconds": 0.007858264951210003,
+          "parent_dispatch_seconds": 0.0008892769983503968
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.10117415900458582,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.09064172997750575,
+          "parent_process_seconds": 0.010071189964946825,
+          "parent_dispatch_seconds": 0.00036118900607107207
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.13854485400224803,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.13162862400349695,
+          "parent_process_seconds": 0.00580813895794563,
+          "parent_dispatch_seconds": 0.0010111160008818842
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.19455125800595852,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.18722701897786465,
+          "parent_process_seconds": 0.006645564986683894,
+          "parent_dispatch_seconds": 0.0005698280001524836
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.20232104000024265,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.19380286707746563,
+          "parent_process_seconds": 0.007742383946606424,
+          "parent_dispatch_seconds": 0.0004927289992338046
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.1762575159955304,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.16870181996637257,
+          "parent_process_seconds": 0.006495808993349783,
+          "parent_dispatch_seconds": 0.0008114969969028607
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.227216369996313,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.22392830096941907,
+          "parent_process_seconds": 0.0024781470201560296,
+          "parent_dispatch_seconds": 0.000504267998621799
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.16088533100264613,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.15904008498910116,
+          "parent_process_seconds": 0.001164029999927152,
+          "parent_dispatch_seconds": 0.00046669799485243857
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.16819214499992086,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.16611440498672891,
+          "parent_process_seconds": 0.0013055730014457367,
+          "parent_dispatch_seconds": 0.0005773579978267662
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.15711845499754418,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.15619263695407426,
+          "parent_process_seconds": 9.909897926263511e-05,
+          "parent_dispatch_seconds": 0.000688517997332383
+        }
+      ]
+    },
+    {
+      "wall_seconds": 2.726014876003319,
+      "worker_wait_seconds": 2.579055932132178,
+      "parent_process_seconds": 0.13094392402854282,
+      "dispatch_seconds": 0.013057103009487037,
+      "site_weights_seconds": 0.0004329899820731953,
+      "other_seconds": 0.0025249268510378897,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.4998356819996843,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.4897164320354932,
+          "parent_process_seconds": 0.009618544012482744,
+          "parent_dispatch_seconds": 0.0004036190002807416
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.02223562899598619,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.014510418994177599,
+          "parent_process_seconds": 0.006144075006886851,
+          "parent_dispatch_seconds": 0.0015035239994176663
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.021440581003844272,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.01419262208219152,
+          "parent_process_seconds": 0.00664750599389663,
+          "parent_dispatch_seconds": 0.0005345380050130188
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.018111893004970625,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.01096553802199196,
+          "parent_process_seconds": 0.006748755120497663,
+          "parent_dispatch_seconds": 0.0003384279989404604
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.022598447001655586,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.015540111991867889,
+          "parent_process_seconds": 0.0062589490407845005,
+          "parent_dispatch_seconds": 0.0007189770039985888
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.021358022997446824,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.014884811986121349,
+          "parent_process_seconds": 0.00605929297307739,
+          "parent_dispatch_seconds": 0.0003457489947322756
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.02369610299501801,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.01743515897396719,
+          "parent_process_seconds": 0.005855875053384807,
+          "parent_dispatch_seconds": 0.00034731799678411335
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.03289738999592373,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.026108690035471227,
+          "parent_process_seconds": 0.006367343936290126,
+          "parent_dispatch_seconds": 0.0003541390033205971
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.04009100500115892,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.03301050199661404,
+          "parent_process_seconds": 0.006666477958788164,
+          "parent_dispatch_seconds": 0.00035403000219957903
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.06582819899631431,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.05910488393419655,
+          "parent_process_seconds": 0.006261379057832528,
+          "parent_dispatch_seconds": 0.00037163900560699403
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.09882849900168367,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.09056791005423293,
+          "parent_process_seconds": 0.007529991009505466,
+          "parent_dispatch_seconds": 0.0006541370021295734
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.08713217199692735,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.07927756502613192,
+          "parent_process_seconds": 0.0074163190147373825,
+          "parent_dispatch_seconds": 0.0003518289959174581
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.13040679400000954,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.12317433304269798,
+          "parent_process_seconds": 0.006575696992513258,
+          "parent_dispatch_seconds": 0.0005772180011263117
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.1559166200022446,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.1486981370326248,
+          "parent_process_seconds": 0.006731666981067974,
+          "parent_dispatch_seconds": 0.0004082279992871918
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.09838206100539537,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.09077408700250089,
+          "parent_process_seconds": 0.00684495205496205,
+          "parent_dispatch_seconds": 0.0006919580046087503
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.13383952199365012,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.1267838019921328,
+          "parent_process_seconds": 0.005994064988044556,
+          "parent_dispatch_seconds": 0.0009744260023580864
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.1915052209951682,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.1844967420474859,
+          "parent_process_seconds": 0.006307060000835918,
+          "parent_dispatch_seconds": 0.0006119579993537627
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.2188959889972466,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.21192908589728177,
+          "parent_process_seconds": 0.006089714959671255,
+          "parent_dispatch_seconds": 0.0007087679987307638
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.1636326120060403,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.15685427699645516,
+          "parent_process_seconds": 0.005950644976110198,
+          "parent_dispatch_seconds": 0.0005937489986536093
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.21388884800398955,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.21081514501565835,
+          "parent_process_seconds": 0.0020279789459891617,
+          "parent_dispatch_seconds": 0.0007455880040652119
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.15336947899777442,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.15081129001191584,
+          "parent_process_seconds": 0.001811253940104507,
+          "parent_dispatch_seconds": 0.0004423580030561425
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.1315494789960212,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.12997523000376532,
+          "parent_process_seconds": 0.0007940130162751302,
+          "parent_dispatch_seconds": 0.0005498979953699745
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.18048945000191452,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.17942915795720182,
+          "parent_process_seconds": 0.00024236899480456486,
+          "parent_dispatch_seconds": 0.00047502699453616515
+        }
+      ]
+    },
+    {
+      "wall_seconds": 2.610694038005022,
+      "worker_wait_seconds": 2.4434178890587646,
+      "parent_process_seconds": 0.15024017868563533,
+      "dispatch_seconds": 0.013854646997060627,
+      "site_weights_seconds": 0.0004371299801277928,
+      "other_seconds": 0.0027441932834335603,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 0.49542834000021685,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543,
+          "parent_wait_seconds": 0.48107794197130715,
+          "parent_process_seconds": 0.01329162300680764,
+          "parent_dispatch_seconds": 0.0008438069999101572
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.022339238996210042,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543,
+          "parent_wait_seconds": 0.013681646079930943,
+          "parent_process_seconds": 0.00810483696841402,
+          "parent_dispatch_seconds": 0.0004836879961658269
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.021112492999236565,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.012875305998022668,
+          "parent_process_seconds": 0.0077602929741260596,
+          "parent_dispatch_seconds": 0.0004083989988430403
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.02098217300226679,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543,
+          "parent_wait_seconds": 0.008591844030888751,
+          "parent_process_seconds": 0.011787999959778972,
+          "parent_dispatch_seconds": 0.0004996669958927669
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.024511150004400406,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543,
+          "parent_wait_seconds": 0.014621288006310351,
+          "parent_process_seconds": 0.008743663973291405,
+          "parent_dispatch_seconds": 0.0009953560002031736
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.02353996400051983,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543,
+          "parent_wait_seconds": 0.014411557982384693,
+          "parent_process_seconds": 0.008472117959172465,
+          "parent_dispatch_seconds": 0.0005845679988851771
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.02566431600280339,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543,
+          "parent_wait_seconds": 0.016884802011190914,
+          "parent_process_seconds": 0.008157070980814751,
+          "parent_dispatch_seconds": 0.0005373979947762564
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.03799875100230565,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543,
+          "parent_wait_seconds": 0.02806710702861892,
+          "parent_process_seconds": 0.008721324018551968,
+          "parent_dispatch_seconds": 0.0010856860026251525
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.044529876999149565,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501,
+          "parent_wait_seconds": 0.03524997601925861,
+          "parent_process_seconds": 0.008274176943814382,
+          "parent_dispatch_seconds": 0.0009032460002345033
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.08048083599715028,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543,
+          "parent_wait_seconds": 0.07178498495341046,
+          "parent_process_seconds": 0.007970497994392645,
+          "parent_dispatch_seconds": 0.0005272190028335899
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.08777692900184775,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543,
+          "parent_wait_seconds": 0.08019358898309292,
+          "parent_process_seconds": 0.0066968289102078415,
+          "parent_dispatch_seconds": 0.0007484669986297376
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.07286326300527435,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501,
+          "parent_wait_seconds": 0.06672356996568851,
+          "parent_process_seconds": 0.005191604956053197,
+          "parent_dispatch_seconds": 0.0008740460034459829
+        },
+        {
+          "round": 12,
+          "wall_seconds": 0.11127115399722243,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543,
+          "parent_wait_seconds": 0.10508972098614322,
+          "parent_process_seconds": 0.005727131967432797,
+          "parent_dispatch_seconds": 0.00038215899985516444
+        },
+        {
+          "round": 13,
+          "wall_seconds": 0.14994238200597465,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495,
+          "parent_wait_seconds": 0.14193680098105688,
+          "parent_process_seconds": 0.007152137994125951,
+          "parent_dispatch_seconds": 0.0007630069958395325
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.09398831699945731,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522,
+          "parent_wait_seconds": 0.0865053990346496,
+          "parent_process_seconds": 0.006917969985806849,
+          "parent_dispatch_seconds": 0.0004897679973510094
+        },
+        {
+          "round": 15,
+          "wall_seconds": 0.127309684001375,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339,
+          "parent_wait_seconds": 0.12257030899490928,
+          "parent_process_seconds": 0.004302526001993101,
+          "parent_dispatch_seconds": 0.0003643990057753399
+        },
+        {
+          "round": 16,
+          "wall_seconds": 0.18130444799317047,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393,
+          "parent_wait_seconds": 0.17555120697215898,
+          "parent_process_seconds": 0.005303324083797634,
+          "parent_dispatch_seconds": 0.0003635589964687824
+        },
+        {
+          "round": 17,
+          "wall_seconds": 0.20102187400334515,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324,
+          "parent_wait_seconds": 0.1907256500198855,
+          "parent_process_seconds": 0.009728991004521959,
+          "parent_dispatch_seconds": 0.00030087900086073205
+        },
+        {
+          "round": 18,
+          "wall_seconds": 0.1567960469983518,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297,
+          "parent_wait_seconds": 0.1519813290287857,
+          "parent_process_seconds": 0.004021383982035331,
+          "parent_dispatch_seconds": 0.0006669569993391633
+        },
+        {
+          "round": 19,
+          "wall_seconds": 0.15819670099881478,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69,
+          "parent_wait_seconds": 0.1569299479815527,
+          "parent_process_seconds": 0.0008362511216546409,
+          "parent_dispatch_seconds": 0.00033396800426999107
+        },
+        {
+          "round": 20,
+          "wall_seconds": 0.13552677600091556,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54,
+          "parent_wait_seconds": 0.13352767199103255,
+          "parent_process_seconds": 0.0014029389567440376,
+          "parent_dispatch_seconds": 0.0004621980042429641
+        },
+        {
+          "round": 21,
+          "wall_seconds": 0.1618615379993571,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33,
+          "parent_wait_seconds": 0.15970828699937556,
+          "parent_process_seconds": 0.0014135469973552972,
+          "parent_dispatch_seconds": 0.0004223790019750595
+        },
+        {
+          "round": 22,
+          "wall_seconds": 0.17615659599687206,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0,
+          "parent_wait_seconds": 0.1747279530391097,
+          "parent_process_seconds": 0.0002619379447423853,
+          "parent_dispatch_seconds": 0.0008138269986375235
+        }
+      ]
+    }
+  ]
+}

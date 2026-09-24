@@ -1,0 +1,6 @@
+{
+  "utc": "2026-09-24T00:12:39Z",
+  "command": "bench_proc.py --workers 16 --samples 3 --target 35 --tag=-hostPinned",
+  "status": "interrupted before any completed timed sample",
+  "reason": "The operator clarified that host agent was only prepared; actual vCPU pinning was not active. No result from this attempted run was used."
+}

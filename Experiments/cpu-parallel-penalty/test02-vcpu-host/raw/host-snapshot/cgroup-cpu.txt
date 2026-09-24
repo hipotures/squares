@@ -1,0 +1,45 @@
+
+CGROUP=/qemu.slice/207.scope
+cpu.max:
+max 100000
+cpu.stat:
+usage_usec 72011868945
+user_usec 71513909055
+system_usec 497959889
+nice_usec 0
+core_sched.force_idle_usec 0
+nr_periods 0
+nr_throttled 0
+throttled_usec 0
+nr_bursts 0
+burst_usec 0
+
+CGROUP=/qemu.slice
+cpu.max:
+max 100000
+cpu.stat:
+usage_usec 72011870984
+user_usec 71513911094
+system_usec 497959890
+nice_usec 0
+core_sched.force_idle_usec 0
+nr_periods 0
+nr_throttled 0
+throttled_usec 0
+nr_bursts 0
+burst_usec 0
+
+CGROUP=/
+cpu.max:
+unavailable
+cpu.stat:
+usage_usec 74200761000
+user_usec 71467406000
+system_usec 2733355000
+nice_usec 115000
+core_sched.force_idle_usec 0
+nr_periods 0
+nr_throttled 0
+throttled_usec 0
+nr_bursts 0
+burst_usec 0

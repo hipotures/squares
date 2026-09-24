@@ -1,0 +1,64 @@
+TID=2459 COMM=CPU 0/KVM
+pid 2459's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2460 COMM=CPU 1/KVM
+pid 2460's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2461 COMM=CPU 2/KVM
+pid 2461's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2462 COMM=CPU 3/KVM
+pid 2462's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2463 COMM=CPU 4/KVM
+pid 2463's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2464 COMM=CPU 5/KVM
+pid 2464's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2465 COMM=CPU 6/KVM
+pid 2465's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2466 COMM=CPU 7/KVM
+pid 2466's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2467 COMM=CPU 8/KVM
+pid 2467's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2468 COMM=CPU 9/KVM
+pid 2468's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2469 COMM=CPU 10/KVM
+pid 2469's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2470 COMM=CPU 11/KVM
+pid 2470's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2471 COMM=CPU 12/KVM
+pid 2471's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2472 COMM=CPU 13/KVM
+pid 2472's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2473 COMM=CPU 14/KVM
+pid 2473's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31
+TID=2474 COMM=CPU 15/KVM
+pid 2474's current affinity list: 0-31
+    TID PSR COMMAND
+Cpus_allowed_list:	0-31

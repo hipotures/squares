@@ -1,0 +1,4 @@
+2311,,ls_dmnd_fills_from_sys.dram_io_near,444618,100.00,,
+674,,ls_hw_pf_dc_fills.dram_io_near,444618,100.00,,
+82887,,cache-references,444618,100.00,,
+19174,,cache-misses,444618,100.00,,

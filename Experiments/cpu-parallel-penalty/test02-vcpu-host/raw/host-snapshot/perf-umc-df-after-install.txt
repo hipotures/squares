@@ -1,0 +1,10 @@
+data_fabric:
+  umc_activate_cmd_rate
+  umc_cas_cmd_rate
+  umc_cas_cmd_read_ratio
+  umc_cas_cmd_write_ratio
+  umc_data_bus_utilization
+  umc_mem_bandwidth
+  umc_mem_read_bandwidth
+  umc_mem_write_bandwidth
+  umc_precharge_cmd_rate

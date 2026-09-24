@@ -1,0 +1,164 @@
+{
+  "workers": 16,
+  "sample": 2,
+  "repeats": 14,
+  "batch_wall": 20.71557764099998,
+  "wall_per_replay": 1.4796841172142845,
+  "cpu_per_replay": 19.624285714285715,
+  "load_before": {
+    "loadavg": [
+      8.2880859375,
+      5.06689453125,
+      3.55908203125
+    ],
+    "cpu_pressure": "some avg10=1.34 avg60=0.83 avg300=0.41 total=234117319\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "canonical_sha256": "db4b0ae1dc2f35de70c3094d90eff092c1a8bcf9fcbfe65f78606d2d1a57327c",
+  "perf": false,
+  "workers_data": [
+    {
+      "worker": 0,
+      "cpu": 0,
+      "directions": 12,
+      "warm_seconds": 1.0037129980046302,
+      "wall_seconds": 13.418779389001429,
+      "cpu_seconds": 13.29,
+      "placement_count": 828
+    },
+    {
+      "worker": 1,
+      "cpu": 1,
+      "directions": 12,
+      "warm_seconds": 1.2148386520057102,
+      "wall_seconds": 16.532654668997566,
+      "cpu_seconds": 16.5,
+      "placement_count": 828
+    },
+    {
+      "worker": 2,
+      "cpu": 2,
+      "directions": 12,
+      "warm_seconds": 1.1034356559976004,
+      "wall_seconds": 15.219249524998304,
+      "cpu_seconds": 15.14,
+      "placement_count": 828
+    },
+    {
+      "worker": 3,
+      "cpu": 3,
+      "directions": 12,
+      "warm_seconds": 1.0526175900013186,
+      "wall_seconds": 15.393471183000656,
+      "cpu_seconds": 15.29,
+      "placement_count": 828
+    },
+    {
+      "worker": 4,
+      "cpu": 4,
+      "directions": 12,
+      "warm_seconds": 1.6166311339984532,
+      "wall_seconds": 20.452386666001985,
+      "cpu_seconds": 20.43,
+      "placement_count": 828
+    },
+    {
+      "worker": 5,
+      "cpu": 5,
+      "directions": 11,
+      "warm_seconds": 1.5812851829978172,
+      "wall_seconds": 20.71427092600061,
+      "cpu_seconds": 20.67,
+      "placement_count": 759
+    },
+    {
+      "worker": 6,
+      "cpu": 6,
+      "directions": 11,
+      "warm_seconds": 1.0120764789971872,
+      "wall_seconds": 12.926474984997185,
+      "cpu_seconds": 12.86,
+      "placement_count": 759
+    },
+    {
+      "worker": 7,
+      "cpu": 7,
+      "directions": 11,
+      "warm_seconds": 0.9677235089984606,
+      "wall_seconds": 13.45777214699774,
+      "cpu_seconds": 13.43,
+      "placement_count": 759
+    },
+    {
+      "worker": 8,
+      "cpu": 8,
+      "directions": 11,
+      "warm_seconds": 1.5328995070012752,
+      "wall_seconds": 16.423362424997322,
+      "cpu_seconds": 16.369999999999997,
+      "placement_count": 759
+    },
+    {
+      "worker": 9,
+      "cpu": 9,
+      "directions": 11,
+      "warm_seconds": 1.5142997349976213,
+      "wall_seconds": 19.50833793199854,
+      "cpu_seconds": 19.439999999999998,
+      "placement_count": 759
+    },
+    {
+      "worker": 10,
+      "cpu": 10,
+      "directions": 11,
+      "warm_seconds": 1.5027053280064138,
+      "wall_seconds": 19.423905928997556,
+      "cpu_seconds": 19.37,
+      "placement_count": 759
+    },
+    {
+      "worker": 11,
+      "cpu": 11,
+      "directions": 11,
+      "warm_seconds": 1.5098701320021064,
+      "wall_seconds": 20.62020667699835,
+      "cpu_seconds": 20.54,
+      "placement_count": 759
+    },
+    {
+      "worker": 12,
+      "cpu": 12,
+      "directions": 11,
+      "warm_seconds": 1.0269882930006133,
+      "wall_seconds": 16.1006240170027,
+      "cpu_seconds": 16.009999999999998,
+      "placement_count": 759
+    },
+    {
+      "worker": 13,
+      "cpu": 13,
+      "directions": 11,
+      "warm_seconds": 1.1255529469999601,
+      "wall_seconds": 14.287987513998814,
+      "cpu_seconds": 14.25,
+      "placement_count": 759
+    },
+    {
+      "worker": 14,
+      "cpu": 14,
+      "directions": 11,
+      "warm_seconds": 1.4844153029989684,
+      "wall_seconds": 20.62979051300499,
+      "cpu_seconds": 20.580000000000002,
+      "placement_count": 759
+    },
+    {
+      "worker": 15,
+      "cpu": 15,
+      "directions": 11,
+      "warm_seconds": 1.4623205340030836,
+      "wall_seconds": 20.603861165996932,
+      "cpu_seconds": 20.57,
+      "placement_count": 759
+    }
+  ]
+}

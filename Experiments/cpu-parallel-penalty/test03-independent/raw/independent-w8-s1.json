@@ -1,0 +1,92 @@
+{
+  "workers": 8,
+  "sample": 1,
+  "repeats": 9,
+  "batch_wall": 23.597887411000556,
+  "wall_per_replay": 2.621987490111173,
+  "cpu_per_replay": 20.41111111111111,
+  "load_before": {
+    "loadavg": [
+      3.89306640625,
+      3.53515625,
+      2.9560546875
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.30 total=233241327\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "canonical_sha256": "db4b0ae1dc2f35de70c3094d90eff092c1a8bcf9fcbfe65f78606d2d1a57327c",
+  "perf": false,
+  "workers_data": [
+    {
+      "worker": 0,
+      "cpu": 0,
+      "directions": 23,
+      "warm_seconds": 2.3939842429972487,
+      "wall_seconds": 22.123549910000293,
+      "cpu_seconds": 22.060000000000002,
+      "placement_count": 1587
+    },
+    {
+      "worker": 1,
+      "cpu": 1,
+      "directions": 23,
+      "warm_seconds": 2.4306828400003724,
+      "wall_seconds": 22.962246317998506,
+      "cpu_seconds": 22.96,
+      "placement_count": 1587
+    },
+    {
+      "worker": 2,
+      "cpu": 2,
+      "directions": 23,
+      "warm_seconds": 2.6780418019989156,
+      "wall_seconds": 23.597337232997234,
+      "cpu_seconds": 23.6,
+      "placement_count": 1587
+    },
+    {
+      "worker": 3,
+      "cpu": 3,
+      "directions": 23,
+      "warm_seconds": 2.6270812959992327,
+      "wall_seconds": 23.221131988997513,
+      "cpu_seconds": 23.22,
+      "placement_count": 1587
+    },
+    {
+      "worker": 4,
+      "cpu": 4,
+      "directions": 23,
+      "warm_seconds": 2.6569764189989655,
+      "wall_seconds": 23.36493492700538,
+      "cpu_seconds": 23.36,
+      "placement_count": 1587
+    },
+    {
+      "worker": 5,
+      "cpu": 5,
+      "directions": 22,
+      "warm_seconds": 2.5561271050028154,
+      "wall_seconds": 23.035161993000656,
+      "cpu_seconds": 23.04,
+      "placement_count": 1518
+    },
+    {
+      "worker": 6,
+      "cpu": 6,
+      "directions": 22,
+      "warm_seconds": 2.543504118999408,
+      "wall_seconds": 22.878356781999173,
+      "cpu_seconds": 22.880000000000003,
+      "placement_count": 1518
+    },
+    {
+      "worker": 7,
+      "cpu": 7,
+      "directions": 22,
+      "warm_seconds": 2.5782438840033137,
+      "wall_seconds": 22.61983401999896,
+      "cpu_seconds": 22.58,
+      "placement_count": 1518
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+perf_path=perf_version=/root/cpu-parallel-penalty-host/phase-a/commands.sh: line 71: perf: command not found
+/proc/sys/kernel/perf_event_paranoid=4
+/proc/sys/kernel/nmi_watchdog=1
+/proc/sys/kernel/kptr_restrict=0
+
+PMU device names:
+amd_iommu_0
+breakpoint
+cpu
+ibs_fetch
+ibs_op
+kprobe
+msr
+power
+power_core
+software
+tracepoint
+uprobe
+
+UMC/DF PMU details:

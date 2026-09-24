@@ -1,0 +1,37 @@
+{
+  "starting_sha": "897b722f2997fbf09b99b1700787a0052270de30",
+  "production_commit": "011aa1b5f39457de1e2d9f5589b3df3f04e36575",
+  "current_sha_at_phase_a": "897b722f2997fbf09b99b1700787a0052270de30",
+  "python": "3.14.7",
+  "numpy": "2.5.2",
+  "scipy": "1.17.1",
+  "highspy": "1.15.1",
+  "kernel": "7.0.0-31-generic",
+  "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "guest_visible_cpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "thread_controls": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "guest_perf_event_paranoid_after_operator_change": "-1",
+  "host_snapshot": "test02-vcpu-host/raw/host-snapshot",
+  "host_pinning": "test02-vcpu-host/raw/host-pinning"
+}
