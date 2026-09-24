@@ -1,0 +1,42 @@
+{
+  "target_seconds": 25.0,
+  "samples": 3,
+  "repeats": {
+    "1": 131,
+    "2": 209,
+    "4": 232,
+    "8": 179,
+    "16": 265
+  },
+  "expected_checksums": {
+    "1": "1945dec119158f0f",
+    "2": "6030510151bba741",
+    "4": "a16b5bf2520685d3",
+    "8": "77848d00d496be59",
+    "16": "3c8c26d1ec934b43"
+  },
+  "calibration": {
+    "1": {
+      "wall_per_replay": 0.19174322425,
+      "estimated_sample_wall": 25.118362376750003
+    },
+    "2": {
+      "wall_per_replay": 0.119642748,
+      "estimated_sample_wall": 25.005334332
+    },
+    "4": {
+      "wall_per_replay": 0.108218886,
+      "estimated_sample_wall": 25.106781552
+    },
+    "8": {
+      "wall_per_replay": 0.1398870885,
+      "estimated_sample_wall": 25.039788841500002
+    },
+    "16": {
+      "wall_per_replay": 0.09459934675,
+      "estimated_sample_wall": 25.06882688875
+    }
+  },
+  "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+  "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7"
+}

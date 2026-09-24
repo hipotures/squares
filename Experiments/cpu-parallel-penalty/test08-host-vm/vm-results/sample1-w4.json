@@ -1,0 +1,84 @@
+{
+  "label": "sample1",
+  "workers": 4,
+  "repeats": 232,
+  "load_before": {
+    "utc": "2026-09-24T02:56:23Z",
+    "loadavg": [
+      1.90771484375,
+      1.92138671875,
+      3.14599609375
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.09 total=346104423\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 4,
+    "repeats": 232,
+    "directions": 181,
+    "wall": 24.44701403,
+    "max_worker_wall": 24.446804661,
+    "worker_cpu": 96.85438858,
+    "calls": 41992,
+    "checksum": "a16b5bf2520685d3",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 246416,
+        "wall": 24.446804661,
+        "cpu_time": 24.439564639,
+        "calls": 10672,
+        "checksum": "a8c40d56dc5a39b5"
+      },
+      {
+        "cpu": 1,
+        "pid": 246417,
+        "wall": 24.366404916,
+        "cpu_time": 24.36603529,
+        "calls": 10440,
+        "checksum": "f354714b0b1da9a5"
+      },
+      {
+        "cpu": 2,
+        "pid": 246418,
+        "wall": 24.041485539,
+        "cpu_time": 24.041170887,
+        "calls": 10440,
+        "checksum": "bb17d4c248150c35"
+      },
+      {
+        "cpu": 3,
+        "pid": 246419,
+        "wall": 24.007950358,
+        "cpu_time": 24.007617764,
+        "calls": 10440,
+        "checksum": "be5ba3fcb0111405"
+      }
+    ]
+  },
+  "external_wall": 24.44854420399497,
+  "command": [
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay",
+    "--data",
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/data.bin",
+    "--workers",
+    "4",
+    "--repeats",
+    "232"
+  ],
+  "perf_events_requested": "instructions,cycles,ls_any_fills_from_sys.all_dram_io",
+  "perf_counters": {
+    "instructions": {
+      "count": 616348981362.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 520940629618.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 3642239720.0,
+      "running_percent": 100.0
+    }
+  },
+  "perf_stderr": ""
+}

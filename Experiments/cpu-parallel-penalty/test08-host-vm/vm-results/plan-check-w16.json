@@ -1,0 +1,167 @@
+{
+  "label": "plan-check",
+  "workers": 16,
+  "repeats": 265,
+  "load_before": {
+    "utc": "2026-09-24T02:52:25Z",
+    "loadavg": [
+      4.02099609375,
+      1.90625,
+      3.47802734375
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.11 total=345578564\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 16,
+    "repeats": 265,
+    "directions": 181,
+    "wall": 24.256655524,
+    "max_worker_wall": 24.256522726,
+    "worker_cpu": 259.696302231,
+    "calls": 47965,
+    "checksum": "3c8c26d1ec934b43",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 245825,
+        "wall": 8.993512206,
+        "cpu_time": 8.902015097,
+        "calls": 3180,
+        "checksum": "81cc0dd8fc824f10"
+      },
+      {
+        "cpu": 1,
+        "pid": 245826,
+        "wall": 24.256522726,
+        "cpu_time": 24.241844899,
+        "calls": 3180,
+        "checksum": "d37050645ea8dff4"
+      },
+      {
+        "cpu": 2,
+        "pid": 245827,
+        "wall": 9.194468043,
+        "cpu_time": 9.193311337,
+        "calls": 3180,
+        "checksum": "fca0777022a108d7"
+      },
+      {
+        "cpu": 3,
+        "pid": 245828,
+        "wall": 23.662057497,
+        "cpu_time": 23.647841183,
+        "calls": 3180,
+        "checksum": "887b2059452ae532"
+      },
+      {
+        "cpu": 4,
+        "pid": 245829,
+        "wall": 24.127143316,
+        "cpu_time": 24.126053464,
+        "calls": 3180,
+        "checksum": "47e435297bf83145"
+      },
+      {
+        "cpu": 5,
+        "pid": 245830,
+        "wall": 23.67518809,
+        "cpu_time": 23.596622299,
+        "calls": 2915,
+        "checksum": "22224fe97d0a8fd1"
+      },
+      {
+        "cpu": 6,
+        "pid": 245831,
+        "wall": 23.210207101,
+        "cpu_time": 23.204082935,
+        "calls": 2915,
+        "checksum": "da7d6312107d4ba7"
+      },
+      {
+        "cpu": 7,
+        "pid": 245832,
+        "wall": 23.53440532,
+        "cpu_time": 23.521821503,
+        "calls": 2915,
+        "checksum": "ff6fe1b5cca8f625"
+      },
+      {
+        "cpu": 8,
+        "pid": 245833,
+        "wall": 22.633840366,
+        "cpu_time": 22.595264505,
+        "calls": 2915,
+        "checksum": "46344ac9fa08cacf"
+      },
+      {
+        "cpu": 9,
+        "pid": 245834,
+        "wall": 8.829127189,
+        "cpu_time": 8.810412042,
+        "calls": 2915,
+        "checksum": "dc0443555e662cc8"
+      },
+      {
+        "cpu": 10,
+        "pid": 245835,
+        "wall": 8.955105742,
+        "cpu_time": 8.885204225,
+        "calls": 2915,
+        "checksum": "b019bc9b9cbd8e01"
+      },
+      {
+        "cpu": 11,
+        "pid": 245836,
+        "wall": 8.900480026,
+        "cpu_time": 8.863100784,
+        "calls": 2915,
+        "checksum": "634f05282de2641d"
+      },
+      {
+        "cpu": 12,
+        "pid": 245837,
+        "wall": 23.915419247,
+        "cpu_time": 23.746892635,
+        "calls": 2915,
+        "checksum": "d387a53259d24ad4"
+      },
+      {
+        "cpu": 13,
+        "pid": 245838,
+        "wall": 8.848284441,
+        "cpu_time": 8.822317823,
+        "calls": 2915,
+        "checksum": "fa3159a5b9105b73"
+      },
+      {
+        "cpu": 14,
+        "pid": 245839,
+        "wall": 8.821692466,
+        "cpu_time": 8.800654777,
+        "calls": 2915,
+        "checksum": "a03ab2cf52d08fb6"
+      },
+      {
+        "cpu": 15,
+        "pid": 245840,
+        "wall": 8.761019631,
+        "cpu_time": 8.738862723,
+        "calls": 2915,
+        "checksum": "a29e3a80dd0b851d"
+      }
+    ]
+  },
+  "external_wall": 24.257993522005563,
+  "command": [
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay",
+    "--data",
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/data.bin",
+    "--workers",
+    "16",
+    "--repeats",
+    "265"
+  ],
+  "perf_events_requested": null,
+  "perf_counters": null,
+  "perf_stderr": null
+}

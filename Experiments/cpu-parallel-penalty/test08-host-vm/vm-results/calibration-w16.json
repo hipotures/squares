@@ -1,0 +1,167 @@
+{
+  "label": "calibration",
+  "workers": 16,
+  "repeats": 4,
+  "load_before": {
+    "utc": "2026-09-24T02:52:24Z",
+    "loadavg": [
+      4.02099609375,
+      1.90625,
+      3.47802734375
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.11 total=345567065\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 16,
+    "repeats": 4,
+    "directions": 181,
+    "wall": 0.378397387,
+    "max_worker_wall": 0.378288478,
+    "worker_cpu": 4.07551701,
+    "calls": 724,
+    "checksum": "9a3284e03b273c38",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 245805,
+        "wall": 0.142548594,
+        "cpu_time": 0.142546071,
+        "calls": 48,
+        "checksum": "d3c4475017147e8d"
+      },
+      {
+        "cpu": 1,
+        "pid": 245806,
+        "wall": 0.378288478,
+        "cpu_time": 0.378285789,
+        "calls": 48,
+        "checksum": "94cb825d0f0315f5"
+      },
+      {
+        "cpu": 2,
+        "pid": 245807,
+        "wall": 0.146236602,
+        "cpu_time": 0.146234047,
+        "calls": 48,
+        "checksum": "3ac870d16af2cb05"
+      },
+      {
+        "cpu": 3,
+        "pid": 245808,
+        "wall": 0.376248205,
+        "cpu_time": 0.376202337,
+        "calls": 48,
+        "checksum": "94e4e84133a0a2d5"
+      },
+      {
+        "cpu": 4,
+        "pid": 245809,
+        "wall": 0.377136283,
+        "cpu_time": 0.377134064,
+        "calls": 48,
+        "checksum": "0c924117f09a1725"
+      },
+      {
+        "cpu": 5,
+        "pid": 245810,
+        "wall": 0.371401001,
+        "cpu_time": 0.371397423,
+        "calls": 44,
+        "checksum": "33e606ae94f852c5"
+      },
+      {
+        "cpu": 6,
+        "pid": 245811,
+        "wall": 0.37176622,
+        "cpu_time": 0.371695633,
+        "calls": 44,
+        "checksum": "aa7f1dd32200afd5"
+      },
+      {
+        "cpu": 7,
+        "pid": 245812,
+        "wall": 0.370958112,
+        "cpu_time": 0.370954435,
+        "calls": 44,
+        "checksum": "fdf617daf29acf25"
+      },
+      {
+        "cpu": 8,
+        "pid": 245813,
+        "wall": 0.35524254,
+        "cpu_time": 0.354827473,
+        "calls": 44,
+        "checksum": "6a2a1ab79a4c9ef5"
+      },
+      {
+        "cpu": 9,
+        "pid": 245814,
+        "wall": 0.137128653,
+        "cpu_time": 0.136006325,
+        "calls": 44,
+        "checksum": "29e7eb815cd7f6fd"
+      },
+      {
+        "cpu": 10,
+        "pid": 245815,
+        "wall": 0.14401648,
+        "cpu_time": 0.14342128,
+        "calls": 44,
+        "checksum": "8fa88298411cb445"
+      },
+      {
+        "cpu": 11,
+        "pid": 245816,
+        "wall": 0.131923552,
+        "cpu_time": 0.128558892,
+        "calls": 44,
+        "checksum": "d08d429c9d057ae5"
+      },
+      {
+        "cpu": 12,
+        "pid": 245817,
+        "wall": 0.370229435,
+        "cpu_time": 0.368033866,
+        "calls": 44,
+        "checksum": "bd8884db816ec89d"
+      },
+      {
+        "cpu": 13,
+        "pid": 245818,
+        "wall": 0.139734533,
+        "cpu_time": 0.139639021,
+        "calls": 44,
+        "checksum": "9de31bb148268d0d"
+      },
+      {
+        "cpu": 14,
+        "pid": 245819,
+        "wall": 0.135554299,
+        "cpu_time": 0.135538296,
+        "calls": 44,
+        "checksum": "8ad3e0944d41a985"
+      },
+      {
+        "cpu": 15,
+        "pid": 245820,
+        "wall": 0.135045451,
+        "cpu_time": 0.135042058,
+        "calls": 44,
+        "checksum": "184b99ecaeb90a65"
+      }
+    ]
+  },
+  "external_wall": 0.37955130400223425,
+  "command": [
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay",
+    "--data",
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/data.bin",
+    "--workers",
+    "16",
+    "--repeats",
+    "4"
+  ],
+  "perf_events_requested": null,
+  "perf_counters": null,
+  "perf_stderr": null
+}

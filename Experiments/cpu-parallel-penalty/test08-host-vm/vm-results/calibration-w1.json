@@ -1,0 +1,47 @@
+{
+  "label": "calibration",
+  "workers": 1,
+  "repeats": 4,
+  "load_before": {
+    "utc": "2026-09-24T02:50:35Z",
+    "loadavg": [
+      0.1640625,
+      0.9921875,
+      3.43701171875
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.17 total=345549398\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 1,
+    "repeats": 4,
+    "directions": 181,
+    "wall": 0.766972897,
+    "max_worker_wall": 0.766892627,
+    "worker_cpu": 0.766852292,
+    "calls": 724,
+    "checksum": "e6c6c99189f6509f",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 245523,
+        "wall": 0.766892627,
+        "cpu_time": 0.766852292,
+        "calls": 724,
+        "checksum": "60f5061cc4dc9435"
+      }
+    ]
+  },
+  "external_wall": 0.7682566820003558,
+  "command": [
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay",
+    "--data",
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/data.bin",
+    "--workers",
+    "1",
+    "--repeats",
+    "4"
+  ],
+  "perf_events_requested": null,
+  "perf_counters": null,
+  "perf_stderr": null
+}

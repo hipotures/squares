@@ -1,0 +1,71 @@
+{
+  "label": "calibration",
+  "workers": 4,
+  "repeats": 4,
+  "load_before": {
+    "utc": "2026-09-24T02:51:31Z",
+    "loadavg": [
+      1.09130859375,
+      1.10498046875,
+      3.33154296875
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.13 total=345557732\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 4,
+    "repeats": 4,
+    "directions": 181,
+    "wall": 0.432875544,
+    "max_worker_wall": 0.432795445,
+    "worker_cpu": 1.676894053,
+    "calls": 724,
+    "checksum": "45a6c82592d8402c",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 245660,
+        "wall": 0.411089461,
+        "cpu_time": 0.410993322,
+        "calls": 184,
+        "checksum": "24ec5f6ffdcdbd4d"
+      },
+      {
+        "cpu": 1,
+        "pid": 245661,
+        "wall": 0.432795445,
+        "cpu_time": 0.432786226,
+        "calls": 180,
+        "checksum": "b3bc874df1389165"
+      },
+      {
+        "cpu": 2,
+        "pid": 245662,
+        "wall": 0.410279223,
+        "cpu_time": 0.410268284,
+        "calls": 180,
+        "checksum": "ba3b8afee05ed2ad"
+      },
+      {
+        "cpu": 3,
+        "pid": 245663,
+        "wall": 0.42288012,
+        "cpu_time": 0.422846221,
+        "calls": 180,
+        "checksum": "414292e62993dd35"
+      }
+    ]
+  },
+  "external_wall": 0.434123428996827,
+  "command": [
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay",
+    "--data",
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/data.bin",
+    "--workers",
+    "4",
+    "--repeats",
+    "4"
+  ],
+  "perf_events_requested": null,
+  "perf_counters": null,
+  "perf_stderr": null
+}

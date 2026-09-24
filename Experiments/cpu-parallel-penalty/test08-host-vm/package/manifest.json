@@ -1,0 +1,1820 @@
+{
+  "round": 18,
+  "directions": 181,
+  "cases": [
+    {
+      "direction": 0,
+      "rows": 144,
+      "columns": 144,
+      "live_sites": 489,
+      "reachable_values": 16129,
+      "difference_fnv64": "f61b940a025ba48d",
+      "mass_fnv64": "085b5bb16b6963e6",
+      "selection_fnv64": "59eeda4cde891522"
+    },
+    {
+      "direction": 1,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 697945,
+      "difference_fnv64": "afad2c2f4751d7ed",
+      "mass_fnv64": "b930e671445146a9",
+      "selection_fnv64": "2168afa52541b919"
+    },
+    {
+      "direction": 2,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 710517,
+      "difference_fnv64": "34097c628f7831cd",
+      "mass_fnv64": "6320704d25de7723",
+      "selection_fnv64": "fed4a3bc6381812a"
+    },
+    {
+      "direction": 3,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 715441,
+      "difference_fnv64": "34bb58b218fc458d",
+      "mass_fnv64": "ef7d075ead87c936",
+      "selection_fnv64": "e23c09de04cf7f1b"
+    },
+    {
+      "direction": 4,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 719517,
+      "difference_fnv64": "ae87a43320d0404d",
+      "mass_fnv64": "2aa99e1ff69a0ce0",
+      "selection_fnv64": "7f5c6ac5b9bceab5"
+    },
+    {
+      "direction": 5,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 722169,
+      "difference_fnv64": "f9bde1122b0c2c0d",
+      "mass_fnv64": "57d8369db7480d98",
+      "selection_fnv64": "611fc1e442a73abe"
+    },
+    {
+      "direction": 6,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 724653,
+      "difference_fnv64": "c9feb486006b8fad",
+      "mass_fnv64": "8be04d4ca9c9651b",
+      "selection_fnv64": "535752502803fc9f"
+    },
+    {
+      "direction": 7,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 726477,
+      "difference_fnv64": "5c42dcbc025ba4cd",
+      "mass_fnv64": "97d3c63a965deb86",
+      "selection_fnv64": "af2d02c76ab870e1"
+    },
+    {
+      "direction": 8,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 727753,
+      "difference_fnv64": "99c06a441004ea2d",
+      "mass_fnv64": "4e59d3c3d1ee2790",
+      "selection_fnv64": "2274139d49cbff9d"
+    },
+    {
+      "direction": 9,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 729089,
+      "difference_fnv64": "e5cf8bbbebdb27cd",
+      "mass_fnv64": "6999e4d40f92f88c",
+      "selection_fnv64": "efb6ff3b2ea161d5"
+    },
+    {
+      "direction": 10,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 730437,
+      "difference_fnv64": "f10469c1d8814ded",
+      "mass_fnv64": "a1f400798e22c252",
+      "selection_fnv64": "77e58e628749cb6a"
+    },
+    {
+      "direction": 11,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 731497,
+      "difference_fnv64": "a6ee96f97e416eed",
+      "mass_fnv64": "2503b8d39fa39666",
+      "selection_fnv64": "0f9657957987bd52"
+    },
+    {
+      "direction": 12,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 732481,
+      "difference_fnv64": "76513a4b436b5b2d",
+      "mass_fnv64": "74a19731c5a8441f",
+      "selection_fnv64": "25c9e37ed067fd53"
+    },
+    {
+      "direction": 13,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 732973,
+      "difference_fnv64": "02930bcd0a7feaad",
+      "mass_fnv64": "00f08d46035cbdf0",
+      "selection_fnv64": "81b29764bbbd6285"
+    },
+    {
+      "direction": 14,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 733637,
+      "difference_fnv64": "2469cd7ba9e4864d",
+      "mass_fnv64": "602360255b5939d1",
+      "selection_fnv64": "1899c577039105b5"
+    },
+    {
+      "direction": 15,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 734529,
+      "difference_fnv64": "5332da7b19d3d6ed",
+      "mass_fnv64": "d645d29f98aa998e",
+      "selection_fnv64": "2e44ef371840d328"
+    },
+    {
+      "direction": 16,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 734617,
+      "difference_fnv64": "9b87aaa5e5d6d80d",
+      "mass_fnv64": "69fb7971211e0213",
+      "selection_fnv64": "52235faefaae8800"
+    },
+    {
+      "direction": 17,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 734837,
+      "difference_fnv64": "8745ce71335abd6d",
+      "mass_fnv64": "0e50b8f23461ee5f",
+      "selection_fnv64": "7f399b4c4f19bdb5"
+    },
+    {
+      "direction": 18,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 735117,
+      "difference_fnv64": "2b37261c0c19c36d",
+      "mass_fnv64": "315bb93947f404d7",
+      "selection_fnv64": "2435534bf1a90b6d"
+    },
+    {
+      "direction": 19,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 735461,
+      "difference_fnv64": "64d0e9bbf60e80cd",
+      "mass_fnv64": "e5e5fbeccbf451b9",
+      "selection_fnv64": "4e548fb086c7fb86"
+    },
+    {
+      "direction": 20,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 735673,
+      "difference_fnv64": "868f3726b4ccd96d",
+      "mass_fnv64": "b54e4123e4ab1922",
+      "selection_fnv64": "b2cf98106ddcea1e"
+    },
+    {
+      "direction": 21,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 735945,
+      "difference_fnv64": "f2aaff216d098c6d",
+      "mass_fnv64": "fb93b2ac443aa34e",
+      "selection_fnv64": "6d4ce3d6a2b17728"
+    },
+    {
+      "direction": 22,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736149,
+      "difference_fnv64": "f9a36307de15570d",
+      "mass_fnv64": "9d9e9b4c400b2648",
+      "selection_fnv64": "32ffeae574a2ae4b"
+    },
+    {
+      "direction": 23,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736417,
+      "difference_fnv64": "167b263467ef3a0d",
+      "mass_fnv64": "e39a891e08e9ffe7",
+      "selection_fnv64": "311b862ad78b7411"
+    },
+    {
+      "direction": 24,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736537,
+      "difference_fnv64": "3cb6bc88b9c7910d",
+      "mass_fnv64": "68a6743fafde3fa9",
+      "selection_fnv64": "d1462f974855375f"
+    },
+    {
+      "direction": 25,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736853,
+      "difference_fnv64": "df4b9b18b5c2408d",
+      "mass_fnv64": "9d1c7ad0448462b4",
+      "selection_fnv64": "c9852d0dbc481d53"
+    },
+    {
+      "direction": 26,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737165,
+      "difference_fnv64": "b1a648e9c3421ecd",
+      "mass_fnv64": "8f5cc72bed20016a",
+      "selection_fnv64": "bc834e6ed97eead6"
+    },
+    {
+      "direction": 27,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737489,
+      "difference_fnv64": "842ca4edd44c624d",
+      "mass_fnv64": "b8e123beaf9a81e8",
+      "selection_fnv64": "2ed043f3fc05aa90"
+    },
+    {
+      "direction": 28,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737921,
+      "difference_fnv64": "b94a4e2c0f8993ed",
+      "mass_fnv64": "9f1fafbd732c746a",
+      "selection_fnv64": "ac07970b0ad3297c"
+    },
+    {
+      "direction": 29,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738389,
+      "difference_fnv64": "f2bdcb7f48f9c44d",
+      "mass_fnv64": "aa8508a812676a63",
+      "selection_fnv64": "3e814d18c3304970"
+    },
+    {
+      "direction": 30,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738825,
+      "difference_fnv64": "ec049b3864c2888d",
+      "mass_fnv64": "1745f668cf926565",
+      "selection_fnv64": "3090de27aca08f36"
+    },
+    {
+      "direction": 31,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 739057,
+      "difference_fnv64": "fe0a9ed68a6e4dcd",
+      "mass_fnv64": "e2b87b0b19148762",
+      "selection_fnv64": "cd372abf69db1d95"
+    },
+    {
+      "direction": 32,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738781,
+      "difference_fnv64": "2ed82bb75a45fbad",
+      "mass_fnv64": "10d5234a26a4335b",
+      "selection_fnv64": "09a814c75a313223"
+    },
+    {
+      "direction": 33,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738785,
+      "difference_fnv64": "3fb82658998a15ad",
+      "mass_fnv64": "5fa6fde43cfa185e",
+      "selection_fnv64": "1806b34d1b030cce"
+    },
+    {
+      "direction": 34,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738777,
+      "difference_fnv64": "5a7da260ebb5d28d",
+      "mass_fnv64": "9fb00c6fe2beb068",
+      "selection_fnv64": "13504ff4eeb2e625"
+    },
+    {
+      "direction": 35,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738893,
+      "difference_fnv64": "174b6afe17acaf8d",
+      "mass_fnv64": "6219265887a78c9c",
+      "selection_fnv64": "e3476747eb56b428"
+    },
+    {
+      "direction": 36,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738725,
+      "difference_fnv64": "43152c6a102c1ded",
+      "mass_fnv64": "885f4247ee3e1de2",
+      "selection_fnv64": "314ec25e2b0dc46b"
+    },
+    {
+      "direction": 37,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738741,
+      "difference_fnv64": "f14f0084412361ed",
+      "mass_fnv64": "70c5fc20491d0b3e",
+      "selection_fnv64": "64ef0825cbe74756"
+    },
+    {
+      "direction": 38,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738645,
+      "difference_fnv64": "151e132e441b75ad",
+      "mass_fnv64": "4c26eb317e3877e0",
+      "selection_fnv64": "cd875c013cbf8f48"
+    },
+    {
+      "direction": 39,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738669,
+      "difference_fnv64": "d28c74e0570844ed",
+      "mass_fnv64": "b95e8c3e646c4ea3",
+      "selection_fnv64": "f507d428a87d7675"
+    },
+    {
+      "direction": 40,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738473,
+      "difference_fnv64": "53652e0d7985a5ed",
+      "mass_fnv64": "66960f361067e79e",
+      "selection_fnv64": "c4afc586aad6ba98"
+    },
+    {
+      "direction": 41,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738513,
+      "difference_fnv64": "7096c85220bdef6d",
+      "mass_fnv64": "d51055de99616736",
+      "selection_fnv64": "24bba4f593f77777"
+    },
+    {
+      "direction": 42,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738413,
+      "difference_fnv64": "d8b65e5e140a6d2d",
+      "mass_fnv64": "f1497cc73023be35",
+      "selection_fnv64": "a7b26dd2f2033a90"
+    },
+    {
+      "direction": 43,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 738109,
+      "difference_fnv64": "3bef4ca6f3ab51ad",
+      "mass_fnv64": "de1651ec35602116",
+      "selection_fnv64": "3e1d4bf1bb1754f4"
+    },
+    {
+      "direction": 44,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737829,
+      "difference_fnv64": "220eab5d75577b0d",
+      "mass_fnv64": "3cbefc907a15e581",
+      "selection_fnv64": "9b32a0e5d7e1e9e2"
+    },
+    {
+      "direction": 45,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737789,
+      "difference_fnv64": "93071a0fb7ad380d",
+      "mass_fnv64": "5d548f2844ed43ec",
+      "selection_fnv64": "87dfed108c0194aa"
+    },
+    {
+      "direction": 46,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737601,
+      "difference_fnv64": "e5fbb823a5bfa04d",
+      "mass_fnv64": "add5feb7775f1fa3",
+      "selection_fnv64": "6237e41fdab72e3d"
+    },
+    {
+      "direction": 47,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737289,
+      "difference_fnv64": "fcbb59d1c1c700cd",
+      "mass_fnv64": "e1283f1c2653447b",
+      "selection_fnv64": "2f4ffc2f074f573a"
+    },
+    {
+      "direction": 48,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 737065,
+      "difference_fnv64": "f7dc133230995f0d",
+      "mass_fnv64": "49541995c76b8272",
+      "selection_fnv64": "1a7e721aecb989ce"
+    },
+    {
+      "direction": 49,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736889,
+      "difference_fnv64": "d1d9df264cf63eed",
+      "mass_fnv64": "bb0c06b16471fa02",
+      "selection_fnv64": "9eebbecdf9095e9f"
+    },
+    {
+      "direction": 50,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736605,
+      "difference_fnv64": "b526b81cfbb6baed",
+      "mass_fnv64": "f1f0a37b155508ff",
+      "selection_fnv64": "a9d0f5c0cd0dca1f"
+    },
+    {
+      "direction": 51,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736385,
+      "difference_fnv64": "f0df76b1c245fecd",
+      "mass_fnv64": "563e23b393772ace",
+      "selection_fnv64": "3645fb73a5e2223c"
+    },
+    {
+      "direction": 52,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 736073,
+      "difference_fnv64": "53c32af0561d34ad",
+      "mass_fnv64": "b08208a8f2335436",
+      "selection_fnv64": "ab2b4402605c4fa1"
+    },
+    {
+      "direction": 53,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 735697,
+      "difference_fnv64": "1f8c4b2d04ab6ecd",
+      "mass_fnv64": "20d06ca4a6a6d3f1",
+      "selection_fnv64": "09d811e3436828ea"
+    },
+    {
+      "direction": 54,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 735725,
+      "difference_fnv64": "af058ce7be38932d",
+      "mass_fnv64": "f2cdced3df8ddda8",
+      "selection_fnv64": "342ee3edb18aa81e"
+    },
+    {
+      "direction": 55,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 735233,
+      "difference_fnv64": "f1289c7ea7bb2e6d",
+      "mass_fnv64": "185962d540b9142a",
+      "selection_fnv64": "3d39f30b5476d542"
+    },
+    {
+      "direction": 56,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 734969,
+      "difference_fnv64": "e548d28b650491ad",
+      "mass_fnv64": "4b568d57d7bd89fd",
+      "selection_fnv64": "3e23c7165cf8bcb7"
+    },
+    {
+      "direction": 57,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 734773,
+      "difference_fnv64": "82670a481203d72d",
+      "mass_fnv64": "e0a30b7a9d08a3a6",
+      "selection_fnv64": "1550df56552d234e"
+    },
+    {
+      "direction": 58,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 734441,
+      "difference_fnv64": "def889d1029a51ed",
+      "mass_fnv64": "b34682bedc66a7cc",
+      "selection_fnv64": "5012ee4f91892e8a"
+    },
+    {
+      "direction": 59,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 734117,
+      "difference_fnv64": "f1cf4de9a3fb712d",
+      "mass_fnv64": "c6fc148f57983277",
+      "selection_fnv64": "4c8316a10da610aa"
+    },
+    {
+      "direction": 60,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 733813,
+      "difference_fnv64": "0f8f68e870af65ad",
+      "mass_fnv64": "bdb3f030fd62f397",
+      "selection_fnv64": "41dc5d9569aed648"
+    },
+    {
+      "direction": 61,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 733545,
+      "difference_fnv64": "804dcc3c88dff72d",
+      "mass_fnv64": "980063622746a7e7",
+      "selection_fnv64": "a48373d2db546bfc"
+    },
+    {
+      "direction": 62,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 733421,
+      "difference_fnv64": "89e73dedca6ac16d",
+      "mass_fnv64": "84a38ae1098446b3",
+      "selection_fnv64": "2c51a96f41bfd090"
+    },
+    {
+      "direction": 63,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 733221,
+      "difference_fnv64": "abdb2a988562b96d",
+      "mass_fnv64": "f4ceb008ce97c547",
+      "selection_fnv64": "3673fd161bb52d88"
+    },
+    {
+      "direction": 64,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 732889,
+      "difference_fnv64": "9c8c246aa99cf36d",
+      "mass_fnv64": "3ad79921a20383c9",
+      "selection_fnv64": "2283ecf2af7dfd1c"
+    },
+    {
+      "direction": 65,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 732565,
+      "difference_fnv64": "adaea516c50027cd",
+      "mass_fnv64": "c0a6590840a90b0a",
+      "selection_fnv64": "84d05e611074da72"
+    },
+    {
+      "direction": 66,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 732233,
+      "difference_fnv64": "5d9baac65d46164d",
+      "mass_fnv64": "4be7a5d98544782d",
+      "selection_fnv64": "b1eaeb6a6c3b2753"
+    },
+    {
+      "direction": 67,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 731941,
+      "difference_fnv64": "c0620acb9a4d3b6d",
+      "mass_fnv64": "b076e543c8182396",
+      "selection_fnv64": "2df21c2550f4b785"
+    },
+    {
+      "direction": 68,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 731505,
+      "difference_fnv64": "753ca75fbdb4188d",
+      "mass_fnv64": "716052528bbe2262",
+      "selection_fnv64": "a7ede0b7581cfc7f"
+    },
+    {
+      "direction": 69,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 731145,
+      "difference_fnv64": "cfdc768499559bad",
+      "mass_fnv64": "8bbfaab1011d2892",
+      "selection_fnv64": "c8b5710a0631d702"
+    },
+    {
+      "direction": 70,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 730781,
+      "difference_fnv64": "1a0a67e61cbdd08d",
+      "mass_fnv64": "739f46a769184198",
+      "selection_fnv64": "8178f4a642b999fc"
+    },
+    {
+      "direction": 71,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 730301,
+      "difference_fnv64": "60ea6e1748c73d8d",
+      "mass_fnv64": "b2d123c85f0e1a91",
+      "selection_fnv64": "1ea192c1164d00a7"
+    },
+    {
+      "direction": 72,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 730237,
+      "difference_fnv64": "6fb5671a218d5f2d",
+      "mass_fnv64": "cd9b39bde2ed58fa",
+      "selection_fnv64": "22ebb505b81d6d41"
+    },
+    {
+      "direction": 73,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 729873,
+      "difference_fnv64": "2afcd5f73b834a8d",
+      "mass_fnv64": "75f529b5a5619695",
+      "selection_fnv64": "0378a540a69deb8a"
+    },
+    {
+      "direction": 74,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 729625,
+      "difference_fnv64": "262e0caf250241cd",
+      "mass_fnv64": "f21cf2fb133109d5",
+      "selection_fnv64": "58a7a5227a8734c6"
+    },
+    {
+      "direction": 75,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 729005,
+      "difference_fnv64": "7c8c958187e68c2d",
+      "mass_fnv64": "8380d4d18249f1c6",
+      "selection_fnv64": "875bb3dc4a26b663"
+    },
+    {
+      "direction": 76,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 728481,
+      "difference_fnv64": "38b59cc4a9b3a16d",
+      "mass_fnv64": "d99b0326f0014395",
+      "selection_fnv64": "9100a0efa8caf5f5"
+    },
+    {
+      "direction": 77,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 728013,
+      "difference_fnv64": "cdf6a905ba9e38cd",
+      "mass_fnv64": "aede61c76d59c6f3",
+      "selection_fnv64": "5910838716ec29f4"
+    },
+    {
+      "direction": 78,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 727701,
+      "difference_fnv64": "0d1f2019117471ed",
+      "mass_fnv64": "9585d5d126e8a929",
+      "selection_fnv64": "14f2524437a668de"
+    },
+    {
+      "direction": 79,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 727169,
+      "difference_fnv64": "b44439d6418b4d0d",
+      "mass_fnv64": "05e6d32b565836f4",
+      "selection_fnv64": "1c8bc66c759c1f32"
+    },
+    {
+      "direction": 80,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 726677,
+      "difference_fnv64": "c9ecc4fa4b2951ad",
+      "mass_fnv64": "24b54a3148835753",
+      "selection_fnv64": "f06e13ded1b5e820"
+    },
+    {
+      "direction": 81,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 726269,
+      "difference_fnv64": "03478a1c9d116d6d",
+      "mass_fnv64": "3ee269d85d34981b",
+      "selection_fnv64": "2bd9c7c2c28b3b6d"
+    },
+    {
+      "direction": 82,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 725737,
+      "difference_fnv64": "af94bb73988edfad",
+      "mass_fnv64": "ee6e073904499d0b",
+      "selection_fnv64": "bb7b896aa762b3dd"
+    },
+    {
+      "direction": 83,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 725289,
+      "difference_fnv64": "36b89069d54389cd",
+      "mass_fnv64": "526007625ace0402",
+      "selection_fnv64": "f3f79d260bbfcbce"
+    },
+    {
+      "direction": 84,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 724909,
+      "difference_fnv64": "b732aebb50259b0d",
+      "mass_fnv64": "e42449f5356bdb24",
+      "selection_fnv64": "ceb4339f6d44c8bc"
+    },
+    {
+      "direction": 85,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 724549,
+      "difference_fnv64": "b4727061c5bf336d",
+      "mass_fnv64": "ffde7b5d07793dd2",
+      "selection_fnv64": "431ed5f902742bc6"
+    },
+    {
+      "direction": 86,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 724209,
+      "difference_fnv64": "d0b464729ea3a24d",
+      "mass_fnv64": "755a4a6fa235cbf1",
+      "selection_fnv64": "6d4400f89674c34b"
+    },
+    {
+      "direction": 87,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 723717,
+      "difference_fnv64": "28e0c1a4776b990d",
+      "mass_fnv64": "5ab606b6d39d8539",
+      "selection_fnv64": "e8885b7a4c360f78"
+    },
+    {
+      "direction": 88,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 723185,
+      "difference_fnv64": "6b8af35a69cce72d",
+      "mass_fnv64": "f7cdef2e2fd464d9",
+      "selection_fnv64": "aa2600fc89396cd9"
+    },
+    {
+      "direction": 89,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 722537,
+      "difference_fnv64": "77350f943be1f3cd",
+      "mass_fnv64": "adf8de8161797ec2",
+      "selection_fnv64": "6e4d947cd775a672"
+    },
+    {
+      "direction": 90,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 722405,
+      "difference_fnv64": "bd2ef774674223ed",
+      "mass_fnv64": "b39441e0a7468d0e",
+      "selection_fnv64": "0810a162bf5fe455"
+    },
+    {
+      "direction": 91,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 721977,
+      "difference_fnv64": "83a352c7ef2b47ad",
+      "mass_fnv64": "5a73047f12236d92",
+      "selection_fnv64": "3444563b38a76398"
+    },
+    {
+      "direction": 92,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 721477,
+      "difference_fnv64": "0cda5cb559b3b7cd",
+      "mass_fnv64": "7224c8a87e60c180",
+      "selection_fnv64": "a550650f217ed497"
+    },
+    {
+      "direction": 93,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 721053,
+      "difference_fnv64": "ccce5c78d47cf78d",
+      "mass_fnv64": "c7e26171a0a80495",
+      "selection_fnv64": "523c3eddd73ac0f3"
+    },
+    {
+      "direction": 94,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 720653,
+      "difference_fnv64": "36016cf7d5010c4d",
+      "mass_fnv64": "8f699c9530c30a69",
+      "selection_fnv64": "58491769c4872e12"
+    },
+    {
+      "direction": 95,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 720253,
+      "difference_fnv64": "58de83a772492bad",
+      "mass_fnv64": "4aaca3caf9fe5508",
+      "selection_fnv64": "4d864b14b031959b"
+    },
+    {
+      "direction": 96,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 719741,
+      "difference_fnv64": "262eafd5b8c2704d",
+      "mass_fnv64": "56ebd99add1379c4",
+      "selection_fnv64": "fde7dab7158d6815"
+    },
+    {
+      "direction": 97,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 719453,
+      "difference_fnv64": "c13abbb69369372d",
+      "mass_fnv64": "77d9cc27a91ee1de",
+      "selection_fnv64": "03ca5dc12516de66"
+    },
+    {
+      "direction": 98,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 719065,
+      "difference_fnv64": "49bec6c228431fcd",
+      "mass_fnv64": "c9c83e96d18d03a9",
+      "selection_fnv64": "1847aa5175035336"
+    },
+    {
+      "direction": 99,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 718629,
+      "difference_fnv64": "19de65e1eb5f008d",
+      "mass_fnv64": "a19547be5cc4c256",
+      "selection_fnv64": "d268d3b93feb5186"
+    },
+    {
+      "direction": 100,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 718037,
+      "difference_fnv64": "923b9dd7f35d680d",
+      "mass_fnv64": "3dc523e96018463e",
+      "selection_fnv64": "04c5359c305243b1"
+    },
+    {
+      "direction": 101,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 717561,
+      "difference_fnv64": "546f1e52409571ad",
+      "mass_fnv64": "da336f69c2b656ac",
+      "selection_fnv64": "582c3c5b6dca6da0"
+    },
+    {
+      "direction": 102,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 717145,
+      "difference_fnv64": "5a0e9a617e1a0c6d",
+      "mass_fnv64": "a393fda4c2c16fbb",
+      "selection_fnv64": "32a8cad0c85e01e4"
+    },
+    {
+      "direction": 103,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 716977,
+      "difference_fnv64": "40b7db51d535ee6d",
+      "mass_fnv64": "c30caf38f5f36749",
+      "selection_fnv64": "f6c0f79ea44fcc20"
+    },
+    {
+      "direction": 104,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 716545,
+      "difference_fnv64": "ca139ed9250944ed",
+      "mass_fnv64": "b3e609beb56364d8",
+      "selection_fnv64": "6c82d6f33372628f"
+    },
+    {
+      "direction": 105,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 716269,
+      "difference_fnv64": "ac859c2f8369b24d",
+      "mass_fnv64": "69bf827a8b3bf77f",
+      "selection_fnv64": "2a2c2d24b3d4f5fa"
+    },
+    {
+      "direction": 106,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 715925,
+      "difference_fnv64": "689582422140156d",
+      "mass_fnv64": "6ded713d803c6914",
+      "selection_fnv64": "461c8f97a8afd19f"
+    },
+    {
+      "direction": 107,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 715505,
+      "difference_fnv64": "0cb2c102a10e246d",
+      "mass_fnv64": "c0be89c410e1d915",
+      "selection_fnv64": "67f2d1ff96d10542"
+    },
+    {
+      "direction": 108,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 715057,
+      "difference_fnv64": "b74cc5b184203c6d",
+      "mass_fnv64": "569e9a072c37a108",
+      "selection_fnv64": "19ab8bf22169eec2"
+    },
+    {
+      "direction": 109,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 714641,
+      "difference_fnv64": "f8f805d3ad0fe20d",
+      "mass_fnv64": "fbcd2cedf218f19b",
+      "selection_fnv64": "36937e4b0593a3e5"
+    },
+    {
+      "direction": 110,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 714297,
+      "difference_fnv64": "5ee2b88f67b0514d",
+      "mass_fnv64": "c19f7aaff6a2fc9d",
+      "selection_fnv64": "d46b904b1d11da54"
+    },
+    {
+      "direction": 111,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 713789,
+      "difference_fnv64": "a8701ba01293524d",
+      "mass_fnv64": "4b3701f8d08f57ac",
+      "selection_fnv64": "178a9d63a7804a4c"
+    },
+    {
+      "direction": 112,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 713601,
+      "difference_fnv64": "6cda41c6f6ee4bed",
+      "mass_fnv64": "a11646eb116f2618",
+      "selection_fnv64": "b0c7682998db42b3"
+    },
+    {
+      "direction": 113,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 713157,
+      "difference_fnv64": "cb60c9b128df280d",
+      "mass_fnv64": "ad8d6c8528f21fc5",
+      "selection_fnv64": "cdc28c2ae6f110da"
+    },
+    {
+      "direction": 114,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 712833,
+      "difference_fnv64": "c340da73944717ad",
+      "mass_fnv64": "dd655d289f684ca1",
+      "selection_fnv64": "f9f7233bbd54f4ab"
+    },
+    {
+      "direction": 115,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 712445,
+      "difference_fnv64": "e5f034f56ba035cd",
+      "mass_fnv64": "80f8ec26de5801d6",
+      "selection_fnv64": "2f80b8a662c36f3a"
+    },
+    {
+      "direction": 116,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 712117,
+      "difference_fnv64": "22f3ef271563e3ed",
+      "mass_fnv64": "a36a571edaa0d8f3",
+      "selection_fnv64": "5a3f749934b72631"
+    },
+    {
+      "direction": 117,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 711865,
+      "difference_fnv64": "d24501a80929666d",
+      "mass_fnv64": "433b2341f0f87996",
+      "selection_fnv64": "ba235c97307f6a0d"
+    },
+    {
+      "direction": 118,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 711329,
+      "difference_fnv64": "b7b66ab64626bf4d",
+      "mass_fnv64": "28923e076a555e43",
+      "selection_fnv64": "a265fccdf784ac0a"
+    },
+    {
+      "direction": 119,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 710945,
+      "difference_fnv64": "1cfff5a9d0ffdaad",
+      "mass_fnv64": "07dc2f342b7f155d",
+      "selection_fnv64": "c4865d384782dd9a"
+    },
+    {
+      "direction": 120,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 710617,
+      "difference_fnv64": "457c25f944d4c44d",
+      "mass_fnv64": "9d67278102b7ca8c",
+      "selection_fnv64": "332f6de0b2ab13c8"
+    },
+    {
+      "direction": 121,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 710221,
+      "difference_fnv64": "9d265dbeda09e2ad",
+      "mass_fnv64": "0ff6d7cd0482b810",
+      "selection_fnv64": "259a6aaf03d7dfab"
+    },
+    {
+      "direction": 122,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 709845,
+      "difference_fnv64": "09c11b9adcf7dcad",
+      "mass_fnv64": "cb7b32659a8c520f",
+      "selection_fnv64": "48c85786bb9d5bac"
+    },
+    {
+      "direction": 123,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 709629,
+      "difference_fnv64": "bad97eef7c6d0f6d",
+      "mass_fnv64": "8dfc1a1737eb9242",
+      "selection_fnv64": "b28cd8b22f44c212"
+    },
+    {
+      "direction": 124,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 709249,
+      "difference_fnv64": "c64734d468a28f4d",
+      "mass_fnv64": "3e412c63190b0127",
+      "selection_fnv64": "22e2641921cd5097"
+    },
+    {
+      "direction": 125,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 708781,
+      "difference_fnv64": "87e36d0fe2fc7aed",
+      "mass_fnv64": "d00aa5b5af021c90",
+      "selection_fnv64": "788fd24dd81df0bb"
+    },
+    {
+      "direction": 126,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 708533,
+      "difference_fnv64": "54b176e3a5d74a8d",
+      "mass_fnv64": "da38853bfb8ed6a4",
+      "selection_fnv64": "7bcc647214feab16"
+    },
+    {
+      "direction": 127,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 708061,
+      "difference_fnv64": "cc6ae90617ca774d",
+      "mass_fnv64": "11486c6943fb27f3",
+      "selection_fnv64": "f984bfdf39eec8d7"
+    },
+    {
+      "direction": 128,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 707857,
+      "difference_fnv64": "de981089cb2a2f0d",
+      "mass_fnv64": "23d05a45f6387767",
+      "selection_fnv64": "e0f94d7c54508a65"
+    },
+    {
+      "direction": 129,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 707565,
+      "difference_fnv64": "78aa8af74d55528d",
+      "mass_fnv64": "1baacef5cb8abdef",
+      "selection_fnv64": "4295e76889b6fb6e"
+    },
+    {
+      "direction": 130,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 707277,
+      "difference_fnv64": "1448672fc38d188d",
+      "mass_fnv64": "fc3ab2db44b64cde",
+      "selection_fnv64": "aea303f8260049ab"
+    },
+    {
+      "direction": 131,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 706913,
+      "difference_fnv64": "f4cc25219d9d47ad",
+      "mass_fnv64": "40bc149c8d7755ea",
+      "selection_fnv64": "99323d331f6fd7a1"
+    },
+    {
+      "direction": 132,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 706609,
+      "difference_fnv64": "d62854e6192b1b8d",
+      "mass_fnv64": "477fcf0d19be69c6",
+      "selection_fnv64": "505800400cc20f57"
+    },
+    {
+      "direction": 133,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 706541,
+      "difference_fnv64": "8cf71ac51634f26d",
+      "mass_fnv64": "48c1d57427bff0a9",
+      "selection_fnv64": "15c37e5ea38f4466"
+    },
+    {
+      "direction": 134,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 706437,
+      "difference_fnv64": "8f720f846b22cb4d",
+      "mass_fnv64": "d255d868ad5681b3",
+      "selection_fnv64": "ede9023e074d25bf"
+    },
+    {
+      "direction": 135,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 706249,
+      "difference_fnv64": "3c29f24b2c23d14d",
+      "mass_fnv64": "b22faf5d395a8024",
+      "selection_fnv64": "9da93521caaccead"
+    },
+    {
+      "direction": 136,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 705781,
+      "difference_fnv64": "9f3f2adca6a6130d",
+      "mass_fnv64": "14a46b39e49b7a9e",
+      "selection_fnv64": "89b5acc7bb249a46"
+    },
+    {
+      "direction": 137,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 705645,
+      "difference_fnv64": "98ef69a0770ad36d",
+      "mass_fnv64": "f4b31357f7bfc745",
+      "selection_fnv64": "aaa5eccf91773ce9"
+    },
+    {
+      "direction": 138,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 705217,
+      "difference_fnv64": "216dbb77d2a6692d",
+      "mass_fnv64": "2c7a4d631c3dc0a8",
+      "selection_fnv64": "3e850d75f07041a3"
+    },
+    {
+      "direction": 139,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 705293,
+      "difference_fnv64": "3bb9777dbc9c0f6d",
+      "mass_fnv64": "fd2fe8dd5cf97464",
+      "selection_fnv64": "e7adcb4e5c5112a8"
+    },
+    {
+      "direction": 140,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 705009,
+      "difference_fnv64": "dfa9738b9a11848d",
+      "mass_fnv64": "23266661b62c1dbc",
+      "selection_fnv64": "3dbd2d643ac05c52"
+    },
+    {
+      "direction": 141,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 704941,
+      "difference_fnv64": "525278e74e2e45cd",
+      "mass_fnv64": "b29bccca6f7d3180",
+      "selection_fnv64": "bc703ab96e62e608"
+    },
+    {
+      "direction": 142,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 704777,
+      "difference_fnv64": "37b91e038c9cd6ed",
+      "mass_fnv64": "b54ac4558117a5ce",
+      "selection_fnv64": "d0181157d8cc6494"
+    },
+    {
+      "direction": 143,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 704577,
+      "difference_fnv64": "58e3f129803cff0d",
+      "mass_fnv64": "2e3cb4a9707841ea",
+      "selection_fnv64": "d0ec7752c6d971f9"
+    },
+    {
+      "direction": 144,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 704317,
+      "difference_fnv64": "88bf4547ec4c27cd",
+      "mass_fnv64": "820cd7fa572aac23",
+      "selection_fnv64": "88047cb8e9146497"
+    },
+    {
+      "direction": 145,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 704093,
+      "difference_fnv64": "c42d8e1a0e16b70d",
+      "mass_fnv64": "fb7fb6181df2d422",
+      "selection_fnv64": "dac18901e12bbd04"
+    },
+    {
+      "direction": 146,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 704153,
+      "difference_fnv64": "7291a782f57285cd",
+      "mass_fnv64": "28cb8bfe75195334",
+      "selection_fnv64": "344a38259de3957a"
+    },
+    {
+      "direction": 147,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703937,
+      "difference_fnv64": "e829c64af2f2aa2d",
+      "mass_fnv64": "ff0d52a33f88401e",
+      "selection_fnv64": "8fd74c954805abab"
+    },
+    {
+      "direction": 148,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703837,
+      "difference_fnv64": "a8f9d27a6286c78d",
+      "mass_fnv64": "ca80fe7569a2ce08",
+      "selection_fnv64": "39b0b8ba2ddcf11f"
+    },
+    {
+      "direction": 149,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703697,
+      "difference_fnv64": "b15546763a46eb6d",
+      "mass_fnv64": "0e24e0180c78a172",
+      "selection_fnv64": "b629c17cac598975"
+    },
+    {
+      "direction": 150,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703601,
+      "difference_fnv64": "c7555cf101b9294d",
+      "mass_fnv64": "bf5dabd3f57a5ccc",
+      "selection_fnv64": "c5a84ad6a6af1719"
+    },
+    {
+      "direction": 151,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703509,
+      "difference_fnv64": "d034a1c0ea3d4c6d",
+      "mass_fnv64": "ba533505378847cd",
+      "selection_fnv64": "ea9c2402cc40d6ff"
+    },
+    {
+      "direction": 152,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703465,
+      "difference_fnv64": "83a69cbe61dc0acd",
+      "mass_fnv64": "b2aac9ab084af814",
+      "selection_fnv64": "7d210be22d7b2e67"
+    },
+    {
+      "direction": 153,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703477,
+      "difference_fnv64": "6a3621f19b2c932d",
+      "mass_fnv64": "e9c044f3d1adc21a",
+      "selection_fnv64": "66b233f32838c822"
+    },
+    {
+      "direction": 154,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703205,
+      "difference_fnv64": "bc45f0fd65c25e6d",
+      "mass_fnv64": "1616f5a2736fe1bc",
+      "selection_fnv64": "42fdac66e6190b50"
+    },
+    {
+      "direction": 155,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703241,
+      "difference_fnv64": "5c3fb9f63f2d530d",
+      "mass_fnv64": "176d719d26725c36",
+      "selection_fnv64": "4e889309f685cc15"
+    },
+    {
+      "direction": 156,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703205,
+      "difference_fnv64": "feafd7afada2a22d",
+      "mass_fnv64": "47e7f7397576841f",
+      "selection_fnv64": "c531b1670a74c4e0"
+    },
+    {
+      "direction": 157,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702985,
+      "difference_fnv64": "cf7ef9aaa3b537ad",
+      "mass_fnv64": "e357e1048e792e02",
+      "selection_fnv64": "0be3451a5d51da4b"
+    },
+    {
+      "direction": 158,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703005,
+      "difference_fnv64": "a71a1b827a336ded",
+      "mass_fnv64": "14a28540be941117",
+      "selection_fnv64": "4f10c113bbc1a097"
+    },
+    {
+      "direction": 159,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702929,
+      "difference_fnv64": "9f9777bcfd24a80d",
+      "mass_fnv64": "5c24a363a22734e5",
+      "selection_fnv64": "ef9e1b58461b289a"
+    },
+    {
+      "direction": 160,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702985,
+      "difference_fnv64": "b015a0592f8c508d",
+      "mass_fnv64": "7d34b999d90effd0",
+      "selection_fnv64": "decb4db9ba90c8be"
+    },
+    {
+      "direction": 161,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703045,
+      "difference_fnv64": "195f12e29ecba22d",
+      "mass_fnv64": "0313af754aee486b",
+      "selection_fnv64": "418083bd2dc18d39"
+    },
+    {
+      "direction": 162,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703017,
+      "difference_fnv64": "cfcbd1fcda6f072d",
+      "mass_fnv64": "9dad8645877d721b",
+      "selection_fnv64": "b845126b5e69820a"
+    },
+    {
+      "direction": 163,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703009,
+      "difference_fnv64": "3ff0bf2fdf09056d",
+      "mass_fnv64": "b6755b3672ca35ca",
+      "selection_fnv64": "0d003b65a1091e1c"
+    },
+    {
+      "direction": 164,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702941,
+      "difference_fnv64": "e8d993f08971372d",
+      "mass_fnv64": "acd3db29210d13b5",
+      "selection_fnv64": "6dafbd84c78b1100"
+    },
+    {
+      "direction": 165,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702877,
+      "difference_fnv64": "f9b93f51b18d75cd",
+      "mass_fnv64": "3d2c4eb326a43f23",
+      "selection_fnv64": "e7ec72bb62b6cac5"
+    },
+    {
+      "direction": 166,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702917,
+      "difference_fnv64": "793ad737c93c4e6d",
+      "mass_fnv64": "2a2faf6dfccc9e02",
+      "selection_fnv64": "4ceb1d6402984de6"
+    },
+    {
+      "direction": 167,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702893,
+      "difference_fnv64": "b76c4ce3b5dbac2d",
+      "mass_fnv64": "7b20e4eb323ded3a",
+      "selection_fnv64": "37ab9f056a12f249"
+    },
+    {
+      "direction": 168,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702857,
+      "difference_fnv64": "1a82c831ea2c6ecd",
+      "mass_fnv64": "841ab2fd61bb0b8d",
+      "selection_fnv64": "be5c5ddfcb866c37"
+    },
+    {
+      "direction": 169,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702941,
+      "difference_fnv64": "3520997c941f256d",
+      "mass_fnv64": "50ac8f189af31a34",
+      "selection_fnv64": "4f140c4f1ee29e1b"
+    },
+    {
+      "direction": 170,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702993,
+      "difference_fnv64": "8eeca0a88623728d",
+      "mass_fnv64": "be0adeaf5df7e209",
+      "selection_fnv64": "55c11c4ce3f949a4"
+    },
+    {
+      "direction": 171,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703113,
+      "difference_fnv64": "af6f33c5d958914d",
+      "mass_fnv64": "bb83bfa3d6806bed",
+      "selection_fnv64": "c75ffc2c767a6947"
+    },
+    {
+      "direction": 172,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703053,
+      "difference_fnv64": "0235d26c6cfe88ed",
+      "mass_fnv64": "f342677bf8131756",
+      "selection_fnv64": "c9914a2de0b91878"
+    },
+    {
+      "direction": 173,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703017,
+      "difference_fnv64": "e4b2afc672b0390d",
+      "mass_fnv64": "f497d80a4841a4cd",
+      "selection_fnv64": "c7130a75d601b06d"
+    },
+    {
+      "direction": 174,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703181,
+      "difference_fnv64": "315cb125d4ae5bcd",
+      "mass_fnv64": "0f1ef07cb209edb9",
+      "selection_fnv64": "d4151fad4c475da9"
+    },
+    {
+      "direction": 175,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703013,
+      "difference_fnv64": "c90d8772a3cd318d",
+      "mass_fnv64": "292fdd4bcfae0fb5",
+      "selection_fnv64": "e06b85912653b794"
+    },
+    {
+      "direction": 176,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702917,
+      "difference_fnv64": "fca45707f43ea60d",
+      "mass_fnv64": "35c1984698205129",
+      "selection_fnv64": "348b9be1884214f6"
+    },
+    {
+      "direction": 177,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 702997,
+      "difference_fnv64": "9ed2d716bbf5ad6d",
+      "mass_fnv64": "1156f3c71f48e14b",
+      "selection_fnv64": "84a51b8bb8db3ddb"
+    },
+    {
+      "direction": 178,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 703781,
+      "difference_fnv64": "168fd88569cd442d",
+      "mass_fnv64": "b62dc679ac31a646",
+      "selection_fnv64": "c77660d0e61f484e"
+    },
+    {
+      "direction": 179,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 705589,
+      "difference_fnv64": "ee737ed1538e236d",
+      "mass_fnv64": "a252693bd6caece3",
+      "selection_fnv64": "d13d7963c3d51bf0"
+    },
+    {
+      "direction": 180,
+      "rows": 980,
+      "columns": 980,
+      "live_sites": 489,
+      "reachable_values": 706661,
+      "difference_fnv64": "6db2812329051e0d",
+      "mass_fnv64": "285ee696a3e323fe",
+      "selection_fnv64": "4c585da2ead6d8f8"
+    }
+  ],
+  "source": "Experiments/cpu-post-integration-profile/raw/current-states.npz",
+  "data_size_bytes": 3542376,
+  "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
+  "grid_cells_total": 172892736
+}

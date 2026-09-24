@@ -1,6 +1,6 @@
 {
-  "phase": "C",
-  "status": "tests 1-7 complete; test 8 pending",
+  "phase": "D",
+  "status": "tests 1-7 complete; test 8 VM complete, physical-host half BLOCKED at Phase D checkpoint",
   "starting_sha": "897b722f2997fbf09b99b1700787a0052270de30",
   "test01": {
     "workers": {
@@ -2473,6 +2473,61 @@
       "directions_sha256": "eb0fa9b2d63a27376ca5c20c3c2f33a21d536c994e89bb32fb4ff7b2be99a681",
       "centres_sha256": "fd9d18e922c4fe7700e31934c0cf697a977986dea5a87a14d2aab0dd9227ab9b",
       "matrix_sha256": "f7fc2882f5f80bafa94c8d386cc03f4fe4f9e38748d12f2d5840c10aac455e38"
+    }
+  },
+  "test08": {
+    "processed_file": "test08-host-vm/processed/summary.json",
+    "package_sha256": "515f1414fc7adee48f7f49eea2cc0637135b271dec33ce9fc9e8c4ec63b26a26",
+    "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
+    "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+    "vm": {
+      "1": {
+        "wall_per_replay": 0.19490926141221374,
+        "worker_cpu_per_replay": 0.19483664203816795,
+        "instructions_ratio": 1.0,
+        "cycles_ratio": 1.0,
+        "cpu_inflation": 1.0,
+        "dram_fills_ratio": 1.0
+      },
+      "2": {
+        "wall_per_replay": 0.11801194496650717,
+        "worker_cpu_per_replay": 0.23458333426794256,
+        "instructions_ratio": 1.0000395487039762,
+        "cycles_ratio": 1.1755075423362202,
+        "cpu_inflation": 1.204000088556178,
+        "dram_fills_ratio": 138.74394022082103
+      },
+      "4": {
+        "wall_per_replay": 0.10537506047413793,
+        "worker_cpu_per_replay": 0.4181492683362069,
+        "instructions_ratio": 1.0004614118024509,
+        "cycles_ratio": 2.099317110120429,
+        "cpu_inflation": 2.1461531258288296,
+        "dram_fills_ratio": 755.6813961857638
+      },
+      "8": {
+        "wall_per_replay": 0.14659935447486033,
+        "worker_cpu_per_replay": 1.1243818395586591,
+        "instructions_ratio": 1.0020744689081709,
+        "cycles_ratio": 5.499468858575333,
+        "cpu_inflation": 5.770895185816207,
+        "dram_fills_ratio": 1485.242636815838
+      },
+      "16": {
+        "wall_per_replay": 0.09073933061886792,
+        "worker_cpu_per_replay": 0.9626683793924528,
+        "instructions_ratio": 1.0018332460504202,
+        "cycles_ratio": 4.505040348439417,
+        "cpu_inflation": 4.940900075684269,
+        "dram_fills_ratio": 967.9404964798507
+      }
+    },
+    "host": {
+      "status": "BLOCKED",
+      "reason": "Direct SSH to root@192.168.100.1 timed out; operator-provided host copy contained only Phase A receipts; verified standalone package and exact host task handed off.",
+      "direct_access_receipt": "test08-host-vm/raw/direct-host-access.json",
+      "host_task": "test08-host-vm/HOST_AGENT_TASK.md",
+      "shared_package": "/srv/ai/benchmarks/squares-cpu-penalty-test08/package.tar.gz"
     }
   }
 }

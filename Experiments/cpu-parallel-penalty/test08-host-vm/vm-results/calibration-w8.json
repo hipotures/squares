@@ -1,0 +1,103 @@
+{
+  "label": "calibration",
+  "workers": 8,
+  "repeats": 4,
+  "load_before": {
+    "utc": "2026-09-24T02:51:57Z",
+    "loadavg": [
+      2.2265625,
+      1.37109375,
+      3.36181640625
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.12 total=345560363\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 8,
+    "repeats": 4,
+    "directions": 181,
+    "wall": 0.559548354,
+    "max_worker_wall": 0.559449654,
+    "worker_cpu": 4.193795196,
+    "calls": 724,
+    "checksum": "3db80ed7ad9c4395",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 245725,
+        "wall": 0.556457385,
+        "cpu_time": 0.556258126,
+        "calls": 92,
+        "checksum": "c6eba5440e5ce18d"
+      },
+      {
+        "cpu": 1,
+        "pid": 245726,
+        "wall": 0.559449654,
+        "cpu_time": 0.559424781,
+        "calls": 92,
+        "checksum": "a4a2135618d8c3c5"
+      },
+      {
+        "cpu": 2,
+        "pid": 245727,
+        "wall": 0.487097741,
+        "cpu_time": 0.487069951,
+        "calls": 92,
+        "checksum": "3f486493a49c7bcd"
+      },
+      {
+        "cpu": 3,
+        "pid": 245728,
+        "wall": 0.55782802,
+        "cpu_time": 0.557704919,
+        "calls": 92,
+        "checksum": "251d8160536a5da5"
+      },
+      {
+        "cpu": 4,
+        "pid": 245729,
+        "wall": 0.558297918,
+        "cpu_time": 0.558280566,
+        "calls": 92,
+        "checksum": "c95a9ec164828f95"
+      },
+      {
+        "cpu": 5,
+        "pid": 245730,
+        "wall": 0.546046151,
+        "cpu_time": 0.546023361,
+        "calls": 88,
+        "checksum": "e459046a05183fad"
+      },
+      {
+        "cpu": 6,
+        "pid": 245731,
+        "wall": 0.375381137,
+        "cpu_time": 0.375371069,
+        "calls": 88,
+        "checksum": "83c868ab9edc81bd"
+      },
+      {
+        "cpu": 7,
+        "pid": 245732,
+        "wall": 0.553680804,
+        "cpu_time": 0.553662423,
+        "calls": 88,
+        "checksum": "99ed04dc2d918205"
+      }
+    ]
+  },
+  "external_wall": 0.5606424489960773,
+  "command": [
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay",
+    "--data",
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/data.bin",
+    "--workers",
+    "8",
+    "--repeats",
+    "4"
+  ],
+  "perf_events_requested": null,
+  "perf_counters": null,
+  "perf_stderr": null
+}

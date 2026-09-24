@@ -307,3 +307,47 @@ traced separation wall, and some of that window contains necessary final
 computation. The measured recoverable share is approximately zero within
 the 0.03–0.18 s pair-to-pair VM variation. Do not add the ordered-wait and
 tail figures.
+
+## Phase D: native host/VM control (host half blocked at checkpoint)
+
+The standalone package captures **all 181 real round-18 directions**. Its C
+source reproduces production-order scatter into the difference grid, both
+in-place prefix passes, slab interval compaction, and the same stable finite
+top-13 heap ordering. Before every timed sample, each process checks the
+complete difference grid, mass grid, and selected candidate indices/masses
+against the Python-captured checksums for its fixed direction share. The
+input file is 3,542,376 bytes and represents 172,892,736 grid cells across
+the 181 directions. The same source, input bytes, `-march=x86-64-v3` flags,
+fixed worker shares, iteration counts, and checksums are prescribed for VM
+and host. Data loading, warmup, perf attachment, and output JSON are outside
+each timed region. This is a representative **single late round repeated**;
+its absolute scaling penalty is not the full 23-round solver penalty.
+
+Each VM endpoint has three independent 23.79–26.54-second samples; perf's
+three events ran at 100% enabled time. The table normalizes by identical
+complete 181-direction replay counts within each worker endpoint:
+
+| VM workers | Wall/replay (s) | Worker CPU/replay (s) | Instructions vs 1 | Cycles vs 1 | IPC | Speedup | Efficiency | CPU inflation |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 0.195 | 0.195 | 1.000× | 1.000× | 2.474 | 1.00× | 100% | 1.00× |
+| 2 | 0.118 | 0.235 | 1.000× | 1.176× | 2.104 | 1.65× | 82.6% | 1.20× |
+| 4 | 0.105 | 0.418 | 1.000× | 2.099× | 1.179 | 1.85× | 46.2% | 2.15× |
+| 8 | 0.147 | 1.124 | 1.002× | 5.499× | 0.451 | 1.33× | 16.6% | 5.77× |
+| 16 | 0.091 | 0.963 | 1.002× | 4.505× | 0.550 | 2.15× | 13.4% | 4.94× |
+
+The VM's DRAM-origin cache-fill event rises about 968× at 16 workers on
+this repeatedly warm single-round workload, while instructions remain
+constant. The very large relative fill ratio has a small one-worker
+denominator because the same grids are reused repeatedly; it is a cache
+fill proxy, **not** physical DDR bytes. The host execution is needed to
+determine whether this native inflation is intrinsic to the workload or
+materially worsened by VM placement/translation. Direct SSH to the PVE host
+gateway `192.168.100.1` timed out (receipt in
+`test08-host-vm/raw/direct-host-access.json`). The operator-provided
+`/home/user/cpu-parallel-penalty-host/` contains the Phase A topology/pinning
+receipts, already preserved byte-for-byte under Test 2, but no Test 8 sample.
+The same 752 KiB lossless package and exact host task are available at
+`/srv/ai/benchmarks/squares-cpu-penalty-test08/`. The host half is therefore
+**BLOCKED at this checkpoint** under the explicit host-access failure policy;
+no physical-host result or VM-specific causal attribution is claimed. Host
+results can be imported later without rerunning the verified VM control.
