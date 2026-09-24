@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
 import signal
+import subprocess
+import sys
 from fractions import Fraction
 from pathlib import Path
 
@@ -19,6 +22,7 @@ def state(tmp_path: Path) -> dict:
         "seed_certificate": str(frontier.DEFAULT_SEED),
         "workers": 1,
         "budgets": [1, 2, 3, 4],
+        "row_rounds": 60,
         "target_width": None,
         "max_cycles": None,
         "root": tmp_path,
@@ -30,6 +34,8 @@ def result(side: Fraction, *, objective: float = 12.5, mass: str = "25/2") -> di
     return {
         "settings": {"n": 12, "outer_side": str(side), "column_rounds": 1},
         "objective": objective,
+        "converged": True,
+        "stopped": "converged: every placement covers mass 1",
         "total_mass": mass,
         "atoms": 3,
         "seconds": 0.1,
@@ -93,6 +99,19 @@ def test_adaptive_policy_uses_multiple_signals() -> None:
     assert frontier.decide_stage(improving, 0, budgets, nearby=False)[0] == "ESCALATE"
 
 
+def test_incomplete_inner_rows_never_shrink_search_frontier() -> None:
+    incomplete = result(Fraction(793, 200))
+    incomplete.update(
+        {"converged": False, "stopped": "round limit 60 reached", "total_mass": None}
+    )
+    for stage_index in range(4):
+        decision, reason = frontier.decide_stage(
+            incomplete, stage_index, [8, 20, 40, 60], nearby=False
+        )
+        assert decision == "UNRESOLVED"
+        assert "row generation did not converge" in reason
+
+
 def test_atomic_state_roundtrip_and_validation(tmp_path: Path) -> None:
     saved = state(tmp_path)
     frontier.save_state(tmp_path, saved)
@@ -101,6 +120,10 @@ def test_atomic_state_roundtrip_and_validation(tmp_path: Path) -> None:
     assert not list(tmp_path.glob("*.tmp"))
     with pytest.raises(ValueError, match="settings differ"):
         frontier.load_state(tmp_path, {"workers": 8})
+    saved["schema"] = 1
+    frontier.save_state(tmp_path, saved)
+    with pytest.raises(ValueError, match="incompatible frontier state schema"):
+        frontier.load_state(tmp_path)
 
 
 def test_import_prior_search_result(tmp_path: Path) -> None:
@@ -307,10 +330,27 @@ def test_full_gate_output_and_target_side_required(
     assert (
         frontier.verify_candidate(tmp_path, candidate, Fraction(793, 200))[0] == "full-rejected"
     )
+    assert not list(tmp_path.glob("candidate.verified*.json"))
+    assert (tmp_path / "candidate.pending-verification.json").exists()
     assert (
         frontier.verify_candidate(tmp_path, candidate, Fraction(397, 100))[0]
         == "candidate-side-mismatch"
     )
+
+    def retained(_args: list[str], output: Path) -> int:
+        output.write_text(
+            "RETAINABLE: both routes accept and agree at 1; sha256 test\n",
+            encoding="utf-8",
+        )
+        return 0
+
+    monkeypatch.setattr(frontier, "run_child", retained)
+    status, verified = frontier.verify_candidate(tmp_path, candidate, Fraction(793, 200))
+    assert status == "full-retainable"
+    assert verified is not None
+    assert Path(verified).exists()
+    assert Path(verified).name == "candidate.verified-2.json"
+    assert not (tmp_path / "candidate.pending-verification-2.json").exists()
 
 
 def test_lock_rejects_second_runner(tmp_path: Path) -> None:
@@ -320,3 +360,115 @@ def test_lock_rejects_second_runner(tmp_path: Path) -> None:
         frontier.locked(tmp_path),
     ):
         pass
+
+
+def test_resume_refuses_live_orphan_child(tmp_path: Path) -> None:
+    ticks = frontier.process_start_ticks(os.getpid())
+    if ticks is None:
+        pytest.skip("process start identity requires Linux procfs")
+    saved = state(tmp_path)
+    side = frontier.next_side(saved)
+    assert side is not None
+    directory = tmp_path / "running-stage"
+    directory.mkdir()
+    (directory / "stdout.log.child.json").write_text(
+        json.dumps({"pid": os.getpid(), "start_ticks": ticks}), encoding="utf-8"
+    )
+    saved["cycles"].append(
+        {"side": str(side), "status": "RUNNING", "stages": [{"directory": str(directory)}]}
+    )
+    saved["active"] = 0
+    with pytest.raises(RuntimeError, match="prior child pid"):
+        frontier.run_cycle(tmp_path, saved)
+    assert (directory / "stdout.log.child.json").exists()
+
+
+def test_real_generator_one_cycle_and_resume(tmp_path: Path) -> None:
+    """Exercise the real child CLI with a deliberately incomplete inner row budget."""
+    packing = Path(__file__).resolve().parents[1]
+    args = [
+        sys.executable,
+        "-m",
+        "devtools.run_n12_frontier",
+        "--root",
+        str(tmp_path),
+        "--search-high",
+        "41/10",
+        "--screen-rounds",
+        "1",
+        "--normal-rounds",
+        "2",
+        "--deep-rounds",
+        "3",
+        "--max-rounds",
+        "4",
+        "--row-rounds",
+        "1",
+        "--max-cycles",
+        "1",
+    ]
+    env = {**os.environ, "PACK_JOBS": "2"}
+    first = subprocess.run(
+        args, cwd=packing, env=env, capture_output=True, text=True, check=True
+    )
+    assert "UNRESOLVED" in first.stdout
+    saved = frontier.load_state(tmp_path)
+    assert len(saved["cycles"]) == 1
+    assert saved["cycles"][0]["status"] == "UNRESOLVED"
+    assert saved["search_high_kind"] == "CONFIGURED_SEARCH_ENDPOINT"
+    stage = tmp_path / "L-403-100/cycle-0001/screen-01"
+    for name in ("result.json", "stdout.log", "column.log", "rows.log", "metadata.json"):
+        assert (stage / name).is_file()
+    assert not (stage / "candidate.unverified.json").exists()
+    assert frontier.load_state(tmp_path)["cycles"][0]["column_rounds_completed"] == 1
+    resumed = subprocess.run(
+        [*args, "--resume"],
+        cwd=packing,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "cycles completed: 1" in resumed.stdout
+    assert len(frontier.load_state(tmp_path)["cycles"]) == 1
+
+
+def test_real_generator_freezes_a_candidate(tmp_path: Path) -> None:
+    """A tiny n=1 run checks the generator's real freeze/result/log contract."""
+    packing = Path(__file__).resolve().parents[1]
+    frozen = tmp_path / "candidate.unverified.json"
+    result_path = tmp_path / "result.json"
+    args = [
+        sys.executable,
+        "-m",
+        "devtools.run_fractional_colgen",
+        "--n",
+        "1",
+        "--side",
+        "2",
+        "--shrink",
+        "9977/10000",
+        "--direction-steps",
+        "8",
+        "--grid-counts",
+        "2,3",
+        "--column-rounds",
+        "1",
+        "--max-rounds",
+        "10",
+        "--scale",
+        "1000",
+        "--freeze",
+        str(frozen),
+        "--json",
+        str(result_path),
+        "--log",
+        str(tmp_path / "column.log"),
+        "--row-log",
+        str(tmp_path / "rows.log"),
+    ]
+    subprocess.run(args, cwd=packing, capture_output=True, text=True, check=True)
+    assert frozen.is_file()
+    assert json.loads(result_path.read_text(encoding="utf-8"))["converged"] is True
+    assert (tmp_path / "column.log").is_file()
+    assert (tmp_path / "rows.log").is_file()

@@ -26,7 +26,7 @@ from typing import Any
 
 REPO = Path(__file__).resolve().parents[2]
 DEFAULT_SEED = REPO / "packing/cases/n12_fractional_certificate/certificate.json"
-SCHEMA = 1
+SCHEMA = 2
 STAGES = ("screen", "normal", "deep", "maximum")
 CSV_FIELDS = (
     "timestamp",
@@ -40,6 +40,7 @@ CSV_FIELDS = (
     "total_mass",
     "atoms",
     "rounds",
+    "cumulative_rounds",
     "elapsed",
     "late_gain",
     "averaged_depth",
@@ -94,7 +95,14 @@ def load_state(root: Path, config: dict[str, Any] | None = None) -> dict[str, An
         raise ValueError("incompatible frontier state schema or n")
     if config is not None and any(
         state.get("config", {}).get(key) != config.get(key)
-        for key in ("verified_low", "search_high", "seed_certificate", "workers", "budgets")
+        for key in (
+            "verified_low",
+            "search_high",
+            "seed_certificate",
+            "workers",
+            "budgets",
+            "row_rounds",
+        )
     ):
         raise ValueError("resume settings differ from the saved experiment")
     low, high = Fraction(state["verified_low"]), Fraction(state["search_high"])
@@ -197,7 +205,15 @@ def signals(result: dict[str, Any]) -> dict[str, float | int | None]:
 def decide_stage(
     result: dict[str, Any], stage_index: int, budgets: list[int], *, nearby: bool
 ) -> tuple[str, str]:
-    """Conservative search classification; convergence text is deliberately ignored."""
+    """Require inner row convergence; do not treat it as column exhaustion."""
+    if result.get("converged") is not True:
+        return "UNRESOLVED", (
+            "inner row generation did not converge; "
+            f"stopped={result.get('stopped', 'unknown')}; "
+            "no search-failure inference"
+        )
+    if result.get("total_mass") is None:
+        return "UNRESOLVED", "row solution produced no rationalized candidate"
     signal_values = signals(result)
     objective = result.get("objective")
     mass = result.get("total_mass")
@@ -268,7 +284,9 @@ def seed_for(state: dict[str, Any], side: Fraction) -> tuple[Path, str]:
     return best_path, best_label
 
 
-def command(side: Fraction, budget: int, seed: Path, directory: Path) -> list[str]:
+def command(
+    side: Fraction, budget: int, seed: Path, directory: Path, row_rounds: int
+) -> list[str]:
     return [
         sys.executable,
         "-m",
@@ -292,7 +310,7 @@ def command(side: Fraction, budget: int, seed: Path, directory: Path) -> list[st
         "--column-rounds",
         str(budget),
         "--max-rounds",
-        "60",
+        str(row_rounds),
         "--rows-per-direction",
         "3",
         "--seed-map",
@@ -310,6 +328,33 @@ def command(side: Fraction, budget: int, seed: Path, directory: Path) -> list[st
     ]
 
 
+def process_start_ticks(pid: int) -> str | None:
+    """Linux process identity, including its start time to exclude PID reuse."""
+    try:
+        stat = Path(f"/proc/{pid}/stat").read_text(encoding="utf-8")
+    except OSError, ValueError:
+        return None
+    fields = stat.rsplit(") ", 1)
+    if len(fields) != 2:
+        return None
+    parts = fields[1].split()
+    return parts[19] if len(parts) > 19 else None
+
+
+def active_child(directory: Path) -> int | None:
+    """Return a retained child still writing this stage, if any."""
+    for record_path in directory.glob("*.child.json"):
+        try:
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+            pid = int(record["pid"])
+            ticks = record["start_ticks"]
+        except OSError, ValueError, KeyError, TypeError:
+            continue
+        if ticks is not None and process_start_ticks(pid) == ticks:
+            return pid
+    return None
+
+
 def run_child(args: list[str], output: Path, env: dict[str, str] | None = None) -> int:
     with output.open("w", encoding="utf-8") as handle:
         process = subprocess.Popen(
@@ -320,7 +365,26 @@ def run_child(args: list[str], output: Path, env: dict[str, str] | None = None) 
             start_new_session=True,
             env=env,
         )
-        return process.wait()
+        atomic_json(
+            output.with_name(output.name + ".child.json"),
+            {
+                "pid": process.pid,
+                "start_ticks": process_start_ticks(process.pid),
+                "started_at": stamp(),
+                "command": args,
+            },
+        )
+        started = time.monotonic()
+        while True:
+            try:
+                return process.wait(timeout=300)
+            except subprocess.TimeoutExpired:
+                if output.parent.parent.name.startswith("cycle-"):
+                    emit(
+                        output.parents[3],
+                        f"[running] {output.parent.name}/{output.name} "
+                        f"elapsed={time.monotonic() - started:.0f}s",
+                    )
 
 
 def verify_candidate(  # noqa: PLR0911 - each exit names a retained gate outcome
@@ -340,26 +404,35 @@ def verify_candidate(  # noqa: PLR0911 - each exit names a retained gate outcome
     attempt = 1
     while (directory / f"verify-declare-{attempt}.log").exists():
         attempt += 1
-    copy = directory / (
+    pending = directory / (
+        "candidate.pending-verification.json"
+        if attempt == 1
+        else f"candidate.pending-verification-{attempt}.json"
+    )
+    verified = directory / (
         "candidate.verified.json" if attempt == 1 else f"candidate.verified-{attempt}.json"
     )
-    shutil.copyfile(candidate, copy)
+    shutil.copyfile(candidate, pending)
     declaration = run_child(
-        [sys.executable, "-m", "devtools.declare_least_cell_mass", str(copy)],
+        [sys.executable, "-m", "devtools.declare_least_cell_mass", str(pending)],
         directory / f"verify-declare-{attempt}.log",
     )
     if declaration:
         return "declaration-rejected", None
     quick_log = directory / f"verify-quick-{attempt}.log"
     quick = run_child(
-        [sys.executable, "-m", "devtools.decide_certificate", "--quick", str(copy)], quick_log
+        [sys.executable, "-m", "devtools.decide_certificate", "--quick", str(pending)],
+        quick_log,
     )
     if quick:
         return "quick-rejected", None
     full_log = directory / f"verify-full-{attempt}.log"
-    full = run_child([sys.executable, "-m", "devtools.decide_certificate", str(copy)], full_log)
+    full = run_child(
+        [sys.executable, "-m", "devtools.decide_certificate", str(pending)], full_log
+    )
     if full == 0 and "RETAINABLE: both routes accept" in full_log.read_text(encoding="utf-8"):
-        return "full-retainable", str(copy)
+        pending.replace(verified)
+        return "full-retainable", str(verified)
     return "full-rejected", None
 
 
@@ -382,6 +455,7 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
                     "total_mass": result.get("total_mass"),
                     "atoms": result.get("atoms"),
                     "rounds": sig["rounds"],
+                    "cumulative_rounds": stage.get("cumulative_column_rounds"),
                     "elapsed": result.get("seconds"),
                     "late_gain": sig["late_gain"],
                     "averaged_depth": sig["averaged_depth"],
@@ -421,14 +495,15 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
             "a positive full two-route exact decision."
         ),
         "",
-        "| Side | Status | Last objective | Reason |",
-        "| --- | --- | ---: | --- |",
+        "| Side | Status | Column rounds | Last objective | Reason |",
+        "| --- | --- | ---: | ---: | --- |",
     ]
     for cycle in state["cycles"]:
         last = cycle["stages"][-1] if cycle["stages"] else {}
         result = last.get("result") or {}
         lines.append(
-            f"| {cycle['side']} | {cycle['status']} | {result.get('objective', '')} "
+            f"| {cycle['side']} | {cycle['status']} | "
+            f"{cycle.get('column_rounds_completed', 0)} | {result.get('objective', '')} "
             f"| {cycle.get('reason', '')} |"
         )
     (root / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -530,6 +605,8 @@ def import_result(root: Path, state: dict[str, Any], source: Path) -> None:
         "status": decision,
         "reason": f"imported prior search result: {reason}",
         "seed_verified_low": state["verified_low"],
+        "column_rounds_completed": len(result.get("rounds") or []),
+        "column_rounds_requested": result["settings"].get("column_rounds", 0),
         "stages": [
             {
                 "name": "import",
@@ -539,6 +616,7 @@ def import_result(root: Path, state: dict[str, Any], source: Path) -> None:
                 "decision": decision,
                 "reason": reason,
                 "result": result,
+                "cumulative_column_rounds": len(result.get("rounds") or []),
                 "finished_at": stamp(),
             }
         ],
@@ -582,6 +660,12 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
     cycle = state["cycles"][active]
     side = Fraction(cycle["side"])
     budgets = state["config"]["budgets"]
+    for stage in cycle["stages"]:
+        if "directory" in stage and (pid := active_child(Path(stage["directory"]))) is not None:
+            raise RuntimeError(
+                f"prior child pid {pid} is still running for {stage['directory']}; "
+                "wait for it to finish, then resume"
+            )
     if cycle["stages"]:
         last = cycle["stages"][-1]
         if last["status"] == "complete" and last["decision"] != "ESCALATE":
@@ -650,7 +734,9 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             )
             if previous is not None:
                 seed, label = Path(previous["candidate_unverified"]), f"search-seed-only@{side}"
-            args = command(side, budgets[stage_index], seed, stage_dir)
+            args = command(
+                side, budgets[stage_index], seed, stage_dir, state["config"]["row_rounds"]
+            )
             generated = {
                 "name": name,
                 "budget": budgets[stage_index],
@@ -738,6 +824,15 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                 "finished_at": stamp(),
             }
         )
+        cycle["column_rounds_requested"] = sum(
+            stage["budget"] for stage in cycle["stages"] if stage["status"] == "complete"
+        )
+        cycle["column_rounds_completed"] = sum(
+            len(stage.get("result", {}).get("rounds") or [])
+            for stage in cycle["stages"]
+            if stage["status"] == "complete"
+        )
+        generated["cumulative_column_rounds"] = cycle["column_rounds_completed"]
         atomic_json(Path(generated["directory"]) / "metadata.json", generated)
         save_state(root, state)
         emit(
@@ -774,6 +869,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--normal-rounds", type=int, default=20)
     parser.add_argument("--deep-rounds", type=int, default=40)
     parser.add_argument("--max-rounds", type=int, default=60)
+    parser.add_argument(
+        "--row-rounds",
+        type=int,
+        default=60,
+        help="maximum inner row-generation rounds per column round",
+    )
     parser.add_argument("--target-width", type=Fraction)
     parser.add_argument("--max-cycles", type=int)
     parser.add_argument("--import-result", type=Path)
@@ -781,6 +882,7 @@ def main(argv: list[str] | None = None) -> int:
     budgets = [args.screen_rounds, args.normal_rounds, args.deep_rounds, args.max_rounds]
     if (
         args.workers < 1
+        or args.row_rounds < 1
         or sorted(set(budgets)) != budgets
         or budgets[0] < 1
         or (args.max_cycles is not None and args.max_cycles < 1)
@@ -798,6 +900,7 @@ def main(argv: list[str] | None = None) -> int:
         "seed_certificate": str(seed),
         "workers": args.workers,
         "budgets": budgets,
+        "row_rounds": args.row_rounds,
         "target_width": str(args.target_width) if args.target_width is not None else None,
         "max_cycles": args.max_cycles,
     }
@@ -826,6 +929,8 @@ def main(argv: list[str] | None = None) -> int:
             stop = StopFlag(root)
             signal.signal(signal.SIGINT, stop.handle)
             signal.signal(signal.SIGTERM, stop.handle)
+            if hasattr(signal, "SIGHUP"):
+                signal.signal(signal.SIGHUP, stop.handle)
             os.environ["PACK_JOBS"] = str(args.workers)
             emit(
                 root,
@@ -878,11 +983,21 @@ PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier \\
 `state.json` is authoritative. Each side has stable rational naming; each cycle
 and stage has its own directory. `summary.csv` and `report.md` are views of state.
 Use `--resume` after interruption. The lock prevents concurrent writers.
+Each subprocess records its PID and Linux process start identity beside its log.
+If a parent crash leaves a child alive, resume refuses to launch a duplicate
+until that child exits. SIGINT, SIGTERM, and SIGHUP request a graceful stop;
+long subprocesses emit a heartbeat every five minutes.
 
 A cycle is one side from screening through its final VERIFIED, SEARCH_FAILED, or
 UNRESOLVED decision. The first Ctrl-C finishes that cycle. Stage budgets rerun
 the generator with sites from the preceding frozen candidate; that candidate is
-only a search seed. No stage resumes solver internals. An incomplete stage with
+only a search seed. Budgets are additional restart budgets: the default
+8/20/40/60 schedule can request up to 128 column rounds across four runs,
+plus repeated inner row generation. State and report record the cumulative
+column rounds actually completed. No stage resumes solver internals.
+`--row-rounds` limits inner row generation per column round; a stage that does
+not converge there is UNRESOLVED regardless of its floating-point objective.
+An incomplete stage with
 a valid result JSON is finalized on resume; otherwise its files remain in place
 and a new stage attempt is made.
 
