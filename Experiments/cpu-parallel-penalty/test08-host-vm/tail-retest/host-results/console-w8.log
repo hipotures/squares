@@ -1,0 +1,3 @@
+{"label": "sample1", "workers": 8, "repeats": 350, "wall": 15.282194849, "worker_cpu": 117.043858358, "checksum": "6dcf5659d2bc7924"}
+{"label": "sample2", "workers": 8, "repeats": 350, "wall": 15.274383, "worker_cpu": 118.148080731, "checksum": "6dcf5659d2bc7924"}
+{"label": "sample3", "workers": 8, "repeats": 350, "wall": 15.301365606, "worker_cpu": 117.528450662, "checksum": "6dcf5659d2bc7924"}

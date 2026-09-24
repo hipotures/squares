@@ -1,0 +1,5 @@
+# started on Thu Sep 24 09:31:58 2026
+
+1651212252740,,instructions,618469304401,100.00,0.52,insn per cycle
+3199490215608,,cycles,618469304401,100.00,,
+10999011898,,ls_any_fills_from_sys.all_dram_io,618469304401,100.00,,

@@ -1,0 +1,116 @@
+{
+  "label": "sample3",
+  "workers": 8,
+  "repeats": 350,
+  "load_before": {
+    "utc": "2026-09-24T07:31:35Z",
+    "loadavg": [
+      3.41259765625,
+      3.15771484375,
+      2.5078125
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62222364\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 8,
+    "repeats": 350,
+    "directions": 181,
+    "wall": 15.301365606,
+    "max_worker_wall": 15.301265116,
+    "worker_cpu": 117.528450662,
+    "calls": 63350,
+    "checksum": "6dcf5659d2bc7924",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 227914,
+        "wall": 14.748787067,
+        "cpu_time": 14.746864292,
+        "calls": 8050,
+        "checksum": "bea5512bbdf801d9"
+      },
+      {
+        "cpu": 1,
+        "pid": 227915,
+        "wall": 14.601941273,
+        "cpu_time": 14.60183126,
+        "calls": 8050,
+        "checksum": "3edcd3d5d7bd4075"
+      },
+      {
+        "cpu": 2,
+        "pid": 227916,
+        "wall": 15.114427446,
+        "cpu_time": 15.114153591,
+        "calls": 8050,
+        "checksum": "8b077c5fbe5545c1"
+      },
+      {
+        "cpu": 3,
+        "pid": 227917,
+        "wall": 15.301265116,
+        "cpu_time": 15.301149932,
+        "calls": 8050,
+        "checksum": "03f3cb33cb4ee565"
+      },
+      {
+        "cpu": 4,
+        "pid": 227918,
+        "wall": 15.089843021,
+        "cpu_time": 15.089755047,
+        "calls": 8050,
+        "checksum": "1cca6d9582f1928d"
+      },
+      {
+        "cpu": 5,
+        "pid": 227919,
+        "wall": 14.109986281,
+        "cpu_time": 14.109019841,
+        "calls": 7700,
+        "checksum": "dfe00bd3a4c4f5c9"
+      },
+      {
+        "cpu": 6,
+        "pid": 227920,
+        "wall": 14.61318604,
+        "cpu_time": 14.61309189,
+        "calls": 7700,
+        "checksum": "48e86d24280d2681"
+      },
+      {
+        "cpu": 7,
+        "pid": 227921,
+        "wall": 13.952679118,
+        "cpu_time": 13.952584809,
+        "calls": 7700,
+        "checksum": "104d26d69f8fe995"
+      }
+    ]
+  },
+  "external_wall": 15.302367601994774,
+  "command": [
+    "/root/squares-cpu-penalty-test08-tail/replay",
+    "--data",
+    "/root/squares-cpu-penalty-test08-tail/data.bin",
+    "--workers",
+    "8",
+    "--repeats",
+    "350"
+  ],
+  "perf_events_requested": "instructions,cycles,ls_any_fills_from_sys.all_dram_io",
+  "perf_counters": {
+    "instructions": {
+      "count": 930030358150.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 558965260154.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 1681960177.0,
+      "running_percent": 100.0
+    }
+  },
+  "perf_stderr": ""
+}

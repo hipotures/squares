@@ -30,3 +30,12 @@ physical CPUs 0–15, matching the distinct-core physical control in Test 2.
 The host's QEMU vCPU threads are normally unpinned; Test 2 measured about a
 5% VM placement effect, which is included in the interpretation uncertainty.
 No system-wide setting or production source is changed.
+
+The first host run completed 1/2/4 workers but its first 8-worker batch lasted
+7.902868434 seconds, below the 10-second minimum. The raw failed receipt is
+retained in `host-results/` and excluded. `tail-retest/` contains a revised
+fixed plan with 350 repeats at 8 and 620 at 16; the same plan ran three
+times per endpoint on both host and VM. From this directory run
+`python3 tail-retest/summarize_combined.py` to regenerate
+`processed/summary-complete.json` from both
+plans. The combined summary is the authoritative host/VM comparison.

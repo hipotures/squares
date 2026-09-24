@@ -1,0 +1,180 @@
+{
+  "label": "sample2",
+  "workers": 16,
+  "repeats": 620,
+  "load_before": {
+    "utc": "2026-09-24T07:32:56Z",
+    "loadavg": [
+      7.8125,
+      4.6025390625,
+      3.068359375
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62289819\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 16,
+    "repeats": 620,
+    "directions": 181,
+    "wall": 56.929895682,
+    "max_worker_wall": 56.929767702,
+    "worker_cpu": 619.36985051,
+    "calls": 112220,
+    "checksum": "9f46094101fd3341",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 228187,
+        "wall": 20.677995753,
+        "cpu_time": 20.676782483,
+        "calls": 7440,
+        "checksum": "6dc7b7555a9c287d"
+      },
+      {
+        "cpu": 1,
+        "pid": 228188,
+        "wall": 21.12429045,
+        "cpu_time": 21.121652929,
+        "calls": 7440,
+        "checksum": "c71db403463bfb55"
+      },
+      {
+        "cpu": 2,
+        "pid": 228189,
+        "wall": 21.705312919,
+        "cpu_time": 21.704574836,
+        "calls": 7440,
+        "checksum": "a88deb3a32e0e845"
+      },
+      {
+        "cpu": 3,
+        "pid": 228190,
+        "wall": 21.238153251,
+        "cpu_time": 21.237717225,
+        "calls": 7440,
+        "checksum": "b65b7467750e09b5"
+      },
+      {
+        "cpu": 4,
+        "pid": 228191,
+        "wall": 21.1994776,
+        "cpu_time": 21.198908084,
+        "calls": 7440,
+        "checksum": "a953f1925e0adf25"
+      },
+      {
+        "cpu": 5,
+        "pid": 228192,
+        "wall": 20.640724277,
+        "cpu_time": 20.64048565,
+        "calls": 6820,
+        "checksum": "fe0f5b6139993485"
+      },
+      {
+        "cpu": 6,
+        "pid": 228193,
+        "wall": 20.389433756,
+        "cpu_time": 20.389200075,
+        "calls": 6820,
+        "checksum": "f62492db91ad1e75"
+      },
+      {
+        "cpu": 7,
+        "pid": 228194,
+        "wall": 20.076844332,
+        "cpu_time": 20.076588843,
+        "calls": 6820,
+        "checksum": "01626597c3c04725"
+      },
+      {
+        "cpu": 8,
+        "pid": 228195,
+        "wall": 56.764153081,
+        "cpu_time": 56.748895584,
+        "calls": 6820,
+        "checksum": "37319db3acdfcbd5"
+      },
+      {
+        "cpu": 9,
+        "pid": 228196,
+        "wall": 56.832785076,
+        "cpu_time": 56.822147861,
+        "calls": 6820,
+        "checksum": "ae67622741a1180d"
+      },
+      {
+        "cpu": 10,
+        "pid": 228197,
+        "wall": 56.792531371,
+        "cpu_time": 56.364071753,
+        "calls": 6820,
+        "checksum": "b928ed9a0b2f5b85"
+      },
+      {
+        "cpu": 11,
+        "pid": 228198,
+        "wall": 56.819544077,
+        "cpu_time": 56.816206103,
+        "calls": 6820,
+        "checksum": "91c06c7321dc2e65"
+      },
+      {
+        "cpu": 12,
+        "pid": 228199,
+        "wall": 56.929767702,
+        "cpu_time": 56.883819307,
+        "calls": 6820,
+        "checksum": "b9a12945fb1ca5cd"
+      },
+      {
+        "cpu": 13,
+        "pid": 228200,
+        "wall": 56.512684081,
+        "cpu_time": 56.506904252,
+        "calls": 6820,
+        "checksum": "1d0a8efb85463f7d"
+      },
+      {
+        "cpu": 14,
+        "pid": 228201,
+        "wall": 56.425654126,
+        "cpu_time": 56.419800106,
+        "calls": 6820,
+        "checksum": "e4cc03139a4cdf45"
+      },
+      {
+        "cpu": 15,
+        "pid": 228202,
+        "wall": 55.765562543,
+        "cpu_time": 55.762095419,
+        "calls": 6820,
+        "checksum": "334753a977efc9e5"
+      }
+    ]
+  },
+  "external_wall": 56.9309062770044,
+  "command": [
+    "/root/squares-cpu-penalty-test08-tail/replay",
+    "--data",
+    "/root/squares-cpu-penalty-test08-tail/data.bin",
+    "--workers",
+    "16",
+    "--repeats",
+    "620"
+  ],
+  "perf_events_requested": "instructions,cycles,ls_any_fills_from_sys.all_dram_io",
+  "perf_counters": {
+    "instructions": {
+      "count": 1651112421435.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 3202521213130.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 11063996613.0,
+      "running_percent": 100.0
+    }
+  },
+  "perf_stderr": ""
+}

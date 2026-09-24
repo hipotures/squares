@@ -1,6 +1,6 @@
 {
   "phase": "final",
-  "status": "complete under host-access failure policy: tests 1-7 executed; test 8 VM executed, physical-host half BLOCKED",
+  "status": "complete: tests 1-8 executed; physical PVE host native comparison incorporated",
   "starting_sha": "897b722f2997fbf09b99b1700787a0052270de30",
   "test01": {
     "workers": {
@@ -2476,59 +2476,244 @@
     }
   },
   "test08": {
-    "processed_file": "test08-host-vm/processed/summary.json",
+    "processed_file": "test08-host-vm/processed/summary-complete.json",
     "package_sha256": "515f1414fc7adee48f7f49eea2cc0637135b271dec33ce9fc9e8c4ec63b26a26",
     "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
     "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
     "vm": {
       "1": {
+        "batch_wall_min": 25.491163722,
+        "batch_wall_median": 25.533113245,
+        "batch_wall_max": 26.541598985,
+        "batch_wall_cv": 0.018781239183318917,
         "wall_per_replay": 0.19490926141221374,
         "worker_cpu_per_replay": 0.19483664203816795,
-        "instructions_ratio": 1.0,
-        "cycles_ratio": 1.0,
+        "instructions_per_replay": 2655451387.19084,
+        "cycles_per_replay": 1073558121.778626,
+        "ipc": 2.4735050048258214,
+        "dram_origin_fills_per_replay": 21044.625954198473,
+        "speedup": 1.0,
+        "efficiency": 1.0,
         "cpu_inflation": 1.0,
-        "dram_fills_ratio": 1.0
+        "checksum": "1945dec119158f0f",
+        "repeats": 131
       },
       "2": {
+        "batch_wall_min": 24.631281985,
+        "batch_wall_median": 24.664496498,
+        "batch_wall_max": 24.927035117,
+        "batch_wall_cv": 0.005346903878900999,
         "wall_per_replay": 0.11801194496650717,
         "worker_cpu_per_replay": 0.23458333426794256,
-        "instructions_ratio": 1.0000395487039762,
-        "cycles_ratio": 1.1755075423362202,
+        "instructions_per_replay": 2655556406.8516746,
+        "cycles_per_replay": 1261975669.2870812,
+        "ipc": 2.104308396471799,
+        "dram_origin_fills_per_replay": 2919814.325358852,
+        "speedup": 1.6516062121298882,
+        "efficiency": 0.8258031060649441,
         "cpu_inflation": 1.204000088556178,
-        "dram_fills_ratio": 138.74394022082103
+        "checksum": "6030510151bba741",
+        "repeats": 209
       },
       "4": {
+        "batch_wall_min": 24.327944873,
+        "batch_wall_median": 24.44701403,
+        "batch_wall_max": 24.591246618,
+        "batch_wall_cv": 0.0044021354537876365,
         "wall_per_replay": 0.10537506047413793,
         "worker_cpu_per_replay": 0.4181492683362069,
-        "instructions_ratio": 1.0004614118024509,
-        "cycles_ratio": 2.099317110120429,
+        "instructions_per_replay": 2656676643.801724,
+        "cycles_per_replay": 2253738933.7586207,
+        "ipc": 1.1787696782767254,
+        "dram_origin_fills_per_replay": 15903032.323275862,
+        "speedup": 1.849671644649258,
+        "efficiency": 0.4624179111623145,
         "cpu_inflation": 2.1461531258288296,
-        "dram_fills_ratio": 755.6813961857638
+        "checksum": "a16b5bf2520685d3",
+        "repeats": 232
       },
       "8": {
-        "wall_per_replay": 0.14659935447486033,
-        "worker_cpu_per_replay": 1.1243818395586591,
-        "instructions_ratio": 1.0020744689081709,
-        "cycles_ratio": 5.499468858575333,
-        "cpu_inflation": 5.770895185816207,
-        "dram_fills_ratio": 1485.242636815838
+        "batch_wall_min": 50.504276091,
+        "batch_wall_median": 51.521564902,
+        "batch_wall_max": 52.000984542,
+        "batch_wall_cv": 0.012154545364779161,
+        "wall_per_replay": 0.14720447114857144,
+        "worker_cpu_per_replay": 1.14086702642,
+        "instructions_per_replay": 2661072242.3142858,
+        "cycles_per_replay": 5998309794.411428,
+        "ipc": 0.4436370133455899,
+        "dram_origin_fills_per_replay": 32031433.165714286,
+        "speedup": 1.3240716120334044,
+        "efficiency": 0.16550895150417555,
+        "cpu_inflation": 5.855505486470596,
+        "checksum": "6dcf5659d2bc7924",
+        "repeats": 350
       },
       "16": {
-        "wall_per_replay": 0.09073933061886792,
-        "worker_cpu_per_replay": 0.9626683793924528,
-        "instructions_ratio": 1.0018332460504202,
-        "cycles_ratio": 4.505040348439417,
-        "cpu_inflation": 4.940900075684269,
-        "dram_fills_ratio": 967.9404964798507
+        "batch_wall_min": 50.084846161,
+        "batch_wall_median": 53.070484613,
+        "batch_wall_max": 56.419709657,
+        "batch_wall_cv": 0.04864701915450341,
+        "wall_per_replay": 0.08559755582741935,
+        "worker_cpu_per_replay": 0.9216042486354838,
+        "instructions_per_replay": 2660097121.832258,
+        "cycles_per_replay": 4619675550.772581,
+        "ipc": 0.5758190359033745,
+        "dram_origin_fills_per_replay": 19613108.553225808,
+        "speedup": 2.277042370289021,
+        "efficiency": 0.1423151481430638,
+        "cpu_inflation": 4.730138227566785,
+        "checksum": "9f46094101fd3341",
+        "repeats": 620
       }
     },
     "host": {
-      "status": "BLOCKED",
-      "reason": "Direct SSH to root@192.168.100.1 timed out; operator-provided host copy contained only Phase A receipts; verified standalone package and exact host task handed off.",
-      "direct_access_receipt": "test08-host-vm/raw/direct-host-access.json",
-      "host_task": "test08-host-vm/HOST_AGENT_TASK.md",
-      "shared_package": "/srv/ai/benchmarks/squares-cpu-penalty-test08/package.tar.gz"
-    }
+      "1": {
+        "batch_wall_min": 34.509959886,
+        "batch_wall_median": 34.519925456,
+        "batch_wall_max": 34.530664094,
+        "batch_wall_cv": 0.00024491241242050884,
+        "wall_per_replay": 0.26351088134351147,
+        "worker_cpu_per_replay": 0.2634912039541985,
+        "instructions_per_replay": 2657791266.1603055,
+        "cycles_per_replay": 1310668424.7175572,
+        "ipc": 2.0278136071928694,
+        "dram_origin_fills_per_replay": 1059.0916030534352,
+        "speedup": 1.0,
+        "efficiency": 1.0,
+        "cpu_inflation": 1.0,
+        "checksum": "1945dec119158f0f",
+        "repeats": 131
+      },
+      "2": {
+        "batch_wall_min": 27.578407924,
+        "batch_wall_median": 27.581684042,
+        "batch_wall_max": 27.58736571,
+        "batch_wall_cv": 0.000134168258076811,
+        "wall_per_replay": 0.13196978010526314,
+        "worker_cpu_per_replay": 0.26340800724401914,
+        "instructions_per_replay": 2657214453.1004786,
+        "cycles_per_replay": 1297427958.9952154,
+        "ipc": 2.048055287768359,
+        "dram_origin_fills_per_replay": 1014.1866028708134,
+        "speedup": 1.9967516891619213,
+        "efficiency": 0.9983758445809606,
+        "cpu_inflation": 0.9996842524193186,
+        "checksum": "6030510151bba741",
+        "repeats": 209
+      },
+      "4": {
+        "batch_wall_min": 15.602764383,
+        "batch_wall_median": 15.620242923,
+        "batch_wall_max": 15.630268124,
+        "batch_wall_cv": 0.0007276943645341174,
+        "wall_per_replay": 0.0673286332887931,
+        "worker_cpu_per_replay": 0.26910834712500004,
+        "instructions_per_replay": 2657048604.9698277,
+        "cycles_per_replay": 1282532980.310345,
+        "ipc": 2.0717195513703355,
+        "dram_origin_fills_per_replay": 108413.03448275862,
+        "speedup": 3.9138011344034376,
+        "efficiency": 0.9784502836008594,
+        "cpu_inflation": 1.021318143021495,
+        "checksum": "a16b5bf2520685d3",
+        "repeats": 232
+      },
+      "8": {
+        "batch_wall_min": 15.274383,
+        "batch_wall_median": 15.282194849,
+        "batch_wall_max": 15.301365606,
+        "batch_wall_cv": 0.0007416137244619487,
+        "wall_per_replay": 0.04366341385428572,
+        "worker_cpu_per_replay": 0.33579557332,
+        "instructions_per_replay": 2657229594.714286,
+        "cycles_per_replay": 1597043600.44,
+        "ipc": 1.6638428618869234,
+        "dram_origin_fills_per_replay": 4805600.505714286,
+        "speedup": 6.035049898363523,
+        "efficiency": 0.7543812372954404,
+        "cpu_inflation": 1.274409043948085,
+        "checksum": "6dcf5659d2bc7924",
+        "repeats": 350
+      },
+      "16": {
+        "batch_wall_min": 56.657744034,
+        "batch_wall_median": 56.929895682,
+        "batch_wall_max": 57.044844151,
+        "batch_wall_cv": 0.0028538295540527594,
+        "wall_per_replay": 0.09182241239032259,
+        "worker_cpu_per_replay": 0.9974469260983871,
+        "instructions_per_replay": 2663084550.701613,
+        "cycles_per_replay": 5160468089.690323,
+        "ipc": 0.5160860454221516,
+        "dram_origin_fills_per_replay": 17740341.77096774,
+        "speedup": 2.8697882628411926,
+        "efficiency": 0.17936176642757454,
+        "cpu_inflation": 3.785503694733464,
+        "checksum": "9f46094101fd3341",
+        "repeats": 620
+      }
+    },
+    "status": "COMPLETE: same native replay on physical PVE and VM, three valid long samples per endpoint",
+    "original_host_failure": {
+      "workers": 8,
+      "sample": 1,
+      "wall_seconds": 7.902868434,
+      "reason": "Below 10-second minimum; excluded from performance comparison",
+      "receipt": "test08-host-vm/host-results/failure-summary.txt"
+    },
+    "tail_retest": {
+      "plan": "test08-host-vm/tail-retest/package/plan.json",
+      "archive": "test08-host-vm/tail-retest/package.tar.gz",
+      "archive_sha256": "3bb51aad4c158181a9a41a067a91226777a92b82fc4fab8207c8e7d1006d05af",
+      "repeats": {
+        "8": 350,
+        "16": 620
+      },
+      "vm_raw": "test08-host-vm/tail-retest/vm-results",
+      "host_raw": "test08-host-vm/tail-retest/host-results"
+    },
+    "comparison": {
+      "1": {
+        "host_vs_vm_wall_ratio": 1.3519669585439151,
+        "host_vs_vm_cpu_ratio": 1.3523698684079215,
+        "host_vs_vm_instruction_ratio": 1.0008811605366803,
+        "host_vs_vm_cycle_ratio": 1.2208639645388708
+      },
+      "2": {
+        "host_vs_vm_wall_ratio": 1.1182747656834002,
+        "host_vs_vm_cpu_ratio": 1.1228760477210749,
+        "host_vs_vm_instruction_ratio": 1.000624368680148,
+        "host_vs_vm_cycle_ratio": 1.0280926887664656
+      },
+      "4": {
+        "host_vs_vm_wall_ratio": 0.6389427724724057,
+        "host_vs_vm_cpu_ratio": 0.6435700538130018,
+        "host_vs_vm_instruction_ratio": 1.0001400099515203,
+        "host_vs_vm_cycle_ratio": 0.5690690084372063
+      },
+      "8": {
+        "host_vs_vm_wall_ratio": 0.2966174431632368,
+        "host_vs_vm_cpu_ratio": 0.2943336651368692,
+        "host_vs_vm_instruction_ratio": 0.998555977722477,
+        "host_vs_vm_cycle_ratio": 0.2662489359799241
+      },
+      "16": {
+        "host_vs_vm_wall_ratio": 1.0727223634218448,
+        "host_vs_vm_cpu_ratio": 1.0822941925183125,
+        "host_vs_vm_instruction_ratio": 1.0011230525550499,
+        "host_vs_vm_cycle_ratio": 1.1170628830908484
+      }
+    },
+    "binary_source_data_check": {
+      "same_source_sha256": true,
+      "same_data_sha256": true,
+      "same_build_flags": true,
+      "same_binary_within_each_machine_original_and_retest": true,
+      "compiler_versions_differ": true,
+      "host_vs_vm_instructions_per_replay_within_fraction": 0.0014
+    },
+    "interpretation": "Physical host reproduces a large 16-worker penalty (3.79x CPU inflation); VM 16-worker absolute wall/CPU is similar. Large 8-worker difference is confounded by physical L3 domain placement of host CPUs 0-7 versus unpinned QEMU vCPU threads."
   },
   "final_synthesis": {
     "primary_comparison": {
@@ -2556,7 +2741,8 @@
       "TLB": "huge pages lower misses but do not improve 16-worker CPU",
       "tails": "0.167-0.221 s observed final-half-idle window, tested schedulers have no reproducible saving",
       "physical_ddr_saturation": "unproven without memory controller counters",
-      "native_host_comparison": "BLOCKED"
+      "native_host_comparison": "Physical PVE reproduces strong 16-worker CPU inflation, 3.79x serial; VM 4.73x serial, similar absolute 16-worker wall/CPU",
+      "host_vm_8_worker_gap": "VM CPU 3.40x PVE CPU per native replay at 8 workers; physical L3 placement differs, so virtualization-specific share unresolved"
     },
     "test_verdicts": {
       "1": "CONFIRMED: slower execution dominates",
@@ -2566,7 +2752,7 @@
       "5": "STRONGLY SUPPORTED: active working set",
       "6": "REFUTED: huge pages as wall optimization",
       "7": "REFUTED: tested schedulers as material improvement",
-      "8": "BLOCKED: physical-host half; VM complete"
+      "8": "STRONGLY SUPPORTED: large 16-worker penalty exists on physical host; exact 8-worker VM excess unresolved"
     },
     "next_cpu_action": {
       "target": "64-row prefix strip, research-only paired full-solver integration test",

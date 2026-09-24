@@ -2,9 +2,10 @@
 
 Research starting point: `897b722f2997fbf09b99b1700787a0052270de30`
 on `main`; accepted production integration `011aa1b5` is an ancestor.
-Phases A–C are complete. Test 8 and final synthesis remain pending.
+All four phases and eight tests are complete, including the physical PVE
+control received after the original host-access-blocked checkpoint.
 
-## Phase A evidence so far
+## Phase A: instructions, host placement, and independent processes
 
 The table uses medians of three long complete-separation batches. All perf
 events in this primary group ran at 100% enabled time. CPU, instructions,
@@ -308,49 +309,35 @@ computation. The measured recoverable share is approximately zero within
 the 0.03–0.18 s pair-to-pair VM variation. Do not add the ordered-wait and
 tail figures.
 
-## Phase D: native host/VM control (host half blocked at checkpoint)
+## Phase D: identical native workload on VM and physical PVE
 
-The standalone package captures **all 181 real round-18 directions**. Its C
-source reproduces production-order scatter into the difference grid, both
-in-place prefix passes, slab interval compaction, and the same stable finite
-top-13 heap ordering. Before every timed sample, each process checks the
-complete difference grid, mass grid, and selected candidate indices/masses
-against the Python-captured checksums for its fixed direction share. The
-input file is 3,542,376 bytes and represents 172,892,736 grid cells across
-the 181 directions. The same source, input bytes, `-march=x86-64-v3` flags,
-fixed worker shares, iteration counts, and checksums are prescribed for VM
-and host. Data loading, warmup, perf attachment, and output JSON are outside
-each timed region. This is a representative **single late round repeated**;
-its absolute scaling penalty is not the full 23-round solver penalty.
+The standalone package replays all 181 captured real round-18 directions. It performs production-order scatter, both in-place prefix passes, slab compaction, and stable finite top-13 selection. Every process verifies the full difference grid, mass grid, and selected indices/masses before timing. The source/data SHA-256 and `-O3 -std=c11 -fno-fast-math -march=x86-64-v3 -mtune=generic` flags match across VM and host. Their GCC versions differ (VM 15.2, PVE 14.2), but executed instructions per replay agree within 0.14% at all five worker counts. Both binaries were identical between their original and retest runs on the same machine. All 15 accepted host samples and 15 accepted VM samples have the fixed plan checksum, 100% enabled perf events, and batch durations of 15.27–57.05 s on PVE and 23.79–56.42 s in the VM.
 
-Each VM endpoint has three independent 23.79–26.54-second samples; perf's
-three events ran at 100% enabled time. The table normalizes by identical
-complete 181-direction replay counts within each worker endpoint:
+The original PVE plan succeeded for workers 1/2/4. Its first 8-worker sample lasted **7.902868434 s**, below the required 10 s. That failed receipt (`host-results/console.log`, `failure-summary.txt`, and `perf-sample1-w8.csv`) is retained and excluded from performance conclusions. The revised fixed plan uses 350 complete 181-direction replays at 8 workers and 620 at 16 on **both** machines. Three valid samples per endpoint were collected. The exact plans, raw JSON/perf, package archive, source, and processed distributions are in `test08-host-vm/`; the combined machine-readable result is `processed/summary-complete.json`.
 
-| VM workers | Wall/replay (s) | Worker CPU/replay (s) | Instructions vs 1 | Cycles vs 1 | IPC | Speedup | Efficiency | CPU inflation |
+| Workers | VM batch median, range (s) | PVE batch median, range (s) | VM wall/replay (s) | PVE wall/replay (s) | VM CPU/replay (s) | PVE CPU/replay (s) | VM CPU inflation | PVE CPU inflation |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 0.195 | 0.195 | 1.000× | 1.000× | 2.474 | 1.00× | 100% | 1.00× |
-| 2 | 0.118 | 0.235 | 1.000× | 1.176× | 2.104 | 1.65× | 82.6% | 1.20× |
-| 4 | 0.105 | 0.418 | 1.000× | 2.099× | 1.179 | 1.85× | 46.2% | 2.15× |
-| 8 | 0.147 | 1.124 | 1.002× | 5.499× | 0.451 | 1.33× | 16.6% | 5.77× |
-| 16 | 0.091 | 0.963 | 1.002× | 4.505× | 0.550 | 2.15× | 13.4% | 4.94× |
+| 1 | 25.53, 25.49–26.54 | 34.52, 34.51–34.53 | 0.1949 | 0.2635 | 0.1948 | 0.2635 | 1.00× | 1.00× |
+| 2 | 24.66, 24.63–24.93 | 27.58, 27.58–27.59 | 0.1180 | 0.1320 | 0.2346 | 0.2634 | 1.20× | 1.00× |
+| 4 | 24.45, 24.33–24.59 | 15.62, 15.60–15.63 | 0.1054 | 0.0673 | 0.4181 | 0.2691 | 2.15× | 1.02× |
+| 8 | 51.52, 50.50–52.00 | 15.28, 15.27–15.30 | 0.1472 | 0.0437 | 1.1409 | 0.3358 | 5.86× | 1.27× |
+| 16 | 53.07, 50.08–56.42 | 56.93, 56.66–57.05 | 0.0856 | 0.0918 | 0.9216 | 0.9974 | 4.73× | 3.79× |
 
-The VM's DRAM-origin cache-fill event rises about 968× at 16 workers on
-this repeatedly warm single-round workload, while instructions remain
-constant. The very large relative fill ratio has a small one-worker
-denominator because the same grids are reused repeatedly; it is a cache
-fill proxy, **not** physical DDR bytes. The host execution is needed to
-determine whether this native inflation is intrinsic to the workload or
-materially worsened by VM placement/translation. Direct SSH to the PVE host
-gateway `192.168.100.1` timed out (receipt in
-`test08-host-vm/raw/direct-host-access.json`). The operator-provided
-`/home/user/cpu-parallel-penalty-host/` contains the Phase A topology/pinning
-receipts, already preserved byte-for-byte under Test 2, but no Test 8 sample.
-The same 752 KiB lossless package and exact host task are available at
-`/srv/ai/benchmarks/squares-cpu-penalty-test08/`. The host half is therefore
-**BLOCKED at this checkpoint** under the explicit host-access failure policy;
-no physical-host result or VM-specific causal attribution is claimed. Host
-results can be imported later without rerunning the verified VM control.
+The VM wall CV across the three samples is 1.88%, 0.53%, 0.44%, 1.22%, and 4.86% for 1/2/4/8/16 workers; PVE CV is 0.02%, 0.01%, 0.07%, 0.07%, and 0.29%. No sample is discarded. VM 16-worker variation makes the small 7% PVE-versus-VM median difference unsuitable for a precise causal claim; the large 8-worker difference remains far outside its sample spread.
+
+| Workers | VM speedup / efficiency | PVE speedup / efficiency | VM instructions (G) | PVE instructions (G) | VM cycles (G) | PVE cycles (G) | VM IPC | PVE IPC | VM / PVE DRAM-origin fills (M) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1.00× / 100% | 1.00× / 100% | 2.656 | 2.658 | 1.074 | 1.311 | 2.474 | 2.028 | 0.021 / 0.001 |
+| 2 | 1.65× / 82.6% | 2.00× / 99.8% | 2.656 | 2.657 | 1.262 | 1.297 | 2.104 | 2.048 | 2.920 / 0.001 |
+| 4 | 1.85× / 46.2% | 3.91× / 97.8% | 2.657 | 2.657 | 2.254 | 1.283 | 1.179 | 2.072 | 15.903 / 0.108 |
+| 8 | 1.32× / 16.6% | 6.04× / 75.4% | 2.661 | 2.657 | 5.998 | 1.597 | 0.444 | 1.664 | 32.031 / 4.806 |
+| 16 | 2.28× / 14.2% | 2.87× / 17.9% | 2.660 | 2.663 | 4.620 | 5.161 | 0.576 | 0.516 | 19.613 / 17.740 |
+
+**Physical-host reproduction:** at 16 workers the physical host needs 3.79× its serial aggregate CPU for essentially the same 2.66 billion instructions, with 3.94× the serial cycles. The VM is 4.73× its own serial CPU, but its 16-worker *absolute* wall, CPU, cycles, and DRAM-origin fills are similar to PVE. Thus a large 16-worker penalty exists without virtualization. The host/VM inflation-ratio difference is partly driven by the PVE serial baseline being 35% slower than the VM serial baseline; it must not be treated as a measured virtualization tax.
+
+**Placement qualification:** host workers are pinned to physical CPUs 0–15. CPUs 0–7 share one recorded L3 domain; CPUs 8–15 are in the other. The 8-worker host endpoint therefore uses only the first domain, while the 16-worker endpoint spans both. Guest workers are pinned to guest vCPUs, but the QEMU vCPU threads were not physically pinned for this native control. At 8 workers the VM consumes 3.40× the PVE worker CPU and has 6.66× the PVE DRAM-origin fills per replay; at 16 the VM and PVE are much closer. This is consistent with placement/cache-domain effects, but the experiment does **not** separate physical placement from nested translation or other VM effects at 8 workers. The earlier controlled host pinning test saved about 5% in the full 23-round replay, a different workload.
+
+The host and guest expose the same AVX2-capable x86-64-v3 ISA target. Neither environment exposes a working AMD UMC/DF PMU device, so controller bandwidth and physical DDR saturation remain unproven. These native results are for one late round repeated, not the full 23-round production separation, and are used to identify mechanism rather than to substitute native wall for solver wall.
 
 ## Final synthesis: why 16 workers consume 2.2× CPU
 
@@ -369,11 +356,11 @@ Estimates below are deliberately **non-additive**. The same lost cycle may appea
 | Guest scheduler wait | Runnable wait 0.009 → 0.513 s/replay | +0.504 s aggregate wait, outside worker CPU; wall contribution unresolved | High |
 | Host throttling / mapping | No recorded cgroup throttle; distinct physical-core pinning changes median wall 1.860 → 1.764 s | About 0.096 s wall and 1.11 worker CPU-s in that paired control | Medium |
 | All-core compute / frequency | Register-only target slows 13–17%; effective counted-cycle rate falls 11.6% | Roughly 2.72 CPU-s arithmetic counterfactual; attribution to frequency unresolved | Low–medium |
-| Shared cache / active capacity | Prefix inflation rises 1.17× at 2 MiB to 3.88× at 16 MiB; strips cut 16-worker kernel CPU 11.7% | Material part of extra cycles; cannot isolate seconds from memory effects | High for causality, low for absolute share |
-| Shared memory subsystem / bandwidth | DRAM-origin fills rise 16.7×; memory backgrounds strongly reduce IPC; different real inputs worsen prefix | Material and overlapping with cache; physical DDR throughput unmeasured | High for interference, low for DDR saturation |
+| Shared cache / active capacity | Prefix inflation rises 1.17× at 2 MiB to 3.88× at 16 MiB; strips cut 16-worker kernel CPU 11.7%; PVE's native 16-worker cycles rise 3.94× with constant instructions | Material part of extra cycles; cannot isolate seconds from memory effects | High for causality, low for absolute share |
+| Shared memory subsystem / bandwidth | DRAM-origin fills rise 16.7× in full VM replay; memory backgrounds strongly reduce IPC; PVE native 16-worker fills also rise sharply | Material and overlapping with cache; physical DDR throughput unmeasured | High for interference, low for DDR saturation |
 | TLB / address translation | Verified huge pages reduce DTLB misses 61% at 16 workers but CPU rises 3.8% | No measured positive 16-worker wall saving | High for negative intervention |
 | Load imbalance / tails | Workers active 83.5%; final half-idle window 0.167–0.221 s/replay; two schedulers have no repeatable gain | Window is at most 0.17–0.22 s wall, not recoverable saving; observed gain ~0 | Medium |
-| Other / unresolved | Host-vs-VM native comparison blocked at checkpoint; cache versus DDR cannot be separated by guest counters | Unquantified residual; do not force a percentage | Explicitly unresolved |
+| Other / unresolved | Physical host reproduces strong 16-worker native inflation; 8-worker host/VM difference is confounded by physical L3 placement; cache versus DDR cannot be separated by available counters | Unquantified residual; do not force a percentage | Explicitly unresolved |
 
 ### Same-replay scaling
 
@@ -398,14 +385,14 @@ All values are median per full 23-round separation replay. Instructions and cycl
 | 5 | Active working set is causal | Size knees and 11.7% 16-worker bitwise row-strip kernel improvement | **STRONGLY SUPPORTED** | High |
 | 6 | TLB translation is a large wall target | Huge pages lower DTLB misses 61% but increase 16-worker CPU 3.8% | **REFUTED** as a simple wall optimization | High |
 | 7 | Tails / ordered waiting dominate | 0.17–0.22 s tail window, but cost-first and balanced schedules show no repeatable saving | **REFUTED** for tested schedules; some unavoidable tail remains | Medium |
-| 8 | Native host-vs-VM scaling | Verified VM native replay; direct host SSH timed out; no host sample supplied | **BLOCKED** (host half) | High for VM, none for host |
+| 8 | Native host-vs-VM scaling | PVE native 16-worker CPU inflation 3.79×, VM 4.73×; absolute 16-worker CPU similar, but PVE scales much better at 8 | **STRONGLY SUPPORTED:** large 16-worker penalty exists physically; exact VM placement cost unresolved | High for physical reproduction; medium for attribution |
 
 ### Answers to the ten causal questions
 
 1. **Why 2.2× CPU?** The same work executes with almost the same instruction count but nearly twice the cycles, plus a lower effective cycle rate. Memory-sensitive phases interfere under concurrency, and larger active working sets amplify the penalty.
 2. **Primary type?** More cycles per instruction from shared cache/memory pressure is the strongest explanation. Small software, host-placement, and general all-core effects coexist; scheduler wait is outside worker CPU.
 3. **Independent processes?** They retain 9.45 of the 12.85 extra CPU-seconds (74%), even without a pool, feeder, queue, or timed result transport.
-4. **Physical host?** Unresolved: the physical-host half of Test 8 is blocked. The verified package and fixed plan await execution by the PVE agent. The Phase A physical pinning control shows a secondary host-placement effect but cannot replace the host-native comparison.
+4. **Physical host?** Yes for the representative late-round native replay: 16 workers consume 3.79× PVE serial CPU with essentially constant instructions. PVE and VM have similar absolute 16-worker CPU and wall. The host's 8-worker penalty is much smaller, with physical L3 placement different from the guest's uncontrolled host placement.
 5. **DRAM-origin fills?** Yes: 20.48 million → 342.15 million per identical full replay, a 16.7× rise at 16 workers.
 6. **Physical DDR saturation?** Unproven. These fills indicate cache misses served from the memory system, not physical DDR bytes or controller utilization; no working UMC/DF PMU was exposed in the guest or host Phase A audit.
 7. **Cache/working set?** Causal in the tested kernels: size-dependent inflation and a bitwise-equal smaller active row strip reduce 16-worker prefix CPU 11.7%.
@@ -421,4 +408,4 @@ end-to-end check if savings below 0.1 second matter to the operator.
 
 The only implementation target supported by a positive semantically exact intervention is a **64-row strip for the row-major prefix**. It preserved bitwise output on 3,620 checks over 905 real grids and cut the 16-worker prefix kernel CPU from 4.701 to 4.153 ms/call. It regressed serial CPU 1.6%. The current solver's 16-worker prefix critical-path proxy is about 0.613 s, so the kernel percentage transferred unchanged would imply roughly 0.07 s, or 2–3% of a 3.052 s solver; that is an explicitly unmeasured projection. The absolute zero-cost prefix ceiling is 0.613 s. A separate small integration experiment should use paired long full-solver samples at workers 1 and 16 and retain only a reproducible end-to-end gain. Complexity is low-to-moderate; the risk is altered floating-point order or worse serial locality if the production implementation deviates from the bitwise prototype. No other tested intervention has a credible larger measured CPU gain.
 
-The campaign narrows the penalty to **shared-resource-sensitive execution of essentially the same instructions**, with smaller placement/general-throughput effects and limited recoverable scheduling overhead. Exact allocation between last-level cache capacity, memory-controller throughput, and any VM translation contribution remains unresolved pending the physical-host control.
+The campaign narrows the penalty to **shared-resource-sensitive execution of essentially the same instructions**. The physical host reproduces a large 16-worker penalty, so virtualization is not required for it. VM placement/general-throughput effects and limited recoverable scheduling overhead coexist. Exact allocation between last-level cache capacity, memory-controller throughput, and the large 8-worker host/VM discrepancy remains unresolved; a placement-matched control would be required to attribute that discrepancy specifically to virtualization.

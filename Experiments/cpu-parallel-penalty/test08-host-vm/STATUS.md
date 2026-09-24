@@ -1,27 +1,30 @@
-# Test 8 status — host half blocked at Phase D checkpoint
+# Test 8 status — complete on VM and physical PVE
 
-The VM half is complete: three 23.79–26.54-second samples for each of
-1, 2, 4, 8, and 16 workers. All 15 outputs match the fixed plan checksum,
-and all perf events ran at 100% enabled time. The captured data, C source,
-fixed iteration plan, reproducibility runner, VM raw results, and VM summary
-are preserved here. The C warmup verified exact difference-grid, mass-grid,
-and selected top-13 checksums on all 181 real round-18 directions.
+The same captured 181-direction round-18 native replay was executed on the
+VM and physical PVE host. Both verified all warmup difference/mass/selection
+checksums and used the same source, data, x86-64-v3 build flags, fixed
+iteration counts per worker count, and result checksums. GCC versions differ
+between machines, but executed instructions agree within 0.14% per replay.
 
-Host package (also copied to the shared virtiofs directory):
+The first PVE run yielded three valid samples at 1, 2, and 4 workers. Its
+first 8-worker sample lasted 7.902868434 seconds, below the required 10
+seconds. That failed attempt is retained under `host-results/` and excluded
+from the performance summary. The `tail-retest/` plan raised the counts to
+350 complete replays at 8 workers and 620 at 16, identically on VM and PVE.
+Both completed three valid 15–57-second samples at each endpoint with 100%
+perf-event enabled time. Original and retest binaries are identical within
+each machine.
 
-`/srv/ai/benchmarks/squares-cpu-penalty-test08/package.tar.gz`
+Primary processed result: `processed/summary-complete.json`. Original
+receipts are in `vm-results/` and `host-results/`; new receipts are in
+`tail-retest/vm-results/` and `tail-retest/host-results/`. The retest archive,
+preparation script, checksum derivation, and exact PVE instructions are
+preserved in `tail-retest/`.
 
-SHA-256:
-`515f1414fc7adee48f7f49eea2cc0637135b271dec33ce9fc9e8c4ec63b26a26`
-
-On the Proxmox host, extract the package and run `python3 run.py --outdir
-host-results` as root. The runner compiles the source, validates captured
-data, checks every warmup output, attaches perf, and takes three long fixed
-iteration samples at each worker count. Do not recalibrate on the host.
-Copy `host-results/` into the shared directory after the run. Then import
-it here and execute `scripts/summarize.py --host-dir <path>`. The direct
-SSH probe to `root@192.168.100.1` timed out, and the operator-supplied
-`/home/user/cpu-parallel-penalty-host/` contained only the earlier Phase A
-host receipts. The exact host task and package have been handed off. Under
-the goal's host-access failure policy, the physical-host half is BLOCKED
-until those results arrive; no host result is claimed in this checkpoint.
+Physical PVE reproduces a large 16-worker CPU-time inflation (3.79× serial)
+for essentially the same instructions. The VM's 16-worker wall/CPU is similar
+in absolute terms, while its 8-worker endpoint is much slower than PVE.
+Host physical CPU placement differs from the guest vCPU's unpinned QEMU
+placement, so the 8-worker difference cannot be attributed specifically to
+virtualization. Neither machine exposes a working physical memory-controller
+PMU, so DDR saturation remains unproven.

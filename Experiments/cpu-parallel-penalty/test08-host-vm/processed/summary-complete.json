@@ -1,0 +1,2180 @@
+{
+  "method": "original plan 1/2/4; matched revised plan 8/16",
+  "excluded_receipt": "host-results/perf-sample1-w8.csv; 7.902868434-second batch, no valid sample JSON",
+  "original_plan": {
+    "target_seconds": 25.0,
+    "samples": 3,
+    "repeats": {
+      "1": 131,
+      "2": 209,
+      "4": 232,
+      "8": 179,
+      "16": 265
+    },
+    "expected_checksums": {
+      "1": "1945dec119158f0f",
+      "2": "6030510151bba741",
+      "4": "a16b5bf2520685d3",
+      "8": "77848d00d496be59",
+      "16": "3c8c26d1ec934b43"
+    },
+    "calibration": {
+      "1": {
+        "wall_per_replay": 0.19174322425,
+        "estimated_sample_wall": 25.118362376750003
+      },
+      "2": {
+        "wall_per_replay": 0.119642748,
+        "estimated_sample_wall": 25.005334332
+      },
+      "4": {
+        "wall_per_replay": 0.108218886,
+        "estimated_sample_wall": 25.106781552
+      },
+      "8": {
+        "wall_per_replay": 0.1398870885,
+        "estimated_sample_wall": 25.039788841500002
+      },
+      "16": {
+        "wall_per_replay": 0.09459934675,
+        "estimated_sample_wall": 25.06882688875
+      }
+    },
+    "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+    "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7"
+  },
+  "tail_plan": {
+    "target_seconds": 25.0,
+    "samples": 3,
+    "repeats": {
+      "1": 131,
+      "2": 209,
+      "4": 232,
+      "8": 350,
+      "16": 620
+    },
+    "expected_checksums": {
+      "1": "1945dec119158f0f",
+      "2": "6030510151bba741",
+      "4": "a16b5bf2520685d3",
+      "8": "6dcf5659d2bc7924",
+      "16": "9f46094101fd3341"
+    },
+    "calibration": {
+      "1": {
+        "wall_per_replay": 0.19174322425,
+        "estimated_sample_wall": 25.118362376750003
+      },
+      "2": {
+        "wall_per_replay": 0.119642748,
+        "estimated_sample_wall": 25.005334332
+      },
+      "4": {
+        "wall_per_replay": 0.108218886,
+        "estimated_sample_wall": 25.106781552
+      },
+      "8": {
+        "wall_per_replay": 0.1398870885,
+        "estimated_sample_wall": 25.039788841500002
+      },
+      "16": {
+        "wall_per_replay": 0.09459934675,
+        "estimated_sample_wall": 25.06882688875
+      }
+    },
+    "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+    "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
+    "retest_reason": "Original host w8 sample lasted 7.902868434 s; fixed repeats increased for w8/w16 on both machines.",
+    "original_plan_repeats": {
+      "1": 131,
+      "2": 209,
+      "4": 232,
+      "8": 179,
+      "16": 265
+    }
+  },
+  "vm": {
+    "environment_original": {
+      "host": "gpu",
+      "kernel": "7.0.0-31-generic",
+      "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor",
+      "cpu_flags": [
+        "fpu",
+        "vme",
+        "de",
+        "pse",
+        "tsc",
+        "msr",
+        "pae",
+        "mce",
+        "cx8",
+        "apic",
+        "sep",
+        "mtrr",
+        "pge",
+        "mca",
+        "cmov",
+        "pat",
+        "pse36",
+        "clflush",
+        "mmx",
+        "fxsr",
+        "sse",
+        "sse2",
+        "ht",
+        "syscall",
+        "nx",
+        "mmxext",
+        "fxsr_opt",
+        "pdpe1gb",
+        "rdtscp",
+        "lm",
+        "rep_good",
+        "nopl",
+        "xtopology",
+        "cpuid",
+        "extd_apicid",
+        "tsc_known_freq",
+        "pni",
+        "pclmulqdq",
+        "ssse3",
+        "fma",
+        "cx16",
+        "sse4_1",
+        "sse4_2",
+        "x2apic",
+        "movbe",
+        "popcnt",
+        "tsc_deadline_timer",
+        "aes",
+        "xsave",
+        "avx",
+        "f16c",
+        "rdrand",
+        "hypervisor",
+        "lahf_lm",
+        "cmp_legacy",
+        "svm",
+        "cr8_legacy",
+        "abm",
+        "sse4a",
+        "misalignsse",
+        "3dnowprefetch",
+        "osvw",
+        "perfctr_core",
+        "ssbd",
+        "perfmon_v2",
+        "ibrs",
+        "ibpb",
+        "stibp",
+        "ibrs_enhanced",
+        "vmmcall",
+        "fsgsbase",
+        "tsc_adjust",
+        "bmi1",
+        "avx2",
+        "smep",
+        "bmi2",
+        "erms",
+        "invpcid",
+        "avx512f",
+        "avx512dq",
+        "rdseed",
+        "adx",
+        "smap",
+        "avx512ifma",
+        "clflushopt",
+        "clwb",
+        "avx512cd",
+        "sha_ni",
+        "avx512bw",
+        "avx512vl",
+        "xsaveopt",
+        "xsavec",
+        "xgetbv1",
+        "xsaves",
+        "user_shstk",
+        "avx512_bf16",
+        "clzero",
+        "xsaveerptr",
+        "wbnoinvd",
+        "arat",
+        "npt",
+        "lbrv",
+        "nrip_save",
+        "tsc_scale",
+        "vmcb_clean",
+        "flushbyasid",
+        "pausefilter",
+        "pfthreshold",
+        "vgif",
+        "vnmi",
+        "avx512vbmi",
+        "umip",
+        "pku",
+        "ospke",
+        "avx512_vbmi2",
+        "gfni",
+        "vaes",
+        "vpclmulqdq",
+        "avx512_vnni",
+        "avx512_bitalg",
+        "avx512_vpopcntdq",
+        "rdpid",
+        "overflow_recov",
+        "succor",
+        "fsrm",
+        "flush_l1d"
+      ],
+      "avx2_available": true,
+      "physical_memory_pmu_devices": [],
+      "all_pmu_devices": [
+        "breakpoint",
+        "cpu",
+        "kprobe",
+        "msr",
+        "software",
+        "tracepoint",
+        "uprobe"
+      ],
+      "lscpu_json": "{\n   \"lscpu\": [\n      {\n         \"field\": \"Architecture:\",\n         \"data\": \"x86_64\"\n      },{\n         \"field\": \"CPU op-mode(s):\",\n         \"data\": \"32-bit, 64-bit\"\n      },{\n         \"field\": \"Address sizes:\",\n         \"data\": \"48 bits physical, 48 bits virtual\"\n      },{\n         \"field\": \"Byte Order:\",\n         \"data\": \"Little Endian\"\n      },{\n         \"field\": \"CPU(s):\",\n         \"data\": \"16\"\n      },{\n         \"field\": \"On-line CPU(s) list:\",\n         \"data\": \"0-15\"\n      },{\n         \"field\": \"Vendor ID:\",\n         \"data\": \"AuthenticAMD\"\n      },{\n         \"field\": \"Model name:\",\n         \"data\": \"AMD Ryzen 9 7950X3D 16-Core Processor\"\n      },{\n         \"field\": \"CPU family:\",\n         \"data\": \"25\"\n      },{\n         \"field\": \"Model:\",\n         \"data\": \"97\"\n      },{\n         \"field\": \"Thread(s) per core:\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Core(s) per socket:\",\n         \"data\": \"16\"\n      },{\n         \"field\": \"Socket(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Stepping:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"BogoMIPS:\",\n         \"data\": \"8400.02\"\n      },{\n         \"field\": \"Flags:\",\n         \"data\": \"fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm rep_good nopl xtopology cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw perfctr_core ssbd perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx512_bf16 clzero xsaveerptr wbnoinvd arat npt lbrv nrip_save tsc_scale vmcb_clean flushbyasid pausefilter pfthreshold vgif vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor fsrm flush_l1d\"\n      },{\n         \"field\": \"Virtualization:\",\n         \"data\": \"AMD-V\"\n      },{\n         \"field\": \"Hypervisor vendor:\",\n         \"data\": \"KVM\"\n      },{\n         \"field\": \"Virtualization type:\",\n         \"data\": \"full\"\n      },{\n         \"field\": \"L1d cache:\",\n         \"data\": \"1 MiB (16 instances)\"\n      },{\n         \"field\": \"L1i cache:\",\n         \"data\": \"1 MiB (16 instances)\"\n      },{\n         \"field\": \"L2 cache:\",\n         \"data\": \"8 MiB (16 instances)\"\n      },{\n         \"field\": \"L3 cache:\",\n         \"data\": \"256 MiB (16 instances)\"\n      },{\n         \"field\": \"NUMA node(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"NUMA node0 CPU(s):\",\n         \"data\": \"0-15\"\n      },{\n         \"field\": \"Vulnerability Gather data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Ghostwrite:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Indirect target selection:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Itlb multihit:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability L1tf:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Meltdown:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mmio stale data:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Old microcode:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Reg file data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Retbleed:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Spec rstack overflow:\",\n         \"data\": \"Mitigation; Safe RET\"\n      },{\n         \"field\": \"Vulnerability Spec store bypass:\",\n         \"data\": \"Mitigation; Speculative Store Bypass disabled via prctl\"\n      },{\n         \"field\": \"Vulnerability Spectre v1:\",\n         \"data\": \"Mitigation; usercopy/swapgs barriers and __user pointer sanitization\"\n      },{\n         \"field\": \"Vulnerability Spectre v2:\",\n         \"data\": \"Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP disabled; PBRSB-eIBRS Not affected; BHI Not affected\"\n      },{\n         \"field\": \"Vulnerability Srbds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Tsa:\",\n         \"data\": \"Mitigation; Clear CPU buffers\"\n      },{\n         \"field\": \"Vulnerability Tsx async abort:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Vmscape:\",\n         \"data\": \"Not affected\"\n      }\n   ]\n}\n",
+      "lscpu_extended": "CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE\n  0    0      0    0 0:0:0:0          yes\n  1    0      0    1 1:1:1:0          yes\n  2    0      0    2 2:2:2:0          yes\n  3    0      0    3 3:3:3:0          yes\n  4    0      0    4 4:4:4:0          yes\n  5    0      0    5 5:5:5:0          yes\n  6    0      0    6 6:6:6:0          yes\n  7    0      0    7 7:7:7:0          yes\n  8    0      0    8 8:8:8:0          yes\n  9    0      0    9 9:9:9:0          yes\n 10    0      0   10 10:10:10:0       yes\n 11    0      0   11 11:11:11:0       yes\n 12    0      0   12 12:12:12:0       yes\n 13    0      0   13 13:13:13:0       yes\n 14    0      0   14 14:14:14:0       yes\n 15    0      0   15 15:15:15:0       yes\n",
+      "compiler": "cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "build_command": [
+        "cc",
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic",
+        "-o",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/package/replay.c",
+        "-lm"
+      ],
+      "build_flags": [
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic"
+      ],
+      "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+      "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
+      "binary_sha256": "58406788c04a953778f9c777b10d3f272e86809cb15a481728f8c69b38cea155",
+      "manifest_sha256": "17c107a63cf0a78f6c31a770f85d4b95d55f244e211d23cda7e14195df7a04bb",
+      "perf_version": "perf version 7.0.14",
+      "perf_event_paranoid": "-1"
+    },
+    "environment_tail": {
+      "host": "gpu",
+      "kernel": "7.0.0-31-generic",
+      "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor",
+      "cpu_flags": [
+        "fpu",
+        "vme",
+        "de",
+        "pse",
+        "tsc",
+        "msr",
+        "pae",
+        "mce",
+        "cx8",
+        "apic",
+        "sep",
+        "mtrr",
+        "pge",
+        "mca",
+        "cmov",
+        "pat",
+        "pse36",
+        "clflush",
+        "mmx",
+        "fxsr",
+        "sse",
+        "sse2",
+        "ht",
+        "syscall",
+        "nx",
+        "mmxext",
+        "fxsr_opt",
+        "pdpe1gb",
+        "rdtscp",
+        "lm",
+        "rep_good",
+        "nopl",
+        "xtopology",
+        "cpuid",
+        "extd_apicid",
+        "tsc_known_freq",
+        "pni",
+        "pclmulqdq",
+        "ssse3",
+        "fma",
+        "cx16",
+        "sse4_1",
+        "sse4_2",
+        "x2apic",
+        "movbe",
+        "popcnt",
+        "tsc_deadline_timer",
+        "aes",
+        "xsave",
+        "avx",
+        "f16c",
+        "rdrand",
+        "hypervisor",
+        "lahf_lm",
+        "cmp_legacy",
+        "svm",
+        "cr8_legacy",
+        "abm",
+        "sse4a",
+        "misalignsse",
+        "3dnowprefetch",
+        "osvw",
+        "perfctr_core",
+        "ssbd",
+        "perfmon_v2",
+        "ibrs",
+        "ibpb",
+        "stibp",
+        "ibrs_enhanced",
+        "vmmcall",
+        "fsgsbase",
+        "tsc_adjust",
+        "bmi1",
+        "avx2",
+        "smep",
+        "bmi2",
+        "erms",
+        "invpcid",
+        "avx512f",
+        "avx512dq",
+        "rdseed",
+        "adx",
+        "smap",
+        "avx512ifma",
+        "clflushopt",
+        "clwb",
+        "avx512cd",
+        "sha_ni",
+        "avx512bw",
+        "avx512vl",
+        "xsaveopt",
+        "xsavec",
+        "xgetbv1",
+        "xsaves",
+        "user_shstk",
+        "avx512_bf16",
+        "clzero",
+        "xsaveerptr",
+        "wbnoinvd",
+        "arat",
+        "npt",
+        "lbrv",
+        "nrip_save",
+        "tsc_scale",
+        "vmcb_clean",
+        "flushbyasid",
+        "pausefilter",
+        "pfthreshold",
+        "vgif",
+        "vnmi",
+        "avx512vbmi",
+        "umip",
+        "pku",
+        "ospke",
+        "avx512_vbmi2",
+        "gfni",
+        "vaes",
+        "vpclmulqdq",
+        "avx512_vnni",
+        "avx512_bitalg",
+        "avx512_vpopcntdq",
+        "rdpid",
+        "overflow_recov",
+        "succor",
+        "fsrm",
+        "flush_l1d"
+      ],
+      "avx2_available": true,
+      "physical_memory_pmu_devices": [],
+      "all_pmu_devices": [
+        "breakpoint",
+        "cpu",
+        "kprobe",
+        "msr",
+        "software",
+        "tracepoint",
+        "uprobe"
+      ],
+      "lscpu_json": "{\n   \"lscpu\": [\n      {\n         \"field\": \"Architecture:\",\n         \"data\": \"x86_64\"\n      },{\n         \"field\": \"CPU op-mode(s):\",\n         \"data\": \"32-bit, 64-bit\"\n      },{\n         \"field\": \"Address sizes:\",\n         \"data\": \"48 bits physical, 48 bits virtual\"\n      },{\n         \"field\": \"Byte Order:\",\n         \"data\": \"Little Endian\"\n      },{\n         \"field\": \"CPU(s):\",\n         \"data\": \"16\"\n      },{\n         \"field\": \"On-line CPU(s) list:\",\n         \"data\": \"0-15\"\n      },{\n         \"field\": \"Vendor ID:\",\n         \"data\": \"AuthenticAMD\"\n      },{\n         \"field\": \"Model name:\",\n         \"data\": \"AMD Ryzen 9 7950X3D 16-Core Processor\"\n      },{\n         \"field\": \"CPU family:\",\n         \"data\": \"25\"\n      },{\n         \"field\": \"Model:\",\n         \"data\": \"97\"\n      },{\n         \"field\": \"Thread(s) per core:\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Core(s) per socket:\",\n         \"data\": \"16\"\n      },{\n         \"field\": \"Socket(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Stepping:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"BogoMIPS:\",\n         \"data\": \"8400.02\"\n      },{\n         \"field\": \"Flags:\",\n         \"data\": \"fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm rep_good nopl xtopology cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw perfctr_core ssbd perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves user_shstk avx512_bf16 clzero xsaveerptr wbnoinvd arat npt lbrv nrip_save tsc_scale vmcb_clean flushbyasid pausefilter pfthreshold vgif vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor fsrm flush_l1d\"\n      },{\n         \"field\": \"Virtualization:\",\n         \"data\": \"AMD-V\"\n      },{\n         \"field\": \"Hypervisor vendor:\",\n         \"data\": \"KVM\"\n      },{\n         \"field\": \"Virtualization type:\",\n         \"data\": \"full\"\n      },{\n         \"field\": \"L1d cache:\",\n         \"data\": \"1 MiB (16 instances)\"\n      },{\n         \"field\": \"L1i cache:\",\n         \"data\": \"1 MiB (16 instances)\"\n      },{\n         \"field\": \"L2 cache:\",\n         \"data\": \"8 MiB (16 instances)\"\n      },{\n         \"field\": \"L3 cache:\",\n         \"data\": \"256 MiB (16 instances)\"\n      },{\n         \"field\": \"NUMA node(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"NUMA node0 CPU(s):\",\n         \"data\": \"0-15\"\n      },{\n         \"field\": \"Vulnerability Gather data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Ghostwrite:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Indirect target selection:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Itlb multihit:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability L1tf:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Meltdown:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mmio stale data:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Old microcode:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Reg file data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Retbleed:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Spec rstack overflow:\",\n         \"data\": \"Mitigation; Safe RET\"\n      },{\n         \"field\": \"Vulnerability Spec store bypass:\",\n         \"data\": \"Mitigation; Speculative Store Bypass disabled via prctl\"\n      },{\n         \"field\": \"Vulnerability Spectre v1:\",\n         \"data\": \"Mitigation; usercopy/swapgs barriers and __user pointer sanitization\"\n      },{\n         \"field\": \"Vulnerability Spectre v2:\",\n         \"data\": \"Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP disabled; PBRSB-eIBRS Not affected; BHI Not affected\"\n      },{\n         \"field\": \"Vulnerability Srbds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Tsa:\",\n         \"data\": \"Mitigation; Clear CPU buffers\"\n      },{\n         \"field\": \"Vulnerability Tsx async abort:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Vmscape:\",\n         \"data\": \"Not affected\"\n      }\n   ]\n}\n",
+      "lscpu_extended": "CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE\n  0    0      0    0 0:0:0:0          yes\n  1    0      0    1 1:1:1:0          yes\n  2    0      0    2 2:2:2:0          yes\n  3    0      0    3 3:3:3:0          yes\n  4    0      0    4 4:4:4:0          yes\n  5    0      0    5 5:5:5:0          yes\n  6    0      0    6 6:6:6:0          yes\n  7    0      0    7 7:7:7:0          yes\n  8    0      0    8 8:8:8:0          yes\n  9    0      0    9 9:9:9:0          yes\n 10    0      0   10 10:10:10:0       yes\n 11    0      0   11 11:11:11:0       yes\n 12    0      0   12 12:12:12:0       yes\n 13    0      0   13 13:13:13:0       yes\n 14    0      0   14 14:14:14:0       yes\n 15    0      0   15 15:15:15:0       yes\n",
+      "compiler": "cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "build_command": [
+        "cc",
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic",
+        "-o",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/tail-retest/package/replay",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/tail-retest/package/replay.c",
+        "-lm"
+      ],
+      "build_flags": [
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic"
+      ],
+      "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+      "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
+      "binary_sha256": "58406788c04a953778f9c777b10d3f272e86809cb15a481728f8c69b38cea155",
+      "manifest_sha256": "17c107a63cf0a78f6c31a770f85d4b95d55f244e211d23cda7e14195df7a04bb",
+      "perf_version": "perf version 7.0.14",
+      "perf_event_paranoid": "-1"
+    },
+    "workers": {
+      "1": {
+        "source": "vm-results",
+        "repeats": 131,
+        "checksum": "1945dec119158f0f",
+        "batch_wall": {
+          "values": [
+            26.541598985,
+            25.533113245,
+            25.491163722
+          ],
+          "min": 25.491163722,
+          "median": 25.533113245,
+          "max": 26.541598985,
+          "cv": 0.018781239183318917
+        },
+        "wall_per_replay": {
+          "values": [
+            0.20260762583969466,
+            0.19490926141221374,
+            0.19458903604580152
+          ],
+          "min": 0.19458903604580152,
+          "median": 0.19490926141221374,
+          "max": 0.20260762583969466,
+          "cv": 0.018781239183318924
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.20253109354961832,
+            0.19483664203816795,
+            0.19451475293129772
+          ],
+          "min": 0.19451475293129772,
+          "median": 0.19483664203816795,
+          "max": 0.20253109354961832,
+          "cv": 0.018781093741004798
+        },
+        "effective_cores": {
+          "values": [
+            0.999622263526562,
+            0.9996274195822218,
+            0.999618256423829
+          ],
+          "min": 0.999618256423829,
+          "median": 0.999622263526562,
+          "max": 0.9996274195822218,
+          "cv": 3.7520491881418123e-06
+        },
+        "ipc": {
+          "values": [
+            2.381993795636807,
+            2.474182850937693,
+            2.4735050048258214
+          ],
+          "min": 2.381993795636807,
+          "median": 2.4735050048258214,
+          "max": 2.474182850937693,
+          "cv": 0.017722237039097415
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T02:53:41Z",
+            "loadavg": [
+              2.54638671875,
+              2.1298828125,
+              3.44775390625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.20 avg300=0.19 total=346063307\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T02:54:10Z",
+            "loadavg": [
+              1.98876953125,
+              2.03564453125,
+              3.3740234375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.12 avg300=0.17 total=346069273\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T02:54:38Z",
+            "loadavg": [
+              1.64990234375,
+              1.951171875,
+              3.31005859375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.07 avg300=0.15 total=346076929\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2655551569.145038,
+            2655423124.5343513,
+            2655451387.19084
+          ],
+          "min": 2655423124.5343513,
+          "median": 2655451387.19084,
+          "max": 2655551569.145038,
+          "cv": 2.07530467995198e-05
+        },
+        "cycles_per_replay": {
+          "values": [
+            1114844032.7633588,
+            1073252578.5343511,
+            1073558121.778626
+          ],
+          "min": 1073252578.5343511,
+          "median": 1073558121.778626,
+          "max": 1114844032.7633588,
+          "cv": 0.017967671782314565
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            19818.076335877864,
+            21044.625954198473,
+            21356.67175572519
+          ],
+          "min": 19818.076335877864,
+          "median": 21044.625954198473,
+          "max": 21356.67175572519,
+          "cv": 0.032019819076378415
+        },
+        "speedup": 1.0,
+        "efficiency": 1.0,
+        "cpu_inflation": 1.0,
+        "instructions_ratio": 1.0,
+        "cycles_ratio": 1.0,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 1.0
+      },
+      "2": {
+        "source": "vm-results",
+        "repeats": 209,
+        "checksum": "6030510151bba741",
+        "batch_wall": {
+          "values": [
+            24.927035117,
+            24.664496498,
+            24.631281985
+          ],
+          "min": 24.631281985,
+          "median": 24.664496498,
+          "max": 24.927035117,
+          "cv": 0.005346903878900999
+        },
+        "wall_per_replay": {
+          "values": [
+            0.11926811060765549,
+            0.11801194496650717,
+            0.11785302385167465
+          ],
+          "min": 0.11785302385167465,
+          "median": 0.11801194496650717,
+          "max": 0.11926811060765549,
+          "cv": 0.005346903878900963
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.23458333426794256,
+            0.23523173545933013,
+            0.2297357717894737
+          ],
+          "min": 0.2297357717894737,
+          "median": 0.23458333426794256,
+          "max": 0.23523173545933013,
+          "cv": 0.010516695054378442
+        },
+        "effective_cores": {
+          "values": [
+            1.9668571345078834,
+            1.9932875059901012,
+            1.9493413429816653
+          ],
+          "min": 1.9493413429816653,
+          "median": 1.9668571345078834,
+          "max": 1.9932875059901012,
+          "cv": 0.009170121939628737
+        },
+        "ipc": {
+          "values": [
+            2.104308396471799,
+            2.090151803640399,
+            2.1409487630751967
+          ],
+          "min": 2.090151803640399,
+          "median": 2.104308396471799,
+          "max": 2.1409487630751967,
+          "cv": 0.010135508228722183
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T02:55:05Z",
+            "loadavg": [
+              1.392578125,
+              1.85888671875,
+              3.2353515625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.04 avg300=0.13 total=346085552\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T02:55:32Z",
+            "loadavg": [
+              1.60107421875,
+              1.87109375,
+              3.201171875
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.02 avg300=0.12 total=346094928\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T02:55:58Z",
+            "loadavg": [
+              1.8583984375,
+              1.9140625,
+              3.177734375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.01 avg300=0.11 total=346099130\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2655585997.0239234,
+            2655556406.8516746,
+            2655540991.4976077
+          ],
+          "min": 2655540991.4976077,
+          "median": 2655556406.8516746,
+          "max": 2655585997.0239234,
+          "cv": 7.032309182370167e-06
+        },
+        "cycles_per_replay": {
+          "values": [
+            1261975669.2870812,
+            1270508870.3253589,
+            1240357096.4880383
+          ],
+          "min": 1240357096.4880383,
+          "median": 1261975669.2870812,
+          "max": 1270508870.3253589,
+          "cv": 0.01009047753604017
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            3222477.7320574163,
+            2919814.325358852,
+            2830773.3349282295
+          ],
+          "min": 2830773.3349282295,
+          "median": 2919814.325358852,
+          "max": 3222477.7320574163,
+          "cv": 0.05605186237528477
+        },
+        "speedup": 1.6516062121298882,
+        "efficiency": 0.8258031060649441,
+        "cpu_inflation": 1.204000088556178,
+        "instructions_ratio": 1.0000395487039762,
+        "cycles_ratio": 1.1755075423362202,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 138.74394022082103
+      },
+      "4": {
+        "source": "vm-results",
+        "repeats": 232,
+        "checksum": "a16b5bf2520685d3",
+        "batch_wall": {
+          "values": [
+            24.44701403,
+            24.591246618,
+            24.327944873
+          ],
+          "min": 24.327944873,
+          "median": 24.44701403,
+          "max": 24.591246618,
+          "cv": 0.0044021354537876365
+        },
+        "wall_per_replay": {
+          "values": [
+            0.10537506047413793,
+            0.1059967526637931,
+            0.10486183134913793
+          ],
+          "min": 0.10486183134913793,
+          "median": 0.10537506047413793,
+          "max": 0.1059967526637931,
+          "cv": 0.004402135453787646
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.4174758128448276,
+            0.42149026412068963,
+            0.4181492683362069
+          ],
+          "min": 0.4174758128448276,
+          "median": 0.4181492683362069,
+          "max": 0.42149026412068963,
+          "cv": 0.0041890201260144895
+        },
+        "effective_cores": {
+          "values": [
+            3.9618085243926213,
+            3.976445065799307,
+            3.9876212627259684
+          ],
+          "min": 3.9618085243926213,
+          "median": 3.976445065799307,
+          "max": 3.9876212627259684,
+          "cv": 0.0026588042201261034
+        },
+        "ipc": {
+          "values": [
+            1.1831463055856517,
+            1.17400538920242,
+            1.1787696782767254
+          ],
+          "min": 1.17400538920242,
+          "median": 1.1787696782767254,
+          "max": 1.1831463055856517,
+          "cv": 0.003167108283228964
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T02:56:23Z",
+            "loadavg": [
+              1.90771484375,
+              1.92138671875,
+              3.14599609375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.09 total=346104423\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T02:56:49Z",
+            "loadavg": [
+              2.62255859375,
+              2.08984375,
+              3.17041015625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.08 total=346107680\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T02:57:14Z",
+            "loadavg": [
+              3.166015625,
+              2.27294921875,
+              3.1982421875
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.07 total=346112121\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2656676643.801724,
+            2656684361.586207,
+            2656639117.8663793
+          ],
+          "min": 2656639117.8663793,
+          "median": 2656676643.801724,
+          "max": 2656684361.586207,
+          "cv": 7.4385648137399286e-06
+        },
+        "cycles_per_replay": {
+          "values": [
+            2245433748.3534484,
+            2262923480.6077585,
+            2253738933.7586207
+          ],
+          "min": 2245433748.3534484,
+          "median": 2253738933.7586207,
+          "max": 2262923480.6077585,
+          "cv": 0.003169059185263052
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            15699309.137931034,
+            15943210.09913793,
+            15903032.323275862
+          ],
+          "min": 15699309.137931034,
+          "median": 15903032.323275862,
+          "max": 15943210.09913793,
+          "cv": 0.006737123647211188
+        },
+        "speedup": 1.849671644649258,
+        "efficiency": 0.4624179111623145,
+        "cpu_inflation": 2.1461531258288296,
+        "instructions_ratio": 1.0004614118024509,
+        "cycles_ratio": 2.099317110120429,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 755.6813961857638
+      },
+      "8": {
+        "source": "tail-retest/vm-results",
+        "repeats": 350,
+        "checksum": "6dcf5659d2bc7924",
+        "batch_wall": {
+          "values": [
+            50.504276091,
+            52.000984542,
+            51.521564902
+          ],
+          "min": 50.504276091,
+          "median": 51.521564902,
+          "max": 52.000984542,
+          "cv": 0.012154545364779161
+        },
+        "wall_per_replay": {
+          "values": [
+            0.14429793168857144,
+            0.14857424154857143,
+            0.14720447114857144
+          ],
+          "min": 0.14429793168857144,
+          "median": 0.14720447114857144,
+          "max": 0.14857424154857143,
+          "cv": 0.012154545364779166
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            1.1077594725857143,
+            1.1593018184057144,
+            1.14086702642
+          ],
+          "min": 1.1077594725857143,
+          "median": 1.14086702642,
+          "max": 1.1593018184057144,
+          "cv": 0.018771861721145235
+        },
+        "effective_cores": {
+          "values": [
+            7.676890857843461,
+            7.802845273329019,
+            7.750219932304493
+          ],
+          "min": 7.676890857843461,
+          "median": 7.750219932304493,
+          "max": 7.802845273329019,
+          "cv": 0.006670487731529551
+        },
+        "ipc": {
+          "values": [
+            0.4555255940906869,
+            0.43582299022545057,
+            0.4436370133455899
+          ],
+          "min": 0.43582299022545057,
+          "median": 0.4436370133455899,
+          "max": 0.4555255940906869,
+          "cv": 0.018203983388726305
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T07:20:52Z",
+            "loadavg": [
+              0.79638671875,
+              0.25146484375,
+              0.138671875
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=351469527\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:21:44Z",
+            "loadavg": [
+              4.48046875,
+              1.3662109375,
+              0.52685546875
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=351478856\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:22:36Z",
+            "loadavg": [
+              6.56689453125,
+              2.42041015625,
+              0.93115234375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=351489980\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2660929812.114286,
+            2661243407.4314284,
+            2661072242.3142858
+          ],
+          "min": 2660929812.114286,
+          "median": 2661072242.3142858,
+          "max": 2661243407.4314284,
+          "cv": 4.8177315967007674e-05
+        },
+        "cycles_per_replay": {
+          "values": [
+            5841449627.931429,
+            6106248332.734285,
+            5998309794.411428
+          ],
+          "min": 5841449627.931429,
+          "median": 5998309794.411428,
+          "max": 6106248332.734285,
+          "cv": 0.018173990220848892
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            31044876.46,
+            32514328.88,
+            32031433.165714286
+          ],
+          "min": 31044876.46,
+          "median": 32031433.165714286,
+          "max": 32514328.88,
+          "cv": 0.019192300589172255
+        },
+        "speedup": 1.3240716120334044,
+        "efficiency": 0.16550895150417555,
+        "cpu_inflation": 5.855505486470596,
+        "instructions_ratio": 1.0021167230364523,
+        "cycles_ratio": 5.587317232972613,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 1522.0718693422018
+      },
+      "16": {
+        "source": "tail-retest/vm-results",
+        "repeats": 620,
+        "checksum": "9f46094101fd3341",
+        "batch_wall": {
+          "values": [
+            53.070484613,
+            50.084846161,
+            56.419709657
+          ],
+          "min": 50.084846161,
+          "median": 53.070484613,
+          "max": 56.419709657,
+          "cv": 0.04864701915450341
+        },
+        "wall_per_replay": {
+          "values": [
+            0.08559755582741935,
+            0.08078200993709678,
+            0.09099953170483871
+          ],
+          "min": 0.08078200993709678,
+          "median": 0.08559755582741935,
+          "max": 0.09099953170483871,
+          "cv": 0.048647019154503424
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.9216042486354838,
+            0.8779424559709678,
+            0.9682933607225807
+          ],
+          "min": 0.8779424559709678,
+          "median": 0.9216042486354838,
+          "max": 0.9682933607225807,
+          "cv": 0.039986960164048374
+        },
+        "effective_cores": {
+          "values": [
+            10.766712200212936,
+            10.86804421745142,
+            10.640641139377355
+          ],
+          "min": 10.640641139377355,
+          "median": 10.766712200212936,
+          "max": 10.86804421745142,
+          "cv": 0.00864620121211774
+        },
+        "ipc": {
+          "values": [
+            0.5758190359033745,
+            0.6074973864167081,
+            0.5456039596536395
+          ],
+          "min": 0.5456039596536395,
+          "median": 0.5758190359033745,
+          "max": 0.6074973864167081,
+          "cv": 0.043848588421587585
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T07:23:32Z",
+            "loadavg": [
+              7.10888671875,
+              3.294921875,
+              1.31884765625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=351505759\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:24:25Z",
+            "loadavg": [
+              8.767578125,
+              4.482421875,
+              1.84423828125
+            ],
+            "cpu_pressure": "some avg10=0.14 avg60=0.74 avg300=0.27 total=352583389\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:25:16Z",
+            "loadavg": [
+              9.88916015625,
+              5.56689453125,
+              2.35986328125
+            ],
+            "cpu_pressure": "some avg10=0.16 avg60=1.08 avg300=0.49 total=353579015\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2660097121.832258,
+            2659752313.051613,
+            2660347964.0629034
+          ],
+          "min": 2659752313.051613,
+          "median": 2660097121.832258,
+          "max": 2660347964.0629034,
+          "cv": 9.179473850628025e-05
+        },
+        "cycles_per_replay": {
+          "values": [
+            4619675550.772581,
+            4378211943.824194,
+            4875968945.958064
+          ],
+          "min": 4378211943.824194,
+          "median": 4619675550.772581,
+          "max": 4875968945.958064,
+          "cv": 0.04394708271053154
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            19613108.553225808,
+            18392303.51935484,
+            20796952.43064516
+          ],
+          "min": 18392303.51935484,
+          "median": 19613108.553225808,
+          "max": 20796952.43064516,
+          "cv": 0.05008637681552116
+        },
+        "speedup": 2.277042370289021,
+        "efficiency": 0.1423151481430638,
+        "cpu_inflation": 4.730138227566785,
+        "instructions_ratio": 1.001749508450363,
+        "cycles_ratio": 4.30314433569642,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 931.9770565612229
+      }
+    }
+  },
+  "host": {
+    "environment_original": {
+      "host": "pve3",
+      "kernel": "7.0.14-19-pve",
+      "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor",
+      "cpu_flags": [
+        "fpu",
+        "vme",
+        "de",
+        "pse",
+        "tsc",
+        "msr",
+        "pae",
+        "mce",
+        "cx8",
+        "apic",
+        "sep",
+        "mtrr",
+        "pge",
+        "mca",
+        "cmov",
+        "pat",
+        "pse36",
+        "clflush",
+        "mmx",
+        "fxsr",
+        "sse",
+        "sse2",
+        "ht",
+        "syscall",
+        "nx",
+        "mmxext",
+        "fxsr_opt",
+        "pdpe1gb",
+        "rdtscp",
+        "lm",
+        "constant_tsc",
+        "rep_good",
+        "amd_lbr_v2",
+        "nopl",
+        "xtopology",
+        "nonstop_tsc",
+        "cpuid",
+        "extd_apicid",
+        "aperfmperf",
+        "rapl",
+        "pni",
+        "pclmulqdq",
+        "monitor",
+        "ssse3",
+        "fma",
+        "cx16",
+        "sse4_1",
+        "sse4_2",
+        "movbe",
+        "popcnt",
+        "aes",
+        "xsave",
+        "avx",
+        "f16c",
+        "rdrand",
+        "lahf_lm",
+        "cmp_legacy",
+        "svm",
+        "extapic",
+        "cr8_legacy",
+        "abm",
+        "sse4a",
+        "misalignsse",
+        "3dnowprefetch",
+        "osvw",
+        "ibs",
+        "skinit",
+        "wdt",
+        "tce",
+        "topoext",
+        "perfctr_core",
+        "perfctr_nb",
+        "bpext",
+        "perfctr_llc",
+        "mwaitx",
+        "cpuid_fault",
+        "cpb",
+        "cat_l3",
+        "cdp_l3",
+        "hw_pstate",
+        "ssbd",
+        "mba",
+        "perfmon_v2",
+        "ibrs",
+        "ibpb",
+        "stibp",
+        "ibrs_enhanced",
+        "vmmcall",
+        "fsgsbase",
+        "bmi1",
+        "avx2",
+        "smep",
+        "bmi2",
+        "erms",
+        "invpcid",
+        "cqm",
+        "rdt_a",
+        "avx512f",
+        "avx512dq",
+        "rdseed",
+        "adx",
+        "smap",
+        "avx512ifma",
+        "clflushopt",
+        "clwb",
+        "avx512cd",
+        "sha_ni",
+        "avx512bw",
+        "avx512vl",
+        "xsaveopt",
+        "xsavec",
+        "xgetbv1",
+        "xsaves",
+        "cqm_llc",
+        "cqm_occup_llc",
+        "cqm_mbm_total",
+        "cqm_mbm_local",
+        "user_shstk",
+        "avx512_bf16",
+        "clzero",
+        "irperf",
+        "xsaveerptr",
+        "rdpru",
+        "wbnoinvd",
+        "cppc",
+        "arat",
+        "npt",
+        "lbrv",
+        "svm_lock",
+        "nrip_save",
+        "tsc_scale",
+        "vmcb_clean",
+        "flushbyasid",
+        "decodeassists",
+        "pausefilter",
+        "pfthreshold",
+        "avic",
+        "vgif",
+        "x2avic",
+        "v_spec_ctrl",
+        "vnmi",
+        "avx512vbmi",
+        "umip",
+        "pku",
+        "ospke",
+        "avx512_vbmi2",
+        "gfni",
+        "vaes",
+        "vpclmulqdq",
+        "avx512_vnni",
+        "avx512_bitalg",
+        "avx512_vpopcntdq",
+        "rdpid",
+        "overflow_recov",
+        "succor",
+        "smca",
+        "fsrm",
+        "flush_l1d",
+        "amd_lbr_pmc_freeze"
+      ],
+      "avx2_available": true,
+      "physical_memory_pmu_devices": [],
+      "all_pmu_devices": [
+        "amd_iommu_0",
+        "breakpoint",
+        "cpu",
+        "ibs_fetch",
+        "ibs_op",
+        "kprobe",
+        "msr",
+        "power",
+        "power_core",
+        "software",
+        "tracepoint",
+        "uprobe"
+      ],
+      "lscpu_json": "{\n   \"lscpu\": [\n      {\n         \"field\": \"Architecture:\",\n         \"data\": \"x86_64\"\n      },{\n         \"field\": \"CPU op-mode(s):\",\n         \"data\": \"32-bit, 64-bit\"\n      },{\n         \"field\": \"Address sizes:\",\n         \"data\": \"48 bits physical, 48 bits virtual\"\n      },{\n         \"field\": \"Byte Order:\",\n         \"data\": \"Little Endian\"\n      },{\n         \"field\": \"CPU(s):\",\n         \"data\": \"32\"\n      },{\n         \"field\": \"On-line CPU(s) list:\",\n         \"data\": \"0-31\"\n      },{\n         \"field\": \"Vendor ID:\",\n         \"data\": \"AuthenticAMD\"\n      },{\n         \"field\": \"Model name:\",\n         \"data\": \"AMD Ryzen 9 7950X3D 16-Core Processor\"\n      },{\n         \"field\": \"CPU family:\",\n         \"data\": \"25\"\n      },{\n         \"field\": \"Model:\",\n         \"data\": \"97\"\n      },{\n         \"field\": \"Thread(s) per core:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"Core(s) per socket:\",\n         \"data\": \"16\"\n      },{\n         \"field\": \"Socket(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Stepping:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"Frequency boost:\",\n         \"data\": \"enabled\"\n      },{\n         \"field\": \"CPU(s) scaling MHz:\",\n         \"data\": \"57%\"\n      },{\n         \"field\": \"CPU max MHz:\",\n         \"data\": \"5763.3560\"\n      },{\n         \"field\": \"CPU min MHz:\",\n         \"data\": \"416.6290\"\n      },{\n         \"field\": \"BogoMIPS:\",\n         \"data\": \"8399.98\"\n      },{\n         \"field\": \"Flags:\",\n         \"data\": \"fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor smca fsrm flush_l1d amd_lbr_pmc_freeze\"\n      },{\n         \"field\": \"Virtualization:\",\n         \"data\": \"AMD-V\"\n      },{\n         \"field\": \"L1d cache:\",\n         \"data\": \"512 KiB (16 instances)\"\n      },{\n         \"field\": \"L1i cache:\",\n         \"data\": \"512 KiB (16 instances)\"\n      },{\n         \"field\": \"L2 cache:\",\n         \"data\": \"16 MiB (16 instances)\"\n      },{\n         \"field\": \"L3 cache:\",\n         \"data\": \"128 MiB (2 instances)\"\n      },{\n         \"field\": \"NUMA node(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"NUMA node0 CPU(s):\",\n         \"data\": \"0-31\"\n      },{\n         \"field\": \"Vulnerability Gather data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Ghostwrite:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Indirect target selection:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Itlb multihit:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability L1tf:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Meltdown:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mmio stale data:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Old microcode:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Reg file data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Retbleed:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Spec rstack overflow:\",\n         \"data\": \"Mitigation; Safe RET\"\n      },{\n         \"field\": \"Vulnerability Spec store bypass:\",\n         \"data\": \"Mitigation; Speculative Store Bypass disabled via prctl\"\n      },{\n         \"field\": \"Vulnerability Spectre v1:\",\n         \"data\": \"Mitigation; usercopy/swapgs barriers and __user pointer sanitization\"\n      },{\n         \"field\": \"Vulnerability Spectre v2:\",\n         \"data\": \"Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected\"\n      },{\n         \"field\": \"Vulnerability Srbds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Tsa:\",\n         \"data\": \"Mitigation; Clear CPU buffers\"\n      },{\n         \"field\": \"Vulnerability Tsx async abort:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Vmscape:\",\n         \"data\": \"Mitigation; IBPB before exit to userspace\"\n      }\n   ]\n}\n",
+      "lscpu_extended": "CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE    MAXMHZ   MINMHZ       MHZ\n  0    0      0    0 0:0:0:0          yes 5763.3560 416.6290 5024.7021\n  1    0      0    1 1:1:1:0          yes 5763.3560 416.6290 2985.8350\n  2    0      0    2 2:2:2:0          yes 5763.3560 416.6290 2985.8350\n  3    0      0    3 3:3:3:0          yes 5763.3560 416.6290 4405.8901\n  4    0      0    4 4:4:4:0          yes 5763.3560 416.6290 2985.8350\n  5    0      0    5 5:5:5:0          yes 5763.3560 416.6290 2985.8350\n  6    0      0    6 6:6:6:0          yes 5763.3560 416.6290 2985.8350\n  7    0      0    7 7:7:7:0          yes 5763.3560 416.6290 2985.8350\n  8    0      0    8 8:8:8:1          yes 5763.3560 416.6290 5298.9678\n  9    0      0    9 9:9:9:1          yes 5763.3560 416.6290 5303.6860\n 10    0      0   10 10:10:10:1       yes 5763.3560 416.6290 3610.2891\n 11    0      0   11 11:11:11:1       yes 5763.3560 416.6290 2985.8350\n 12    0      0   12 12:12:12:1       yes 5763.3560 416.6290 2985.8350\n 13    0      0   13 13:13:13:1       yes 5763.3560 416.6290 3730.3269\n 14    0      0   14 14:14:14:1       yes 5763.3560 416.6290 2985.8350\n 15    0      0   15 15:15:15:1       yes 5763.3560 416.6290 2985.8350\n 16    0      0    0 0:0:0:0          yes 5763.3560 416.6290 2985.8350\n 17    0      0    1 1:1:1:0          yes 5763.3560 416.6290 2985.8350\n 18    0      0    2 2:2:2:0          yes 5763.3560 416.6290 2985.8350\n 19    0      0    3 3:3:3:0          yes 5763.3560 416.6290 2985.8350\n 20    0      0    4 4:4:4:0          yes 5763.3560 416.6290 2985.8350\n 21    0      0    5 5:5:5:0          yes 5763.3560 416.6290 2985.8350\n 22    0      0    6 6:6:6:0          yes 5763.3560 416.6290 2985.8350\n 23    0      0    7 7:7:7:0          yes 5763.3560 416.6290 2985.8350\n 24    0      0    8 8:8:8:1          yes 5763.3560 416.6290 2985.8350\n 25    0      0    9 9:9:9:1          yes 5763.3560 416.6290 2985.8350\n 26    0      0   10 10:10:10:1       yes 5763.3560 416.6290 2985.8350\n 27    0      0   11 11:11:11:1       yes 5763.3560 416.6290 2985.8350\n 28    0      0   12 12:12:12:1       yes 5763.3560 416.6290 2985.8350\n 29    0      0   13 13:13:13:1       yes 5763.3560 416.6290 2985.8350\n 30    0      0   14 14:14:14:1       yes 5763.3560 416.6290 2985.8350\n 31    0      0   15 15:15:15:1       yes 5763.3560 416.6290 2985.8350\n",
+      "compiler": "cc (Debian 14.2.0-19) 14.2.0",
+      "build_command": [
+        "cc",
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic",
+        "-o",
+        "/root/squares-cpu-penalty-test08/replay",
+        "/root/squares-cpu-penalty-test08/replay.c",
+        "-lm"
+      ],
+      "build_flags": [
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic"
+      ],
+      "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+      "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
+      "binary_sha256": "373d69844acd2bf9af5d4fcc790347e939facd7e69fdf9ec20d7afd5a42a304c",
+      "manifest_sha256": "17c107a63cf0a78f6c31a770f85d4b95d55f244e211d23cda7e14195df7a04bb",
+      "perf_version": "perf version 6.12.107",
+      "perf_event_paranoid": "4"
+    },
+    "environment_tail": {
+      "host": "pve3",
+      "kernel": "7.0.14-19-pve",
+      "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor",
+      "cpu_flags": [
+        "fpu",
+        "vme",
+        "de",
+        "pse",
+        "tsc",
+        "msr",
+        "pae",
+        "mce",
+        "cx8",
+        "apic",
+        "sep",
+        "mtrr",
+        "pge",
+        "mca",
+        "cmov",
+        "pat",
+        "pse36",
+        "clflush",
+        "mmx",
+        "fxsr",
+        "sse",
+        "sse2",
+        "ht",
+        "syscall",
+        "nx",
+        "mmxext",
+        "fxsr_opt",
+        "pdpe1gb",
+        "rdtscp",
+        "lm",
+        "constant_tsc",
+        "rep_good",
+        "amd_lbr_v2",
+        "nopl",
+        "xtopology",
+        "nonstop_tsc",
+        "cpuid",
+        "extd_apicid",
+        "aperfmperf",
+        "rapl",
+        "pni",
+        "pclmulqdq",
+        "monitor",
+        "ssse3",
+        "fma",
+        "cx16",
+        "sse4_1",
+        "sse4_2",
+        "movbe",
+        "popcnt",
+        "aes",
+        "xsave",
+        "avx",
+        "f16c",
+        "rdrand",
+        "lahf_lm",
+        "cmp_legacy",
+        "svm",
+        "extapic",
+        "cr8_legacy",
+        "abm",
+        "sse4a",
+        "misalignsse",
+        "3dnowprefetch",
+        "osvw",
+        "ibs",
+        "skinit",
+        "wdt",
+        "tce",
+        "topoext",
+        "perfctr_core",
+        "perfctr_nb",
+        "bpext",
+        "perfctr_llc",
+        "mwaitx",
+        "cpuid_fault",
+        "cpb",
+        "cat_l3",
+        "cdp_l3",
+        "hw_pstate",
+        "ssbd",
+        "mba",
+        "perfmon_v2",
+        "ibrs",
+        "ibpb",
+        "stibp",
+        "ibrs_enhanced",
+        "vmmcall",
+        "fsgsbase",
+        "bmi1",
+        "avx2",
+        "smep",
+        "bmi2",
+        "erms",
+        "invpcid",
+        "cqm",
+        "rdt_a",
+        "avx512f",
+        "avx512dq",
+        "rdseed",
+        "adx",
+        "smap",
+        "avx512ifma",
+        "clflushopt",
+        "clwb",
+        "avx512cd",
+        "sha_ni",
+        "avx512bw",
+        "avx512vl",
+        "xsaveopt",
+        "xsavec",
+        "xgetbv1",
+        "xsaves",
+        "cqm_llc",
+        "cqm_occup_llc",
+        "cqm_mbm_total",
+        "cqm_mbm_local",
+        "user_shstk",
+        "avx512_bf16",
+        "clzero",
+        "irperf",
+        "xsaveerptr",
+        "rdpru",
+        "wbnoinvd",
+        "cppc",
+        "arat",
+        "npt",
+        "lbrv",
+        "svm_lock",
+        "nrip_save",
+        "tsc_scale",
+        "vmcb_clean",
+        "flushbyasid",
+        "decodeassists",
+        "pausefilter",
+        "pfthreshold",
+        "avic",
+        "vgif",
+        "x2avic",
+        "v_spec_ctrl",
+        "vnmi",
+        "avx512vbmi",
+        "umip",
+        "pku",
+        "ospke",
+        "avx512_vbmi2",
+        "gfni",
+        "vaes",
+        "vpclmulqdq",
+        "avx512_vnni",
+        "avx512_bitalg",
+        "avx512_vpopcntdq",
+        "rdpid",
+        "overflow_recov",
+        "succor",
+        "smca",
+        "fsrm",
+        "flush_l1d",
+        "amd_lbr_pmc_freeze"
+      ],
+      "avx2_available": true,
+      "physical_memory_pmu_devices": [],
+      "all_pmu_devices": [
+        "amd_iommu_0",
+        "breakpoint",
+        "cpu",
+        "ibs_fetch",
+        "ibs_op",
+        "kprobe",
+        "msr",
+        "power",
+        "power_core",
+        "software",
+        "tracepoint",
+        "uprobe"
+      ],
+      "lscpu_json": "{\n   \"lscpu\": [\n      {\n         \"field\": \"Architecture:\",\n         \"data\": \"x86_64\"\n      },{\n         \"field\": \"CPU op-mode(s):\",\n         \"data\": \"32-bit, 64-bit\"\n      },{\n         \"field\": \"Address sizes:\",\n         \"data\": \"48 bits physical, 48 bits virtual\"\n      },{\n         \"field\": \"Byte Order:\",\n         \"data\": \"Little Endian\"\n      },{\n         \"field\": \"CPU(s):\",\n         \"data\": \"32\"\n      },{\n         \"field\": \"On-line CPU(s) list:\",\n         \"data\": \"0-31\"\n      },{\n         \"field\": \"Vendor ID:\",\n         \"data\": \"AuthenticAMD\"\n      },{\n         \"field\": \"Model name:\",\n         \"data\": \"AMD Ryzen 9 7950X3D 16-Core Processor\"\n      },{\n         \"field\": \"CPU family:\",\n         \"data\": \"25\"\n      },{\n         \"field\": \"Model:\",\n         \"data\": \"97\"\n      },{\n         \"field\": \"Thread(s) per core:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"Core(s) per socket:\",\n         \"data\": \"16\"\n      },{\n         \"field\": \"Socket(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Stepping:\",\n         \"data\": \"2\"\n      },{\n         \"field\": \"Frequency boost:\",\n         \"data\": \"enabled\"\n      },{\n         \"field\": \"CPU(s) scaling MHz:\",\n         \"data\": \"55%\"\n      },{\n         \"field\": \"CPU max MHz:\",\n         \"data\": \"5763.3560\"\n      },{\n         \"field\": \"CPU min MHz:\",\n         \"data\": \"416.6290\"\n      },{\n         \"field\": \"BogoMIPS:\",\n         \"data\": \"8399.98\"\n      },{\n         \"field\": \"Flags:\",\n         \"data\": \"fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor smca fsrm flush_l1d amd_lbr_pmc_freeze\"\n      },{\n         \"field\": \"Virtualization:\",\n         \"data\": \"AMD-V\"\n      },{\n         \"field\": \"L1d cache:\",\n         \"data\": \"512 KiB (16 instances)\"\n      },{\n         \"field\": \"L1i cache:\",\n         \"data\": \"512 KiB (16 instances)\"\n      },{\n         \"field\": \"L2 cache:\",\n         \"data\": \"16 MiB (16 instances)\"\n      },{\n         \"field\": \"L3 cache:\",\n         \"data\": \"128 MiB (2 instances)\"\n      },{\n         \"field\": \"NUMA node(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"NUMA node0 CPU(s):\",\n         \"data\": \"0-31\"\n      },{\n         \"field\": \"Vulnerability Gather data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Ghostwrite:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Indirect target selection:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Itlb multihit:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability L1tf:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Meltdown:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mmio stale data:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Old microcode:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Reg file data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Retbleed:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Spec rstack overflow:\",\n         \"data\": \"Mitigation; Safe RET\"\n      },{\n         \"field\": \"Vulnerability Spec store bypass:\",\n         \"data\": \"Mitigation; Speculative Store Bypass disabled via prctl\"\n      },{\n         \"field\": \"Vulnerability Spectre v1:\",\n         \"data\": \"Mitigation; usercopy/swapgs barriers and __user pointer sanitization\"\n      },{\n         \"field\": \"Vulnerability Spectre v2:\",\n         \"data\": \"Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected\"\n      },{\n         \"field\": \"Vulnerability Srbds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Tsa:\",\n         \"data\": \"Mitigation; Clear CPU buffers\"\n      },{\n         \"field\": \"Vulnerability Tsx async abort:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Vmscape:\",\n         \"data\": \"Mitigation; IBPB before exit to userspace\"\n      }\n   ]\n}\n",
+      "lscpu_extended": "CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE    MAXMHZ   MINMHZ       MHZ\n  0    0      0    0 0:0:0:0          yes 5763.3560 416.6290 2985.8350\n  1    0      0    1 1:1:1:0          yes 5763.3560 416.6290 2985.8350\n  2    0      0    2 2:2:2:0          yes 5763.3560 416.6290 2985.8350\n  3    0      0    3 3:3:3:0          yes 5763.3560 416.6290 2985.8350\n  4    0      0    4 4:4:4:0          yes 5763.3560 416.6290 2985.8350\n  5    0      0    5 5:5:5:0          yes 5763.3560 416.6290 2985.8350\n  6    0      0    6 6:6:6:0          yes 5763.3560 416.6290 2985.8350\n  7    0      0    7 7:7:7:0          yes 5763.3560 416.6290 2985.8350\n  8    0      0    8 8:8:8:1          yes 5763.3560 416.6290 3597.1609\n  9    0      0    9 9:9:9:1          yes 5763.3560 416.6290 2985.8350\n 10    0      0   10 10:10:10:1       yes 5763.3560 416.6290 5372.6709\n 11    0      0   11 11:11:11:1       yes 5763.3560 416.6290 2985.8350\n 12    0      0   12 12:12:12:1       yes 5763.3560 416.6290 2985.8350\n 13    0      0   13 13:13:13:1       yes 5763.3560 416.6290 2985.8350\n 14    0      0   14 14:14:14:1       yes 5763.3560 416.6290 2985.8350\n 15    0      0   15 15:15:15:1       yes 5763.3560 416.6290 2985.8350\n 16    0      0    0 0:0:0:0          yes 5763.3560 416.6290 2985.8350\n 17    0      0    1 1:1:1:0          yes 5763.3560 416.6290 2985.8350\n 18    0      0    2 2:2:2:0          yes 5763.3560 416.6290 2985.8350\n 19    0      0    3 3:3:3:0          yes 5763.3560 416.6290 2985.8350\n 20    0      0    4 4:4:4:0          yes 5763.3560 416.6290 5045.2788\n 21    0      0    5 5:5:5:0          yes 5763.3560 416.6290 5053.0542\n 22    0      0    6 6:6:6:0          yes 5763.3560 416.6290 2985.8350\n 23    0      0    7 7:7:7:0          yes 5763.3560 416.6290 2985.8350\n 24    0      0    8 8:8:8:1          yes 5763.3560 416.6290 4574.8281\n 25    0      0    9 9:9:9:1          yes 5763.3560 416.6290 2985.8350\n 26    0      0   10 10:10:10:1       yes 5763.3560 416.6290 2985.8350\n 27    0      0   11 11:11:11:1       yes 5763.3560 416.6290 2985.8350\n 28    0      0   12 12:12:12:1       yes 5763.3560 416.6290 2985.8350\n 29    0      0   13 13:13:13:1       yes 5763.3560 416.6290 2985.8350\n 30    0      0   14 14:14:14:1       yes 5763.3560 416.6290 2985.8350\n 31    0      0   15 15:15:15:1       yes 5763.3560 416.6290 2985.8350\n",
+      "compiler": "cc (Debian 14.2.0-19) 14.2.0",
+      "build_command": [
+        "cc",
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic",
+        "-o",
+        "/root/squares-cpu-penalty-test08-tail/replay",
+        "/root/squares-cpu-penalty-test08-tail/replay.c",
+        "-lm"
+      ],
+      "build_flags": [
+        "-O3",
+        "-std=c11",
+        "-fno-fast-math",
+        "-march=x86-64-v3",
+        "-mtune=generic"
+      ],
+      "source_sha256": "52bdbd1801f69fa2725794f26d49c75cf53fa554586dc6fdf4257acb421a9287",
+      "data_sha256": "e76e239f01788d17733842cc874dc45a8a351d103203772df055346556d11ae7",
+      "binary_sha256": "373d69844acd2bf9af5d4fcc790347e939facd7e69fdf9ec20d7afd5a42a304c",
+      "manifest_sha256": "17c107a63cf0a78f6c31a770f85d4b95d55f244e211d23cda7e14195df7a04bb",
+      "perf_version": "perf version 6.12.107",
+      "perf_event_paranoid": "4"
+    },
+    "workers": {
+      "1": {
+        "source": "host-results",
+        "repeats": 131,
+        "checksum": "1945dec119158f0f",
+        "batch_wall": {
+          "values": [
+            34.530664094,
+            34.519925456,
+            34.509959886
+          ],
+          "min": 34.509959886,
+          "median": 34.519925456,
+          "max": 34.530664094,
+          "cv": 0.00024491241242050884
+        },
+        "wall_per_replay": {
+          "values": [
+            0.26359285567938934,
+            0.26351088134351147,
+            0.2634348082900763
+          ],
+          "min": 0.2634348082900763,
+          "median": 0.26351088134351147,
+          "max": 0.26359285567938934,
+          "cv": 0.0002449124124205169
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.263572694870229,
+            0.2634912039541985,
+            0.26341551933587787
+          ],
+          "min": 0.26341551933587787,
+          "median": 0.2634912039541985,
+          "max": 0.263572694870229,
+          "cv": 0.00024357839490452902
+        },
+        "effective_cores": {
+          "values": [
+            0.9999235153429771,
+            0.9999253260844005,
+            0.9999267790223939
+          ],
+          "min": 0.9999235153429771,
+          "median": 0.9999253260844005,
+          "max": 0.9999267790223939,
+          "cv": 1.3351577725141586e-06
+        },
+        "ipc": {
+          "values": [
+            2.027251946562912,
+            2.0278136071928694,
+            2.0284913294858673
+          ],
+          "min": 2.027251946562912,
+          "median": 2.0278136071928694,
+          "max": 2.0284913294858673,
+          "cv": 0.0002498776332180826
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T07:09:15Z",
+            "loadavg": [
+              0.0224609375,
+              0.0546875,
+              0.08203125
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61468576\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:09:52Z",
+            "loadavg": [
+              0.54541015625,
+              0.18994140625,
+              0.126953125
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61474509\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:10:30Z",
+            "loadavg": [
+              0.79638671875,
+              0.29638671875,
+              0.16650390625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61483122\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2657796820.3129773,
+            2657791266.1603055,
+            2657783571.7938933
+          ],
+          "min": 2657783571.7938933,
+          "median": 2657791266.1603055,
+          "max": 2657796820.3129773,
+          "cv": 2.043862638891239e-06
+        },
+        "cycles_per_replay": {
+          "values": [
+            1311034291.923664,
+            1310668424.7175572,
+            1310226735.091603
+          ],
+          "min": 1310226735.091603,
+          "median": 1310668424.7175572,
+          "max": 1311034291.923664,
+          "cv": 0.0002519127581206665
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            1059.0916030534352,
+            1030.442748091603,
+            1237.320610687023
+          ],
+          "min": 1030.442748091603,
+          "median": 1059.0916030534352,
+          "max": 1237.320610687023,
+          "cv": 0.08252926659007964
+        },
+        "speedup": 1.0,
+        "efficiency": 1.0,
+        "cpu_inflation": 1.0,
+        "instructions_ratio": 1.0,
+        "cycles_ratio": 1.0,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 1.0
+      },
+      "2": {
+        "source": "host-results",
+        "repeats": 209,
+        "checksum": "6030510151bba741",
+        "batch_wall": {
+          "values": [
+            27.581684042,
+            27.58736571,
+            27.578407924
+          ],
+          "min": 27.578407924,
+          "median": 27.581684042,
+          "max": 27.58736571,
+          "cv": 0.000134168258076811
+        },
+        "wall_per_replay": {
+          "values": [
+            0.13196978010526314,
+            0.13199696511961723,
+            0.13195410489952153
+          ],
+          "min": 0.13195410489952153,
+          "median": 0.13196978010526314,
+          "max": 0.13199696511961723,
+          "cv": 0.0001341682580768305
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.2634752568851675,
+            0.2633941357990431,
+            0.26340800724401914
+          ],
+          "min": 0.2633941357990431,
+          "median": 0.26340800724401914,
+          "max": 0.2634752568851675,
+          "cv": 0.00013448515763127524
+        },
+        "effective_cores": {
+          "values": [
+            1.9964817451011247,
+            1.9954559982523248,
+            1.996209268704412
+          ],
+          "min": 1.9954559982523248,
+          "median": 1.996209268704412,
+          "max": 1.9964817451011247,
+          "cv": 0.00021734052284815808
+        },
+        "ipc": {
+          "values": [
+            2.048077679665306,
+            2.048055287768359,
+            2.047925521500401
+          ],
+          "min": 2.047925521500401,
+          "median": 2.048055287768359,
+          "max": 2.048077679665306,
+          "cv": 3.275167389990763e-05
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T07:11:06Z",
+            "loadavg": [
+              1.00048828125,
+              0.40673828125,
+              0.20947265625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61489897\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:11:35Z",
+            "loadavg": [
+              1.39501953125,
+              0.560546875,
+              0.26806640625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61492491\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:12:04Z",
+            "loadavg": [
+              1.634765625,
+              0.69921875,
+              0.32421875
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61497370\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2657214453.1004786,
+            2657204191.91866,
+            2657242873.54067
+          ],
+          "min": 2657204191.91866,
+          "median": 2657214453.1004786,
+          "max": 2657242873.54067,
+          "cv": 6.157364901032323e-06
+        },
+        "cycles_per_replay": {
+          "values": [
+            1297418784.2009568,
+            1297427958.9952154,
+            1297529058.3779905
+          ],
+          "min": 1297418784.2009568,
+          "median": 1297427958.9952154,
+          "max": 1297529058.3779905,
+          "cv": 3.8507452641049116e-05
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            1014.1866028708134,
+            1120.6076555023924,
+            958.4688995215311
+          ],
+          "min": 958.4688995215311,
+          "median": 1014.1866028708134,
+          "max": 1120.6076555023924,
+          "cv": 0.06523505579944433
+        },
+        "speedup": 1.9967516891619213,
+        "efficiency": 0.9983758445809606,
+        "cpu_inflation": 0.9996842524193186,
+        "instructions_ratio": 0.9997829727762405,
+        "cycles_ratio": 0.9898979288181181,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 0.9576004567941456
+      },
+      "4": {
+        "source": "host-results",
+        "repeats": 232,
+        "checksum": "a16b5bf2520685d3",
+        "batch_wall": {
+          "values": [
+            15.602764383,
+            15.630268124,
+            15.620242923
+          ],
+          "min": 15.602764383,
+          "median": 15.620242923,
+          "max": 15.630268124,
+          "cv": 0.0007276943645341174
+        },
+        "wall_per_replay": {
+          "values": [
+            0.06725329475431034,
+            0.06737184536206897,
+            0.0673286332887931
+          ],
+          "min": 0.06725329475431034,
+          "median": 0.0673286332887931,
+          "max": 0.06737184536206897,
+          "cv": 0.0007276943645341655
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.26861991045689654,
+            0.26910834712500004,
+            0.2691495804525862
+          ],
+          "min": 0.26861991045689654,
+          "median": 0.26910834712500004,
+          "max": 0.2691495804525862,
+          "cv": 0.0008944094977375811
+        },
+        "effective_cores": {
+          "values": [
+            3.994152426854602,
+            3.994373995231408,
+            3.9975500363734007
+          ],
+          "min": 3.994152426854602,
+          "median": 3.994373995231408,
+          "max": 3.9975500363734007,
+          "cv": 0.00038846634529060293
+        },
+        "ipc": {
+          "values": [
+            2.0687559487744953,
+            2.0717195513703355,
+            2.0717998310396792
+          ],
+          "min": 2.0687559487744953,
+          "median": 2.0717195513703355,
+          "max": 2.0717998310396792,
+          "cv": 0.000683979826983007
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T07:12:32Z",
+            "loadavg": [
+              1.77978515625,
+              0.8251953125,
+              0.37939453125
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61499734\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:12:49Z",
+            "loadavg": [
+              2.2724609375,
+              0.9814453125,
+              0.43798828125
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61500546\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:13:06Z",
+            "loadavg": [
+              2.73583984375,
+              1.146484375,
+              0.5009765625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61504506\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2657048604.9698277,
+            2657048650.586207,
+            2657037614.5086207
+          ],
+          "min": 2657037614.5086207,
+          "median": 2657048604.9698277,
+          "max": 2657048650.586207,
+          "cv": 1.953952028302866e-06
+        },
+        "cycles_per_replay": {
+          "values": [
+            1284370254.762931,
+            1282532980.310345,
+            1282477956.9439654
+          ],
+          "min": 1282477956.9439654,
+          "median": 1282532980.310345,
+          "max": 1284370254.762931,
+          "cv": 0.0006853222865400508
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            135596.69827586206,
+            108413.03448275862,
+            103644.58189655172
+          ],
+          "min": 103644.58189655172,
+          "median": 108413.03448275862,
+          "max": 135596.69827586206,
+          "cv": 0.12144584814754254
+        },
+        "speedup": 3.9138011344034376,
+        "efficiency": 0.9784502836008594,
+        "cpu_inflation": 1.021318143021495,
+        "instructions_ratio": 0.9997205720404256,
+        "cycles_ratio": 0.9785335147497161,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 102.36417149394468
+      },
+      "8": {
+        "source": "tail-retest/host-results",
+        "repeats": 350,
+        "checksum": "6dcf5659d2bc7924",
+        "batch_wall": {
+          "values": [
+            15.282194849,
+            15.274383,
+            15.301365606
+          ],
+          "min": 15.274383,
+          "median": 15.282194849,
+          "max": 15.301365606,
+          "cv": 0.0007416137244619487
+        },
+        "wall_per_replay": {
+          "values": [
+            0.04366341385428572,
+            0.043641094285714284,
+            0.043718187445714284
+          ],
+          "min": 0.043641094285714284,
+          "median": 0.04366341385428572,
+          "max": 0.043718187445714284,
+          "cv": 0.0007416137244619626
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.33441102388,
+            0.3375659449457143,
+            0.33579557332
+          ],
+          "min": 0.33441102388,
+          "median": 0.33579557332,
+          "max": 0.3375659449457143,
+          "cv": 0.0038437171650615035
+        },
+        "effective_cores": {
+          "values": [
+            7.658838243752587,
+            7.735047676295664,
+            7.680912520377563
+          ],
+          "min": 7.658838243752587,
+          "median": 7.680912520377563,
+          "max": 7.735047676295664,
+          "cv": 0.004162586878623857
+        },
+        "ipc": {
+          "values": [
+            1.669562620576034,
+            1.6530885016957508,
+            1.6638428618869234
+          ],
+          "min": 1.6530885016957508,
+          "median": 1.6638428618869234,
+          "max": 1.669562620576034,
+          "cv": 0.004108749090274516
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T07:31:04Z",
+            "loadavg": [
+              0.220703125,
+              2.60986328125,
+              2.31494140625
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62217845\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:31:19Z",
+            "loadavg": [
+              2.01220703125,
+              2.890625,
+              2.412109375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62219591\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:31:35Z",
+            "loadavg": [
+              3.41259765625,
+              3.15771484375,
+              2.5078125
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62222364\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2657224190.654286,
+            2657229758.182857,
+            2657229594.714286
+          ],
+          "min": 2657224190.654286,
+          "median": 2657229594.714286,
+          "max": 2657229758.182857,
+          "cv": 9.73529306481089e-07
+        },
+        "cycles_per_replay": {
+          "values": [
+            1591569048.0285714,
+            1607433452.8714285,
+            1597043600.44
+          ],
+          "min": 1591569048.0285714,
+          "median": 1597043600.44,
+          "max": 1607433452.8714285,
+          "cv": 0.004115528586937844
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            4764890.165714285,
+            4933851.368571429,
+            4805600.505714286
+          ],
+          "min": 4764890.165714285,
+          "median": 4805600.505714286,
+          "max": 4933851.368571429,
+          "cv": 0.0148916938667479
+        },
+        "speedup": 6.035049898363523,
+        "efficiency": 0.7543812372954404,
+        "cpu_inflation": 1.274409043948085,
+        "instructions_ratio": 0.9997886698428237,
+        "cycles_ratio": 1.2184955174945604,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 4537.47389919758
+      },
+      "16": {
+        "source": "tail-retest/host-results",
+        "repeats": 620,
+        "checksum": "9f46094101fd3341",
+        "batch_wall": {
+          "values": [
+            57.044844151,
+            56.929895682,
+            56.657744034
+          ],
+          "min": 56.657744034,
+          "median": 56.929895682,
+          "max": 57.044844151,
+          "cv": 0.0028538295540527594
+        },
+        "wall_per_replay": {
+          "values": [
+            0.0920078131467742,
+            0.09182241239032259,
+            0.09138345811935483
+          ],
+          "min": 0.09138345811935483,
+          "median": 0.09182241239032259,
+          "max": 0.0920078131467742,
+          "cv": 0.0028538295540527863
+        },
+        "worker_cpu_per_replay": {
+          "values": [
+            0.9974469260983871,
+            0.9989836298548387,
+            0.9886540269258064
+          ],
+          "min": 0.9886540269258064,
+          "median": 0.9974469260983871,
+          "max": 0.9989836298548387,
+          "cv": 0.004573406304256361
+        },
+        "effective_cores": {
+          "values": [
+            10.840893745699876,
+            10.879518451424659,
+            10.818741676798194
+          ],
+          "min": 10.818741676798194,
+          "median": 10.840893745699876,
+          "max": 10.879518451424659,
+          "cv": 0.002315422121313745
+        },
+        "ipc": {
+          "values": [
+            0.5160860454221516,
+            0.5155664276837927,
+            0.522072069620864
+          ],
+          "min": 0.5155664276837927,
+          "median": 0.5160860454221516,
+          "max": 0.522072069620864,
+          "cv": 0.005699747721859156
+        },
+        "load_before": [
+          {
+            "utc": "2026-09-24T07:31:58Z",
+            "loadavg": [
+              3.748046875,
+              3.283203125,
+              2.568359375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62229389\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:32:56Z",
+            "loadavg": [
+              7.8125,
+              4.6025390625,
+              3.068359375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62289819\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          },
+          {
+            "utc": "2026-09-24T07:33:53Z",
+            "loadavg": [
+              9.25048828125,
+              5.73486328125,
+              3.56396484375
+            ],
+            "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=62347127\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+          }
+        ],
+        "instructions_per_replay": {
+          "values": [
+            2663245568.935484,
+            2663084550.701613,
+            2663083120.66129
+          ],
+          "min": 2663083120.66129,
+          "median": 2663084550.701613,
+          "max": 2663245568.935484,
+          "cv": 2.8629394932014568e-05
+        },
+        "cycles_per_replay": {
+          "values": [
+            5160468089.690323,
+            5165356795.370968,
+            5100987537.209678
+          ],
+          "min": 5100987537.209678,
+          "median": 5160468089.690323,
+          "max": 5165356795.370968,
+          "cv": 0.00569005940854661
+        },
+        "ls_any_fills_from_sys.all_dram_io_per_replay": {
+          "values": [
+            17740341.77096774,
+            17845155.827419356,
+            17586025.153225806
+          ],
+          "min": 17586025.153225806,
+          "median": 17740341.77096774,
+          "max": 17845155.827419356,
+          "cv": 0.0060049710784503925
+        },
+        "speedup": 2.8697882628411926,
+        "efficiency": 0.17936176642757454,
+        "cpu_inflation": 3.785503694733464,
+        "instructions_ratio": 1.0019916103302404,
+        "cycles_ratio": 3.9372796295160457,
+        "ls_any_fills_from_sys.all_dram_io_ratio": 16750.526318801032
+      }
+    }
+  },
+  "comparison": {
+    "1": {
+      "host_vs_vm_wall_ratio": 1.3519669585439151,
+      "host_vs_vm_cpu_ratio": 1.3523698684079215,
+      "host_vs_vm_instruction_ratio": 1.0008811605366803,
+      "host_vs_vm_cycle_ratio": 1.2208639645388708
+    },
+    "2": {
+      "host_vs_vm_wall_ratio": 1.1182747656834002,
+      "host_vs_vm_cpu_ratio": 1.1228760477210749,
+      "host_vs_vm_instruction_ratio": 1.000624368680148,
+      "host_vs_vm_cycle_ratio": 1.0280926887664656
+    },
+    "4": {
+      "host_vs_vm_wall_ratio": 0.6389427724724057,
+      "host_vs_vm_cpu_ratio": 0.6435700538130018,
+      "host_vs_vm_instruction_ratio": 1.0001400099515203,
+      "host_vs_vm_cycle_ratio": 0.5690690084372063
+    },
+    "8": {
+      "host_vs_vm_wall_ratio": 0.2966174431632368,
+      "host_vs_vm_cpu_ratio": 0.2943336651368692,
+      "host_vs_vm_instruction_ratio": 0.998555977722477,
+      "host_vs_vm_cycle_ratio": 0.2662489359799241
+    },
+    "16": {
+      "host_vs_vm_wall_ratio": 1.0727223634218448,
+      "host_vs_vm_cpu_ratio": 1.0822941925183125,
+      "host_vs_vm_instruction_ratio": 1.0011230525550499,
+      "host_vs_vm_cycle_ratio": 1.1170628830908484
+    }
+  }
+}
