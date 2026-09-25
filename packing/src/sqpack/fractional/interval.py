@@ -1082,8 +1082,6 @@ def verify_by_intervals(
         if len(rotations) >= _INTERVAL_PARALLEL_MIN_DIRECTIONS and count > 1
         else None
     )
-    used_workers = count if context is not None else 1
-
     def record(outcome: DirectionOutcome, boxes: list[list[float]]) -> bool:
         if stall_log is not None:
             stall_log[outcome.label] = boxes
@@ -1147,8 +1145,7 @@ def verify_by_intervals(
         (o for o in outcomes if o.upper is not None), key=lambda o: o.upper or 0, default=None
     )
     detail = (
-        f"{len(outcomes)} directions, workers={used_workers}, "
-        f"{sum(o.boxes for o in outcomes)} boxes, "
+        f"{len(outcomes)} directions, {sum(o.boxes for o in outcomes)} boxes, "
         f"{sum(o.stalled for o in outcomes)} stalled, "
         f"{sum(o.budget_exhausted for o in outcomes)} budget-exhausted"
     )
