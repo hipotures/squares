@@ -20,6 +20,7 @@ import time
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
+from decimal import Decimal, localcontext
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
@@ -76,9 +77,18 @@ def side_name(side: Fraction) -> str:
 
 
 def display(side: Fraction | str | None) -> str:
-    """Compact decimal diagnostic with enough precision to expose adjacent floats."""
+    """Readable exact-rational decimal, with detail near a narrow frontier."""
 
-    return "none" if side is None else format(float(Fraction(side)), ".17g")
+    if side is None:
+        return "none"
+    value = Fraction(side)
+    with localcontext() as context:
+        context.prec = 50
+        text = format(Decimal(value.numerator) / Decimal(value.denominator), ".18f")
+    whole, _, fractional = text.partition(".")
+    fractional = fractional.rstrip("0")
+    fractional = fractional.ljust(9, "0")
+    return f"{whole}.{fractional}"
 
 
 def atomic_json(path: Path, value: dict[str, Any]) -> None:
