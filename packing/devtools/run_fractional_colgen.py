@@ -370,6 +370,9 @@ def run(
     result["work_kind"] = "generation"
     result["column_rounds_executed"] = len(log.rounds)
     result["raw_weights"] = str(raw_weights) if raw_weights is not None and raw_weights.exists() else None
+    if result["raw_weights"] is not None:
+        from devtools.frontier_io import digest
+        result["raw_weights_sha256"] = digest(raw_weights)
     result["least_cell_mass"] = least_cell_mass
     result["family_frozen"] = None if family_frozen is None else str(family_frozen)
     result["priced_support_rows"] = (

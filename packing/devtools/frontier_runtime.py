@@ -8,6 +8,7 @@ Only a process group bearing this job's unguessable ownership token may be kille
 from __future__ import annotations
 
 import argparse
+import errno
 import fcntl
 import os
 import shutil
@@ -133,7 +134,7 @@ def _paths(args: list[str], cwd: Path) -> tuple[list[Path], list[Path]]:
         ("--seed-certificate", inputs), ("--snapshot", inputs),
         ("--source-result", inputs), ("--input", inputs),
         ("--json", outputs), ("--freeze", outputs), ("--raw-weights", outputs),
-        ("--report", outputs),
+        ("--report", outputs), ("--log", outputs), ("--row-log", outputs),
     ):
         if flag in args:
             path = Path(args[args.index(flag) + 1])
@@ -162,9 +163,11 @@ def _receipt_valid(receipt: dict[str, Any], fingerprint: str) -> bool:
 
 def code_fingerprint(cwd: Path) -> str:
     """Fingerprint executable search/verification code, not changing research data."""
-    paths = sorted((cwd / "src/sqpack/fractional").glob("*.py"))
+    paths = sorted(p for p in (cwd / "src/sqpack/fractional").iterdir()
+                   if p.suffix in (".py", ".c"))
     paths += sorted((cwd / "devtools").glob("frontier*.py"))
-    paths += [cwd / "devtools/run_fractional_colgen.py", cwd / "devtools/decide_certificate.py"]
+    paths += [cwd / "devtools/run_fractional_colgen.py", cwd / "devtools/decide_certificate.py",
+              cwd / "src/sqpack/workers.py", cwd / "uv.lock"]
     return canonical_digest({str(p.relative_to(cwd)): digest(p) for p in paths if p.is_file()})
 
 
@@ -192,13 +195,19 @@ def run(
     overrides = {key: environment[key] for key in (
         "PACK_JOBS", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"
     ) if key in environment}
-    fingerprint = canonical_digest({"command": args, "inputs": _checksums(inputs),
-                                    "environment": overrides, "cwd": str(cwd.resolve())})
     spec_path = output.with_name(output.name + ".job.json")
     receipt_path = output.with_name(output.name + ".receipt.json")
     lock_path = output.with_name(output.name + ".job.lock")
-    if spec_path.exists():
-        spec = read_json(spec_path)
+    spec = read_json(spec_path) if spec_path.exists() else None
+    if spec is not None:
+        # CLI changes on resume apply to future jobs, not an already-running job.
+        # In-flight work keeps its original resource budget and environment.
+        overrides = dict(spec["overrides"])
+        settings = {**DEFAULTS, **spec["limits"]}
+        environment.update(overrides)
+    fingerprint = canonical_digest({"command": args, "inputs": _checksums(inputs),
+                                    "environment": overrides, "cwd": str(cwd.resolve())})
+    if spec is not None:
         if spec["fingerprint"] != fingerprint:
             raise JobConflict(f"job input or command changed: {spec_path}")
     else:
@@ -220,6 +229,7 @@ def run(
         supervisor = _spawn_supervisor(spec_path, output, cwd, environment)
     start = time.monotonic()
     next_heartbeat = start + settings["heartbeat_seconds"]
+    supervisor_restarts = 0
     while True:
         if on_poll is not None:
             on_poll()
@@ -231,7 +241,12 @@ def run(
                 supervisor.wait(timeout=30)
             return int(receipt["returncode"])
         if supervisor is not None and supervisor.poll() is not None:
-            raise RuntimeError(f"job supervisor exited without a receipt: {spec_path}")
+            if supervisor_restarts >= int(settings["retries"]):
+                raise RuntimeError(f"job supervisor repeatedly exited without a receipt: {spec_path}")
+            supervisor_restarts += 1
+            supervisor = None
+            # Recovery reconciles job-owned descendants under the original
+            # deadline; a crashed supervisor never authorizes overlapping work.
         if supervisor is None and not lock_busy(lock_path):
             # The old supervisor died. Its replacement reconciles the original
             # owned child before launching any new computation.
@@ -295,20 +310,56 @@ def supervise(spec_path: Path) -> int:
         atomic_json(spec_path, spec)
         # The ownership token also closes the child-spawn/PID-save crash window:
         # a replacement supervisor finds unrecorded descendants without guessing PIDs.
-        groups = {member["pgid"] for member in owned_members(None, token)}
-        if groups:
-            deadline = float(spec.get("child_deadline", spec["created_at"] + max_seconds))
-            while owned_members(None, token) and time.time() < deadline:
+        members = owned_members(None, token)
+        if members:
+            groups = {member["pgid"] for member in members}
+            deadline = min(float(spec["deadline"]), float(spec.get("child_deadline", spec["deadline"])))
+            watched = [output, output.parent / "rows.log", output.parent / "column.log"]
+            previous = _progress(watched)
+            last_progress = time.monotonic()
+            recovery_reason = "owned descendants finished; exit status unavailable"
+            while members:
+                groups.update(member["pgid"] for member in members)
+                now = time.monotonic()
+                progress = _progress(watched)
+                if progress != previous:
+                    previous, last_progress = progress, now
+                rss = sum(member["rss"] for member in members)
+                if (int(limits["max_rss_mib"]) > 0 and rss > int(limits["max_rss_mib"]) * 1024**2
+                        or shutil.disk_usage(output.parent).free < int(limits["min_free_mib"]) * 1024**2):
+                    recovery_reason = "orphan resource guard"
+                    break
+                if time.time() >= deadline:
+                    recovery_reason = "orphan wall-time budget"
+                    break
+                if progress_seconds and now - last_progress >= progress_seconds:
+                    recovery_reason = "orphan no-progress watchdog"
+                    break
                 time.sleep(max(0.01, limits["poll_seconds"]))
+                members = owned_members(None, token)
             for pgid in groups:
                 terminate_owned(pgid, token, limits["terminate_seconds"])
-            spec["attempts"].append({"kind": "orphan-reconciled", "at": time.time()})
+            spec["attempts"].append({"kind": "orphan-reconciled", "at": time.time(),
+                                     "reason": recovery_reason})
             spec.pop("child", None)
             atomic_json(spec_path, spec)
         returncode = INFRASTRUCTURE
         reason = "retry budget exhausted"
         consumed = sum(a.get("kind") == "execution" for a in spec["attempts"])
         for attempt in range(consumed, int(limits["retries"]) + 1):
+            # Never execute updated files under a job spec stamped with old code.
+            # Completed immutable receipts remain reusable as historical evidence.
+            if spec.get("code_sha256") != code_fingerprint(Path(spec["cwd"])):
+                returncode, reason = PERMANENT_ERROR, "executable source changed; schedule a fresh job"
+                break
+            input_paths, _ = _paths(args, Path(spec["cwd"]))
+            current_inputs = canonical_digest({
+                "command": args, "inputs": _checksums(input_paths),
+                "environment": spec["overrides"], "cwd": spec["cwd"],
+            })
+            if current_inputs != spec["fingerprint"]:
+                returncode, reason = PERMANENT_ERROR, "job inputs changed before execution"
+                break
             if time.time() >= float(spec["deadline"]):
                 returncode, reason = TIMEOUT, "total job budget including retries"
                 break
@@ -326,19 +377,39 @@ def supervise(spec_path: Path) -> int:
                             shutil.copy2(path, destination)
                         if path != output:
                             path.unlink()
-                time.sleep(min(60.0, limits["backoff_seconds"] * 2 ** (attempt - 1)))
+                delay = min(60.0, limits["backoff_seconds"] * 2 ** (attempt - 1))
+                time.sleep(max(0.0, min(delay, float(spec["deadline"]) - time.time())))
+                if time.time() >= float(spec["deadline"]):
+                    returncode, reason = TIMEOUT, "total job budget exhausted during backoff"
+                    break
             environment = {**os.environ, **spec["overrides"],
                            "SQUARES_FRONTIER_JOB_TOKEN": token}
-            if attempt and returncode == RESOURCE_LIMIT:
-                environment["PACK_JOBS"] = str(max(1, int(environment.get("PACK_JOBS", 1)) // 2))
+            prior_limits = sum(a.get("returncode") == RESOURCE_LIMIT for a in spec["attempts"])
+            if prior_limits:
+                environment["PACK_JOBS"] = str(max(1, int(environment.get("PACK_JOBS", 1)) // (2 ** prior_limits)))
             began = time.monotonic()
             with output.open("a", encoding="utf-8") as handle:
                 handle.write(f"\n[supervisor] attempt={attempt + 1} kind={kind}\n")
                 handle.flush()
-                child = subprocess.Popen(
-                    args, cwd=spec["cwd"], env=environment, stdin=subprocess.DEVNULL,
-                    stdout=handle, stderr=subprocess.STDOUT, start_new_session=True,
-                )
+                try:
+                    child = subprocess.Popen(
+                        args, cwd=spec["cwd"], env=environment, stdin=subprocess.DEVNULL,
+                        stdout=handle, stderr=subprocess.STDOUT, start_new_session=True,
+                    )
+                except OSError as error:
+                    returncode = (PERMANENT_ERROR if error.errno in (
+                        errno.ENOENT, errno.EACCES, errno.ENOEXEC, errno.ENOTDIR
+                    ) else INFRASTRUCTURE)
+                    reason = f"child could not start: {error}"
+                    handle.write(reason + "\n")
+                    handle.flush()
+                    spec["attempts"].append({"kind": "execution", "attempt": attempt + 1,
+                        "returncode": returncode, "reason": reason, "spawn_error": True,
+                        "elapsed": time.monotonic() - began, "finished_at": time.time()})
+                    atomic_json(spec_path, spec)
+                    if returncode == PERMANENT_ERROR:
+                        break
+                    continue
                 try:
                     spec["child"] = identity(child.pid)
                     spec["child_deadline"] = float(spec["deadline"])

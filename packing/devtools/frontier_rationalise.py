@@ -20,7 +20,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", type=Path, required=True)
     args = parser.parse_args(argv)
     began = time.monotonic()
+    sources = {args.source_result.resolve(), args.snapshot.resolve()}
+    if args.freeze.resolve() in sources or args.json.resolve() in sources or args.freeze.resolve() == args.json.resolve():
+        raise ValueError("refinement outputs must not overwrite inputs or each other")
+    result_sha = digest(args.source_result)
+    snapshot_sha = digest(args.snapshot)
     result = read_json(args.source_result)
+    if result.get("raw_weights_sha256") != snapshot_sha:
+        raise ValueError("raw LP snapshot does not match the source result digest")
     if result.get("converged") is not True:
         raise ValueError("only a converged raw LP solution may be re-rationalised")
     candidate = rationalise(args.snapshot, args.scale)
@@ -33,12 +40,14 @@ def main(argv: list[str] | None = None) -> int:
         raise ValueError("raw LP snapshot and source result use different direction net")
     if Fraction(settings["angle_limit"]) != candidate.half_tangents[-1]:
         raise ValueError("raw LP snapshot and source result use different angle limit")
+    if digest(args.source_result) != result_sha or digest(args.snapshot) != snapshot_sha:
+        raise ValueError("raw refinement inputs changed while reading")
     atomic_text(args.freeze, certificate_json(candidate, None))
     result.update({
         "settings": {**settings, "scale": args.scale},
         "total_mass": str(candidate.total_mass), "total_mass_float": float(candidate.total_mass),
         "atoms": len(candidate.atoms), "frozen": str(args.freeze), "least_cell_mass": None,
-        "raw_weights": str(args.snapshot), "raw_weights_sha256": digest(args.snapshot),
+        "raw_weights": str(args.snapshot), "raw_weights_sha256": snapshot_sha,
         "work_kind": "rerationalisation", "column_rounds_executed": 0,
         "lp_rounds_executed": 0, "source_result": str(args.source_result),
         "seconds": time.monotonic() - began,

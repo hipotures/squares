@@ -230,6 +230,7 @@ def fake_proof(path: Path, side: str) -> Path:
     atomic_json(path.parent / "verification.json", {
         "status": "VERIFIED", "category": "full-retainable", "side": side,
         "verified_sha256": digest(path), "verified_candidate": str(path),
+        "finished": True,
     })
     return path
 

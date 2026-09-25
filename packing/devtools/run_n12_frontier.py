@@ -300,13 +300,9 @@ def next_side(state: dict[str, Any]) -> Fraction | None:
                 return ceiling
             break
 
-    # Without an explicit --target-width, keep bisecting in exact Fraction
-    # arithmetic until the operator stops the campaign. The search backend is
-    # partly float-based and may eventually see numerically identical nearby
-    # sides, but that is not a valid reason to stop an unattended experiment:
-    # frozen candidates are still judged by the exact retention gate. If the
-    # operator wants a finite precision target, --target-width is the explicit
-    # stopping control.
+    # Return the exact midpoint proposal. The policy layer must still reject
+    # duplicate float-backend work and select precision, repair, or another
+    # instrument before idle exhaustion; a Fraction alone is not a useful trial.
     return (low + ceiling) / 2
 
 
@@ -719,13 +715,12 @@ def select_repair_candidate(state: dict[str, Any]) -> dict[str, Any] | None:
     """Choose the best untried below-12 candidate rejected by an exact gate."""
 
     low = Fraction(state["verified_low"])
-    completed = {
-        attempt.get("candidate")
-        for attempt in state.get("repair_attempts", [])
-        if attempt.get("status") in ("VERIFIED", "REJECTED", "ERROR")
-    }
-    completed_digests = {a.get("candidate_sha256") for a in state.get("repair_attempts", [])
-                         if a.get("status") in ("VERIFIED", "REJECTED", "ERROR")}
+    finished = [a for a in state.get("repair_attempts", [])
+                if a.get("status") in ("VERIFIED", "REJECTED")
+                or (a.get("status") == "ERROR"
+                    and a.get("error_epoch", 0) >= state.get("error_epoch", 0))]
+    completed = {attempt.get("candidate") for attempt in finished}
+    completed_digests = {attempt.get("candidate_sha256") for attempt in finished}
     candidates: list[dict[str, Any]] = []
     for cycle_index, cycle in enumerate(state["cycles"], 1):
         side = Fraction(cycle["side"])
@@ -856,7 +851,7 @@ def write_boosted_candidate(
     record["total_mass"] = str(total)
     record["least_cell_mass"] = None
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(record, indent=1) + "\n", encoding="utf-8")
+    atomic_json(destination, record)
     return total
 
 
@@ -876,7 +871,8 @@ def full_gate_on_declared(directory: Path, declared: Path) -> str | None:
 
 
 def repair_job_failure(state: dict[str, Any], attempt: dict[str, Any], status: str) -> None:
-    attempt.update(status="ERROR", reason=status, finished_at=stamp())
+    attempt.update(status="ERROR", reason=status, finished_at=stamp(),
+                   error_epoch=state.get("error_epoch", 0))
     state["consecutive_job_errors"] = int(state.get("consecutive_job_errors", 0)) + 1
     state.setdefault("operational_errors", []).append({
         "at": stamp(), "side": attempt["side"], "reason": status,
@@ -1570,7 +1566,9 @@ def raw_source_for(state: dict[str, Any], cycle: dict[str, Any], side: Fraction,
     if completed and completed[-1].get("decision") != "REFINE_SCALE":
         return None
     for previous_cycle in reversed(state["cycles"]):
-        if Fraction(previous_cycle["side"]) != side or previous_cycle.get("strategy", "baseline") != cycle.get("strategy", "baseline"):
+        if (Fraction(previous_cycle["side"]) != side
+                or previous_cycle.get("strategy", "baseline") != cycle.get("strategy", "baseline")
+                or previous_cycle.get("search_revision", 0) != cycle.get("search_revision", 0)):
             continue
         for stage in reversed(previous_cycle.get("stages", [])):
             result = stage.get("result") or {}
@@ -1578,6 +1576,7 @@ def raw_source_for(state: dict[str, Any], cycle: dict[str, Any], side: Fraction,
             used = stage_scale(stage)
             if (path_text and used and used < target_scale and scale_limited_result(result)
                     and Path(path_text).is_file()
+                    and result.get("raw_weights_sha256") == digest(Path(path_text))
                     and (Path(stage["directory"]) / "result.json").exists()):
                 return stage, Path(path_text)
     return None
@@ -1631,6 +1630,7 @@ def promote_verified(state: dict[str, Any], side: Fraction, candidate: Path, mec
         raise ValueError("verified artifact is missing its full exact gate receipt")
     verdict = read_json(proof_receipt)
     if (verdict.get("status") != "VERIFIED" or verdict.get("category") != "full-retainable"
+            or verdict.get("finished") is not True
             or verdict.get("verified_sha256") != proof_sha
             or Fraction(verdict.get("side", "0")) != side):
         raise ValueError("verified artifact does not match its full gate receipt")
@@ -1813,11 +1813,14 @@ def main(argv: list[str] | None = None) -> int:
                     if any(config[k] != state["config"].get(k) for k in ("budgets", "row_rounds", "max_row_rounds")):
                         state["search_revision"] = int(state.get("search_revision", 0)) + 1
                 state["config"] = config
-            if args.resume and state.get("mode") == "BLOCKED":
-                state.setdefault("recoveries", []).append({"at": stamp(), "reason": "operator resumed blocked campaign"})
-                state["mode"] = "FRONTIER"
-                state["consecutive_job_errors"] = 0
+            if args.resume:
+                # Explicit resume permits fresh bounded attempts for operational
+                # failures, including repairs; it does not erase mathematical refusals.
                 state["error_epoch"] = int(state.get("error_epoch", 0)) + 1
+                if state.get("mode") == "BLOCKED":
+                    state.setdefault("recoveries", []).append({"at": stamp(), "reason": "operator resumed blocked campaign"})
+                    state["mode"] = "FRONTIER"
+                    state["consecutive_job_errors"] = 0
             save_state(root, state)
             if args.import_result is not None:
                 if args.resume:
@@ -1847,7 +1850,11 @@ def main(argv: list[str] | None = None) -> int:
             while (not stop.requested or state.get("active") is not None
                    or any(a.get("status") in ("RUNNING", "INTERRUPTED") for a in state.get("repair_attempts", []))):
                 poll_stop()
-                if state.get("active") is None:
+                active_repair = any(a.get("status") in ("RUNNING", "INTERRUPTED")
+                                    for a in state.get("repair_attempts", []))
+                if stop.requested and state.get("active") is None and not active_repair:
+                    break
+                if state.get("active") is None and not active_repair:
                     completed = sum(c["status"] in ("VERIFIED", "SEARCH_FAILED", "UNRESOLVED", "ERROR") for c in state["cycles"])
                     if args.max_cycles is not None and completed >= args.max_cycles:
                         break
@@ -1944,7 +1951,7 @@ errors enter BLOCKED. Explicit resume permits recovery after fixing the environm
 
 The default portfolio is baseline,centre,pricing,windows,dense,fine-net. Stagnation
 changes the instrument instead of indefinitely increasing one round budget. Scale
-refinement uses raw-weights.json without re-solving LP; legacy stages without raw
+refinement uses raw-lp.json without re-solving LP; legacy stages without raw
 snapshots require an initial fresh solve. Search failures are only heuristic
 frontier points. The full existing exact two-route gate alone permits VERIFIED.
 
