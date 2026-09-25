@@ -718,3 +718,77 @@ def test_real_generator_freezes_a_candidate(tmp_path: Path) -> None:
     assert json.loads(result_path.read_text(encoding="utf-8"))["converged"] is True
     assert (tmp_path / "column.log").is_file()
     assert (tmp_path / "rows.log").is_file()
+
+
+
+def test_exact_only_verified_refinement_uses_quiet_banner(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    saved = state(tmp_path)
+    previous = Fraction.from_float(3.961968473978136)
+    side = previous + Fraction(1, 10**20)
+    assert side > previous
+    assert float(side) == float(previous)
+    saved["verified_low"] = str(side)
+    saved["discoveries"] = [
+        {
+            "id": "micro-proof",
+            "at": frontier.stamp(),
+            "side": str(side),
+            "previous": str(previous),
+            "improvement": str(side - previous),
+            "mass": "11999/1000",
+            "candidate": str(tmp_path / "candidate.verified.json"),
+            "sha256": "abc",
+            "mechanism": "search",
+            "float64_distinct": False,
+            "gate_receipt": str(tmp_path / "verification.json"),
+        }
+    ]
+    frontier.save_state(tmp_path, saved)
+    frontier.publish_findings(tmp_path, saved)
+    output = capsys.readouterr().out
+    assert "VERIFIED EXACT REFINEMENT" in output
+    assert "unchanged at float64 search resolution" in output
+    assert "VERIFIED LOWER BOUND IMPROVEMENT" not in output
+    ledger = json.loads((tmp_path / "findings.json").read_text())
+    assert ledger["schema"] == 2
+
+
+def test_notable_search_improvement_is_separate_nonproof_event(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    side = Fraction(3169574779182501, 800000000000000)
+    prior_stage = {
+        "name": "screen",
+        "status": "complete",
+        "work_kind": "generation",
+        "directory": str(tmp_path / "prior"),
+        "result": {"converged": True, "objective": 11.999660486864869},
+    }
+    prior_cycle = {
+        "side": str(side),
+        "strategy": "centre",
+        "search_revision": 0,
+        "stages": [prior_stage],
+    }
+    current_stage = {
+        "name": "screen",
+        "status": "complete",
+        "work_kind": "generation",
+        "directory": str(tmp_path / "windows"),
+        "result": {"converged": True, "objective": 11.99571691213635},
+    }
+    current_cycle = {
+        "side": str(side),
+        "strategy": "windows",
+        "search_revision": 0,
+        "stages": [current_stage],
+    }
+    saved["cycles"] = [prior_cycle, current_cycle]
+    event = frontier.record_notable_search(saved, current_cycle, current_stage)
+    assert event is not None
+    assert event["proof"] is False
+    assert event["strategy"] == "windows"
+    assert event["previous_best_strategy"] == "centre"
+    assert event["gain"] > frontier.NOTABLE_OBJECTIVE_GAIN
+    assert saved["search_findings"] == [event]
