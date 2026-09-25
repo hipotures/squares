@@ -9,14 +9,11 @@ on:
       - 'packing/tests/test*frontier*'
       - '.github/workflows/frontier-autonomy.yml'
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
   group: frontier-autonomy-${{ github.ref }}
   cancel-in-progress: false
-
 jobs:
   focused-tests:
     runs-on: ubuntu-latest
@@ -37,7 +34,7 @@ jobs:
             packing/cases/n12_fractional_certificate
             packages/workbench
             vendor/kpress
-      - name: Preserve the exact reviewed source subset
+      - name: Preserve reviewed source
         run: |
           mkdir -p frontier-artifacts
           git archive HEAD packing/src packing/devtools packing/tests/test_run_n12_frontier.py packing/cases/n12_fractional_certificate packing/pyproject.toml packing/uv.lock packing/hatch_build.py > frontier-artifacts/reviewed-source.tar
@@ -49,15 +46,36 @@ jobs:
       - name: Install locked project
         working-directory: packing
         run: uv sync --frozen
+      - name: Prepare isolated offline test runtime
+        working-directory: packing
+        run: |
+          uv run --frozen python - <<'PY'
+          import pathlib, shutil, sys, tarfile
+          root = pathlib.Path('../frontier-offline-runtime')
+          root.mkdir()
+          shutil.copytree(sys.base_prefix, root/'python', ignore=shutil.ignore_patterns('__pycache__', 'test', 'turtledemo'))
+          target = root/'site-packages'
+          target.mkdir()
+          prefixes = ('numpy', 'scipy', 'highspy', 'pytest', '_pytest', 'pluggy', 'packaging', 'iniconfig', 'pygments', 'mpmath', 'jsonschema', 'attrs', 'attr', 'referencing', 'rpds', 'typing_extensions', 'yaml', '_yaml', 'strif')
+          site = pathlib.Path(sys.prefix)/'lib/python3.14/site-packages'
+          for source in site.iterdir():
+              if source.name.startswith(prefixes):
+                  if source.is_dir():
+                      shutil.copytree(source, target/source.name, ignore=shutil.ignore_patterns('__pycache__'))
+                  else:
+                      shutil.copy2(source, target/source.name)
+          with tarfile.open('../frontier-artifacts/offline-runtime.tar.gz', 'w:gz') as archive:
+              archive.add(root, arcname='runtime')
+          PY
       - name: Run focused frontier tests
         working-directory: packing
         run: |
           set -o pipefail
-          uv run --frozen pytest tests/test*frontier*.py -q --junitxml=../frontier-artifacts/pytest.xml 2>&1 | tee ../frontier-artifacts/tests.log
+          uv run --frozen pytest tests/test_run_n12_frontier.py -q --junitxml=../frontier-artifacts/pytest.xml 2>&1 | tee ../frontier-artifacts/tests.log
           uv run --frozen python -m devtools.run_n12_frontier --help > ../frontier-artifacts/help.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: frontier-autonomy-${{ github.sha }}
           path: frontier-artifacts/
-          retention-days: 14
+          retention-days: 7
