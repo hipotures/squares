@@ -22,7 +22,9 @@ uv run --frozen python -m devtools.run_n12_frontier \
 The first Ctrl-C, SIGTERM, or SIGHUP requests a graceful stop. The controller
 finishes the current bounded side cycle or repair attempt, saves state, and prints
 a summary. A cycle can include several stages and exact verification; stopping is
-not instantaneous. Repeated signals do not secretly become a destructive kill.
+not instantaneous. Repeated signals do not secretly become a destructive kill. A stop received at
+a scheduling boundary does not start another side. Finite session limits do not
+preempt an already-active repair recovered by `--resume`.
 Watchdogs remain active. An OS hard shutdown cannot be delayed by this program.
 
 Use `tmux` for ordinary SSH sessions. SIGHUP requests a stop rather than promising
@@ -30,7 +32,8 @@ that an SSH disconnect will keep the entire campaign running forever. After a
 controller crash, a detached supervisor can finish and record the active job;
 `--resume` attaches to that job. A reboot loses in-flight computation but not
 completed artifacts or the last atomic checkpoint. An incomplete job can be
-retried within its budget; a missing outcome is never fabricated as success.
+retried within its budget; updated executable source requires a fresh job
+instead of being run under an old job specification; a missing outcome is never fabricated as success.
 
 Stop an old version gracefully **before** pulling an upgrade. Schema-2 campaigns
 migrate to schema 3 with an untouched backup. Existing history and verified
@@ -73,12 +76,15 @@ spending the whole budget.
 
 ## Raw weights and repair
 
-New converged generation saves `raw-weights.json`: exact rational geometry plus
+New converged generation saves `raw-lp.json`: exact rational geometry plus
 hexadecimal binary64 LP weights. If objective <12 but rational mass >=12, scales
 are doubled from 1,600,000 up to 25,600,000. `frontier_rationalise` reuses the raw
 snapshot with **zero new LP solves**, using the unchanged production rationaliser
 and safety bump. Old campaigns without snapshots cannot reconstruct raw weights
 from rounded weights: their first stronger trial still needs a fresh LP solve.
+The result binds each new snapshot to a SHA-256 digest; changed or unbound raw
+inputs are never silently reused. A newly revised search budget also does not
+reuse a raw snapshot from the old revision instead of doing the requested search.
 Changing the grid, net, shrink, or other search strategy also requires generation.
 
 Declaration-rejected below-12 candidates are eligible for diagnosis. Structured
@@ -125,13 +131,19 @@ plan reasons, and five-minute heartbeats stay concise.
 Summed RSS may double-count shared pages: this is a conservative guard, not a
 physical bandwidth measurement. A memory-guard failure reduces workers on the next
 retry. Termination targets only a job-owned process group carrying a random token.
-Boot ID and process start ticks prevent using stale foreign PIDs. The token can
+Boot ID and process start ticks prevent using stale foreign PIDs. Watchdogs
+remain active while reconciling descendants of a crashed supervisor. Backoff
+counts against the total deadline; memory failures successively reduce workers
+on bounded retries. Missing executables produce an explicit durable error receipt. The controller also
+attempts bounded supervisor recovery without requiring an operator restart. The token can
 rediscover an unrecorded child created just before a crash. Live pre-supervisor
 children block duplicates, but are never blindly killed.
 
 Execution failures never shrink the mathematical lower bound or become SEARCH_FAILED.
 Repeated errors open a resumable BLOCKED circuit. Missing dependencies do not retry
-forever. Fix the environment and explicitly resume to reset the circuit. Broken
+forever. Fix the environment and explicitly resume to reset the circuit. Each explicit
+resume permits fresh bounded trials of operational ERROR records (including
+repairs), but never forgets exact rejections or successful certificates. Broken
 storage, permissions, power loss, and externally stopped VMs can require intervention.
 
 After all configured useful trials are exhausted, the default is IDLE_EXHAUSTED:
@@ -149,7 +161,8 @@ live under `--root`, never only `/tmp`. The runner does not automatically commit
 changing research files; ordinary Git commits and pushes remain available.
 
 ```bash
-uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py -q
+uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py \
+  tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py -q
 ```
 
 The suite combines explicit receipt doubles for controller branches with real
