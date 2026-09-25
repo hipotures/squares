@@ -1,0 +1,39 @@
+name: Frontier development snapshot
+on:
+  push:
+    branches: [work/frontier-autonomy]
+    paths: [.github/workflows/frontier-development-export.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          python-version: '3.14'
+          enable-cache: false
+      - name: Prepare locked environment and source for offline regression testing
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd packing
+          uv sync --frozen
+          cd ..
+          mkdir -p development-snapshot
+          git rev-parse HEAD > development-snapshot/commit.txt
+          git ls-files -s > development-snapshot/tree.txt
+          tar -czf development-snapshot/source.tar.gz packing/src packing/devtools packing/tests packing/cases packing/pyproject.toml packing/uv.lock packages/workbench .github/workflows AGENTS.md
+          PYTHON_HOME=$(cd packing && uv run --frozen python -c 'import sys; print(sys.base_prefix)')
+          tar -czf development-snapshot/python.tar.gz -C "$PYTHON_HOME" .
+          tar -czf development-snapshot/site-packages.tar.gz -C packing/.venv/lib/python3.14/site-packages .
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: frontier-development-snapshot
+          path: development-snapshot/
+          retention-days: 2
