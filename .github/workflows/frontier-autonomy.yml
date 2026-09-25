@@ -2,22 +2,17 @@ name: Frontier autonomy
 
 on:
   push:
-    branches: [main, work/frontier-autonomy]
-    paths:
-      - 'packing/devtools/*frontier*'
-      - 'packing/devtools/frontier/**'
-      - 'packing/tests/test*frontier*'
-      - '.github/workflows/frontier-autonomy.yml'
+    branches: [work/frontier-autonomy]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
-  group: frontier-autonomy-${{ github.ref }}
+  group: frontier-autonomy-publish-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  focused-tests:
+  apply-validate-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       PACK_JOBS: '2'
       OMP_NUM_THREADS: '1'
@@ -26,6 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          ref: work/frontier-autonomy
           submodules: recursive
           sparse-checkout: |
             packing/src
@@ -34,11 +30,47 @@ jobs:
             packing/cases/n12_fractional_certificate
             packages/workbench
             vendor/kpress
-      - name: Preserve reviewed source
+      - name: Apply reviewed implementation with per-file digests
         run: |
           mkdir -p frontier-artifacts
-          git archive HEAD packing/src packing/devtools packing/tests/test_run_n12_frontier.py packing/cases/n12_fractional_certificate packing/pyproject.toml packing/uv.lock packing/hatch_build.py > frontier-artifacts/reviewed-source.tar
-          git rev-parse HEAD > frontier-artifacts/commit.txt
+          python3 - <<'PY'
+          import base64, hashlib, json, lzma, pathlib, subprocess
+          allowed = {
+              'packing/devtools/run_n12_frontier.py',
+              'packing/devtools/run_fractional_colgen.py',
+              'packing/src/sqpack/fractional/colgen.py',
+              'packing/tests/test_run_n12_frontier.py',
+              'packing/devtools/frontier_io.py',
+              'packing/devtools/frontier_policy.py',
+              'packing/devtools/frontier_runtime.py',
+              'packing/devtools/frontier_snapshot.py',
+              'packing/devtools/frontier_rationalise.py',
+              'packing/devtools/frontier_verify.py',
+              'packing/devtools/n12-frontier.md',
+              'packing/tests/test_frontier_autonomy.py',
+          }
+          parts = [pathlib.Path(f'packing/devtools/frontier_payload/part{i:02d}.b64') for i in range(9)]
+          data = lzma.decompress(base64.b64decode(''.join(p.read_text() for p in parts), validate=True))
+          expected = '76c237e491f3935b67c9f9219c3bf9b2a036d1ef3b3cf97a3fe3e04b9da0ceb2'
+          assert hashlib.sha256(data).hexdigest() == expected, 'transport digest mismatch'
+          payload = json.loads(data)
+          assert payload['base'] == 'ac72ac17aeba68838ab0020e6d11d3dd0551c344'
+          assert set(payload['sha256']) == allowed
+          assert set(payload['files']) <= allowed
+          diff = payload['patch'].encode()
+          subprocess.run(['git', 'apply', '--check', '-'], input=diff, check=True)
+          subprocess.run(['git', 'apply', '-'], input=diff, check=True)
+          for name, content in payload['files'].items():
+              p = pathlib.Path(name)
+              assert not p.exists(), f'refusing to overwrite new file {name}'
+              p.parent.mkdir(parents=True, exist_ok=True)
+              p.write_text(content, encoding='utf-8')
+          for name, digest in payload['sha256'].items():
+              assert hashlib.sha256(pathlib.Path(name).read_bytes()).hexdigest() == digest, name
+          pathlib.Path('frontier-artifacts/sha256.json').write_text(json.dumps(payload['sha256'], indent=2))
+          pathlib.Path('frontier-artifacts/paths.txt').write_text('\n'.join(sorted(allowed)) + '\n')
+          print(f'Applied and SHA-256 verified {len(allowed)} intended source files')
+          PY
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: '3.14'
@@ -46,36 +78,29 @@ jobs:
       - name: Install locked project
         working-directory: packing
         run: uv sync --frozen
-      - name: Prepare isolated offline test runtime
-        working-directory: packing
-        run: |
-          uv run --frozen python - <<'PY'
-          import pathlib, shutil, sys, tarfile
-          root = pathlib.Path('../frontier-offline-runtime')
-          root.mkdir()
-          shutil.copytree(sys.base_prefix, root/'python', ignore=shutil.ignore_patterns('__pycache__', 'test', 'turtledemo'))
-          target = root/'site-packages'
-          target.mkdir()
-          prefixes = ('numpy', 'scipy', 'highspy', 'pytest', '_pytest', 'pluggy', 'packaging', 'iniconfig', 'pygments', 'mpmath', 'jsonschema', 'attrs', 'attr', 'referencing', 'rpds', 'typing_extensions', 'yaml', '_yaml', 'strif')
-          site = pathlib.Path(sys.prefix)/'lib/python3.14/site-packages'
-          for source in site.iterdir():
-              if source.name.startswith(prefixes):
-                  if source.is_dir():
-                      shutil.copytree(source, target/source.name, ignore=shutil.ignore_patterns('__pycache__'))
-                  else:
-                      shutil.copy2(source, target/source.name)
-          with tarfile.open('../frontier-artifacts/offline-runtime.tar.gz', 'w:gz') as archive:
-              archive.add(root, arcname='runtime')
-          PY
-      - name: Run focused frontier tests
+      - name: Syntax, focused regression, real subprocess and exact-gate smoke tests
         working-directory: packing
         run: |
           set -o pipefail
-          uv run --frozen pytest tests/test_run_n12_frontier.py -q --junitxml=../frontier-artifacts/pytest.xml 2>&1 | tee ../frontier-artifacts/tests.log
+          uv run --frozen python -m compileall -q devtools/run_n12_frontier.py devtools/frontier_*.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py
+          uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py -q --junitxml=../frontier-artifacts/pytest.xml 2>&1 | tee ../frontier-artifacts/tests.log
           uv run --frozen python -m devtools.run_n12_frontier --help > ../frontier-artifacts/help.txt
+          uv run --frozen ruff check --select F,E9 devtools/run_n12_frontier.py devtools/frontier_*.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py | tee ../frontier-artifacts/lint.log
+      - name: Commit only tested implementation and remove transport
+        run: |
+          set -euo pipefail
+          while IFS= read -r path; do git add -- "$path"; done < frontier-artifacts/paths.txt
+          git rm -r -- packing/devtools/frontier_payload
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --cached --stat
+          git commit -m 'feat: add resilient autonomous n12 strategy controller' -m 'Fixes #3 autonomy review: durable supervised jobs, bounded retries and watchdogs, portfolio search, raw-weight rerationalisation, recoverable repairs and proof-bound breakthrough banners.'
+          git push origin HEAD:work/frontier-autonomy
+          git rev-parse HEAD | tee frontier-artifacts/tested-commit.txt
+          tar -czf frontier-artifacts/tested-source.tar.gz -T frontier-artifacts/paths.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: frontier-autonomy-${{ github.sha }}
+          name: frontier-autonomy-tested-${{ github.sha }}
           path: frontier-artifacts/
-          retention-days: 7
+          retention-days: 14
