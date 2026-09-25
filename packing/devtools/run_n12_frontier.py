@@ -36,6 +36,7 @@ SCHEMA = 3
 LEGACY_RATIONALISATION_SCALE = 200_000
 DEFAULT_RATIONALISATION_SCALE = 1_600_000
 DEFAULT_MAX_RATIONALISATION_SCALE = 25_600_000
+NOTABLE_OBJECTIVE_GAIN = 1e-3
 REPAIR_SLACK_FRACTIONS = (
     Fraction(1, 2),
     Fraction(3, 4),
@@ -372,6 +373,83 @@ def significant_result(decision: str, result: dict[str, Any]) -> bool:
     return decision in ("VERIFIED", "REFINE_SCALE") or (
         decision == "UNRESOLVED" and scale_limited_result(result)
     )
+
+
+def record_notable_search(
+    state: dict[str, Any], cycle: dict[str, Any], stage: dict[str, Any]
+) -> dict[str, Any] | None:
+    """Record a materially better same-backend, same-stage search objective.
+
+    Search objectives are evidence about the instrument, not proofs. Comparing
+    only the same stage avoids calling a deeper-budget result an improvement
+    merely because it received more column rounds.
+    """
+
+    result = stage.get("result") or {}
+    objective = result.get("objective")
+    if (
+        stage.get("work_kind") == "rerationalisation"
+        or result.get("converged") is not True
+        or not isinstance(objective, int | float)
+        or not math.isfinite(float(objective))
+    ):
+        return None
+    side = Fraction(cycle["side"])
+    backend = frontier_policy.backend_key(side)
+    revision = cycle.get("search_revision", 0)
+    best: tuple[float, str] | None = None
+    for prior_cycle in state.get("cycles", []):
+        if prior_cycle is cycle:
+            candidates = prior_cycle.get("stages", [])
+        else:
+            if (
+                frontier_policy.backend_key(Fraction(prior_cycle["side"])) != backend
+                or prior_cycle.get("search_revision", 0) != revision
+            ):
+                continue
+            candidates = prior_cycle.get("stages", [])
+        for prior_stage in candidates:
+            if prior_stage is stage or prior_stage.get("name") != stage.get("name"):
+                continue
+            prior_result = prior_stage.get("result") or {}
+            prior_objective = prior_result.get("objective")
+            if (
+                prior_stage.get("status") != "complete"
+                or prior_stage.get("work_kind") == "rerationalisation"
+                or prior_result.get("converged") is not True
+                or not isinstance(prior_objective, int | float)
+                or not math.isfinite(float(prior_objective))
+            ):
+                continue
+            value = float(prior_objective)
+            if best is None or value < best[0]:
+                best = (value, prior_cycle.get("strategy", "baseline"))
+    if best is None:
+        return None
+    gain = best[0] - float(objective)
+    if gain < NOTABLE_OBJECTIVE_GAIN:
+        return None
+    identity = hashlib.sha256(
+        f"{stage.get('directory')}|{objective}|{best[0]}".encode()
+    ).hexdigest()
+    events = state.setdefault("search_findings", [])
+    if any(event.get("id") == identity for event in events):
+        return None
+    event = {
+        "id": identity,
+        "at": stamp(),
+        "side": str(side),
+        "stage": stage.get("name"),
+        "strategy": cycle.get("strategy", "baseline"),
+        "objective": float(objective),
+        "previous_best_objective": best[0],
+        "previous_best_strategy": best[1],
+        "gain": gain,
+        "directory": stage.get("directory"),
+        "proof": False,
+    }
+    events.append(event)
+    return event
 
 
 def apply_result(state: dict[str, Any], cycle: dict[str, Any]) -> None:
@@ -1206,6 +1284,7 @@ def initial_state(config: dict[str, Any], seed: Path) -> dict[str, Any]:
         "verified_certificate": str(seed),
         "verified_sha256": digest(seed),
         "discoveries": [],
+        "search_findings": [],
         "operational_errors": [],
         "policy_version": frontier_policy.POLICY_VERSION,
         "search_high": str(high),
@@ -1555,6 +1634,7 @@ def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = Fal
                 "finished_at": stamp(),
             }
         )
+        record_notable_search(state, cycle, generated)
         cycle["column_rounds_requested"] = sum(
             stage["budget"] for stage in cycle["stages"] if stage["status"] == "complete"
         )
@@ -1708,6 +1788,7 @@ def promote_verified(state: dict[str, Any], side: Fraction, candidate: Path, mec
     event = {"id": proof_sha, "at": stamp(), "side": str(side), "previous": str(previous),
              "improvement": str(side - previous), "mass": str(mass),
              "candidate": str(candidate), "sha256": proof_sha, "mechanism": mechanism,
+             "float64_distinct": float(side) != float(previous),
              "gate_receipt": str(proof_receipt)}
     if not any(e["id"] == proof_sha for e in state.setdefault("discoveries", [])):
         state["discoveries"].append(event)
@@ -1715,27 +1796,77 @@ def promote_verified(state: dict[str, Any], side: Fraction, candidate: Path, mec
 
 def publish_findings(root: Path, state: dict[str, Any]) -> None:
     discoveries = state.get("discoveries", [])
+    search_findings = state.get("search_findings", [])
     atomic_json(root / "findings.json", {
-        "schema": 1, "verified_improvements": discoveries,
+        "schema": 2,
+        "verified_improvements": discoveries,
+        "notable_search_improvements": search_findings,
         "current_verified": {"side": state["verified_low"], "candidate": state["verified_certificate"],
                              "sha256": state.get("verified_sha256")},
     })
     lines = ["# Verified lower-bound improvements", "",
              "Only full two-route gate successes appear here. Search opportunities are not proofs.", ""]
     for event in discoveries:
+        distinct = event.get(
+            "float64_distinct",
+            float(Fraction(event["side"])) != float(Fraction(event["previous"])),
+        )
+        classification = "backend-distinct improvement" if distinct else "exact-only refinement"
         lines.extend([f"## s(12) >= {event['side']} ({display(event['side'])})",
+                      f"Classification: **{classification}**.",
                       f"Improvement: `{event['improvement']}`; mass: `{event['mass']}`.",
                       f"Certificate: `{event['candidate']}`", f"SHA-256: `{event['sha256']}`", ""])
+    if search_findings:
+        lines.extend(["# Notable search improvements", "",
+                      "These are search-instrument results, **not proofs**.", ""])
+        for event in search_findings:
+            lines.extend([
+                f"## {event['strategy']} / {event['stage']} at L={event['side']}",
+                f"Objective: `{event['previous_best_objective']:.12g}` → "
+                f"`{event['objective']:.12g}` (gain `{event['gain']:.6g}`).",
+                f"Previous best strategy: `{event['previous_best_strategy']}`.",
+                "",
+            ])
     atomic_text(root / "findings.md", "\n".join(lines) + "\n")
     for event in discoveries:
         if event.get("announced"):
             continue
-        emit(root, "\n" + "=" * 72 + "\nVERIFIED LOWER BOUND IMPROVEMENT\n"
+        distinct = event.get(
+            "float64_distinct",
+            float(Fraction(event["side"])) != float(Fraction(event["previous"])),
+        )
+        heading = (
+            "VERIFIED LOWER BOUND IMPROVEMENT"
+            if distinct
+            else "VERIFIED EXACT REFINEMENT"
+        )
+        note = (
+            ""
+            if distinct
+            else "exactly stronger, but unchanged at float64 search resolution\n"
+        )
+        emit(root, "\n" + "=" * 72 + f"\n{heading}\n"
              f"s(12) >= {event['side']} = {display(event['side'])}\n"
              f"previous={display(event['previous'])}  improvement={event['improvement']}\n"
+             f"{note}"
              f"full exact gate: PASS   mass={event['mass']}\n"
              f"certificate: {event['candidate']}\nsha256: {event['sha256']}\n" + "=" * 72,
-             significant=True)
+             significant=distinct)
+        event["announced"] = True
+        save_state(root, state)
+    for event in search_findings:
+        if event.get("announced"):
+            continue
+        emit(
+            root,
+            "\n" + "-" * 72 + "\nNOTABLE SEARCH IMPROVEMENT (NOT A PROOF)\n"
+            f"L={display(event['side'])} strategy={event['strategy']} stage={event['stage']}\n"
+            f"objective {event['previous_best_objective']:.12g} -> "
+            f"{event['objective']:.12g}  gain={event['gain']:.6g}\n"
+            f"previous-best-strategy={event['previous_best_strategy']}\n"
+            + "-" * 72,
+            significant=True,
+        )
         event["announced"] = True
         save_state(root, state)
 
