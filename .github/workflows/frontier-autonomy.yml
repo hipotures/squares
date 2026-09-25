@@ -51,6 +51,13 @@ jobs:
           for path, digest in expected.items():
               assert hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest() == digest, path
           print('Applied patch matches the locally reviewed source bytes')
+          # The structural positive-receipt double must obey the new completion
+          # invariant. The separate negative test still rejects finished=False.
+          p = pathlib.Path('packing/tests/test_run_n12_frontier.py')
+          s = p.read_text()
+          old = '        "verified_sha256": digest(path), "verified_candidate": str(path),\n'
+          assert s.count(old) == 1
+          p.write_text(s.replace(old, old + '        "finished": True,\n'))
           PY
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
         with:
@@ -80,7 +87,7 @@ jobs:
         run: |
           set -euo pipefail
           mv .github/frontier-autonomy.final.yml .github/workflows/frontier-autonomy.yml
-          git add -- packing/devtools/frontier_runtime.py packing/devtools/frontier_rationalise.py packing/devtools/run_fractional_colgen.py packing/devtools/run_n12_frontier.py .github/workflows/frontier-autonomy.yml
+          git add -- packing/devtools/frontier_runtime.py packing/devtools/frontier_rationalise.py packing/devtools/run_fractional_colgen.py packing/devtools/run_n12_frontier.py packing/tests/test_run_n12_frontier.py .github/workflows/frontier-autonomy.yml
           git rm -- .github/frontier-hardening.patch .github/frontier-autonomy.final.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
