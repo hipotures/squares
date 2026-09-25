@@ -138,7 +138,7 @@ def test_controller_changes_strategy_after_three_failed_cycles(tmp_path, monkeyp
         })
         return 0
     monkeypatch.setattr(frontier, "run_child", simulated_search)
-    assert frontier.main(["--root", str(tmp_path), "--strategies", "baseline,centre", "--max-cycles", "4"]) == 0
+    assert frontier.main(["--root", str(tmp_path), "--strategies", "baseline,centre", "--generation-trials", "1", "--max-cycles", "4"]) == 0
     state = read_json(tmp_path / "state.json")
     assert [c["strategy"] for c in state["cycles"]] == ["baseline", "baseline", "baseline", "centre"]
     assert len(commands) == 4

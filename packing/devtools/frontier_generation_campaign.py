@@ -7,14 +7,13 @@ artifacts; a speculative sibling never overwrites an earlier verified result.
 """
 from __future__ import annotations
 
-import json
 import sys
 import time
 from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
-from devtools import frontier_policy, frontier_runtime
+from devtools import frontier_policy
 from devtools.frontier_io import atomic_json, digest, read_json
 
 
@@ -89,8 +88,9 @@ def _finish_wave(root: Path, state: dict[str, Any], frontier) -> None:
                   f"max_busy={metrics['max_busy']}/{metrics['slots']}")
 
 
-def run_portfolio(root: Path, state: dict[str, Any]) -> None:
-    from devtools import run_n12_frontier as frontier
+def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
+    if frontier is None:
+        from devtools import run_n12_frontier as frontier
 
     if not state.get("active_generation"):
         if state.get("active") is not None:

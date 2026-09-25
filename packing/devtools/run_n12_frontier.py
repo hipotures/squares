@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Any
 
 from devtools import frontier_policy, frontier_runtime
+from devtools.frontier_phase import timestamped
 from devtools.frontier_io import atomic_json as durable_json, atomic_text, digest, read_json
 
 REPO = Path(__file__).resolve().parents[2]
@@ -186,6 +187,10 @@ def load_state(root: Path, config: dict[str, Any] | None = None) -> dict[str, An
     state.setdefault("operational_errors", [])
     state.setdefault("policy_version", frontier_policy.POLICY_VERSION)
     state.setdefault("search_revision", 0)
+    active_generation = state.setdefault("active_generation", [])
+    if (not isinstance(active_generation, list) or len(set(active_generation)) != len(active_generation)
+            or any(type(i) is not int or not 0 <= i < len(state["cycles"]) for i in active_generation)):
+        raise ValueError("invalid active generation cohort")
     # Do not mark a repair INTERRUPTED merely because the controller restarted:
     # its supervisor may still be running and must be reattached to first.
     return state
@@ -466,6 +471,7 @@ def decide_stage(
 
 
 def emit(root: Path, message: str, *, significant: bool = False) -> None:
+    message = timestamped(message)
     colour = significant and "NO_COLOR" not in os.environ and (
         sys.stdout.isatty() or os.environ.get("FORCE_COLOR") == "1"
     )
@@ -569,7 +575,8 @@ def command(
             args[args.index(flag) + 1] = value
         else:
             args.extend([flag, value])
-    args.extend(["--raw-weights", str(directory / "raw-lp.json")])
+    args.extend(["--raw-weights", str(directory / "raw-lp.json"),
+                 "--phase-log", str(directory / "phase.log")])
     return args
 
 
@@ -638,6 +645,15 @@ def latest_progress(directory: Path) -> tuple[str, str, str]:
 def heartbeat_message(args: list[str], output: Path, elapsed: float) -> str:
     """One concise progress line for a long-running real subprocess."""
     minutes = max(1, round(elapsed / 60))
+    if "devtools.frontier_generation_queue" in args:
+        try:
+            progress = read_json(output.parent / "generation-progress.json")
+            return (f"[running] generation-queue elapsed_s={elapsed:.1f} "
+                    f"serial={progress['serial_owners']} directions={progress['direction_tasks']} "
+                    f"slots={progress['slots']} jobs={progress['completed_jobs']}/{progress['jobs']} "
+                    f"coordinator_cpu={progress['coordinator_cpu_seconds']:.3f}s")
+        except (OSError, ValueError, KeyError):
+            return f"[running] generation-queue starting elapsed_s={elapsed:.1f}"
     if "devtools.frontier_boost_queue" in args:
         checkpoint = output.parent / "queue-checkpoint.json"
         try:
@@ -1267,7 +1283,7 @@ class StopFlag:
             emit(self.root, f"[stop] signal {self.signum} requested; finishing current cycle, then stopping")
 
 
-def run_cycle(root: Path, state: dict[str, Any]) -> None:
+def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = False) -> dict | None:
     active = state["active"]
     if active is None:
         plan = state.pop("scheduled_work", {})
@@ -1316,11 +1332,13 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             return
     while True:
         incomplete = next(
-            (stage for stage in reversed(cycle["stages"]) if stage["status"] == "running"), None
+            (stage for stage in reversed(cycle["stages"]) if stage["status"] in ("running", "queued")), None
         )
         if incomplete is not None:
+            if incomplete["status"] == "queued" and defer_generation:
+                return incomplete
             old_dir = Path(incomplete["directory"])
-            if (old_dir / "stdout.log.job.json").exists():
+            if incomplete["status"] == "queued" or (old_dir / "stdout.log.job.json").exists():
                 code = run_child(incomplete["command"], old_dir / "stdout.log", controlled_env(state))
                 if code:
                     record_job_failure(root, state, cycle, incomplete, code)
@@ -1433,6 +1451,7 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                 "command": args,
                 "strategy": cycle.get("strategy", "baseline"),
                 "work_kind": "rerationalisation" if raw_source is not None else "generation",
+                "started_epoch": int(time.time()),
                 "git_sha": git_sha(),
                 "started_at": stamp(),
                 "status": "running",
@@ -1446,6 +1465,10 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                 f"stage={name}({budgets[stage_index]}) scale={stage_scale_value} "
                 f"strategy={cycle.get('strategy', 'baseline')} work={generated['work_kind']}",
             )
+            if defer_generation:
+                generated["status"] = "queued"
+                save_state(root, state)
+                return generated
             env = controlled_env(state)
             code = run_child(args, stage_dir / "stdout.log", env)
             if code or not (stage_dir / "result.json").exists():
@@ -1473,12 +1496,14 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
         mass = result.get("total_mass")
         verifier = "mass-not-below-12"
         verified_path = None
+        verification_started = time.monotonic()
         if mass is not None and Fraction(mass) < 12 and candidate.exists():
             verifier, verified_path = verify_candidate(
                 Path(generated["directory"]), candidate, side
             )
         elif mass is not None and Fraction(mass) < 12:
             verifier = "candidate-missing"
+        generated["verification_seconds"] = time.monotonic() - verification_started
         generated["verifier"] = verifier
         if verifier.startswith("verification-error"):
             try:
@@ -1548,7 +1573,9 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             f"[stage] L={display(side)} rounds={generated['budget']} "
             f"scale={stage_scale(generated)} objective={result.get('objective')} "
             f"total={result.get('total_mass')} "
-            f"time={float(result.get('seconds') or 0):.0f}s -> {decision}",
+            f"time={float(result.get('seconds') or 0):.0f}s "
+            f"verify_s={generated['verification_seconds']:.3f} "
+            f"stage_wall_s={max(0, time.time() - generated.get('started_epoch', time.time())):.3f} -> {decision}",
             significant=significant_result(decision, result),
         )
         if decision in ("ESCALATE", "REFINE_SCALE"):
@@ -1625,7 +1652,7 @@ def cycle_stalled(cycle: dict[str, Any], result: dict[str, Any]) -> bool:
         return False
     completed = [s for s in cycle["stages"] if s.get("status") == "complete"
                  and s.get("result", {}).get("work_kind") != "rerationalisation"]
-    if not completed or completed[-1].get("name") == "screen":
+    if not completed:
         return False
     old = completed[-1].get("result", {}).get("objective")
     new = result.get("objective")
@@ -1713,7 +1740,20 @@ def publish_findings(root: Path, state: dict[str, Any]) -> None:
         save_state(root, state)
 
 
+def generation_parallelism(state: dict[str, Any], work: dict[str, Any]) -> bool:
+    if state.get("active_generation"):
+        return True
+    if work["kind"] != "search" or state.get("active") is not None:
+        return False
+    if state["config"].get("generation_trials", 3) <= 1 or state["config"]["workers"] <= 1:
+        return False
+    from devtools.frontier_generation_campaign import select_plans
+    return len(select_plans(state, work)) > 1
+
+
 def choose_work(state: dict[str, Any]) -> dict[str, Any]:
+    if state.get("active_generation"):
+        return {"kind": "resume-generation", "reason": "finish the durable strategy cohort"}
     target = next_side(state)
     ceiling = soft_high(state)
     pending = target == ceiling and any(
@@ -1742,7 +1782,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.add_argument(f"--{name}", type=Fraction)
     parser.add_argument("--seed-certificate", type=Path)
     for name in ("workers", "screen-rounds", "normal-rounds", "deep-rounds", "max-rounds",
-                 "row-rounds", "max-row-rounds", "scale", "max-scale", "max-cycles"):
+                 "row-rounds", "max-row-rounds", "scale", "max-scale", "max-cycles", "generation-trials"):
         parser.add_argument(f"--{name}", type=int)
     parser.add_argument("--strategies", help="comma-separated portfolio (default: baseline,centre,pricing,windows,dense,fine-net)")
     parser.add_argument("--max-hours", type=float, help="request a graceful stop after this session budget")
@@ -1758,7 +1798,7 @@ def main(argv: list[str] | None = None) -> int:
     started = time.monotonic()
     if args.status:
         state = read_json(root / "state.json")
-        print(summary(root, state, started))
+        print(timestamped(summary(root, state, started)))
         return 0
     previous_handlers = {}
     previous_workers_env = os.environ.get("PACK_JOBS")
@@ -1787,6 +1827,7 @@ def main(argv: list[str] | None = None) -> int:
                 "max_scale": DEFAULT_MAX_RATIONALISATION_SCALE,
                 "strategies": [p["name"] for p in frontier_policy.PROFILES],
                 "strategy_width": "1/100000", "target_width": None, "max_cycles": None,
+                "generation_trials": 3,
             }
             config = {**defaults, **config}
             for key in ("verified_low", "search_high", "seed_certificate"):
@@ -1796,7 +1837,7 @@ def main(argv: list[str] | None = None) -> int:
                     if args.resume and value != config[key]:
                         raise ValueError(f"cannot change initial {key} while resuming this campaign")
                     config[key] = value
-            for key in ("workers", "row_rounds", "max_row_rounds", "scale", "max_scale"):
+            for key in ("workers", "row_rounds", "max_row_rounds", "scale", "max_scale", "generation_trials"):
                 if getattr(args, key) is not None:
                     config[key] = getattr(args, key)
             budgets = list(config["budgets"])
@@ -1828,7 +1869,8 @@ def main(argv: list[str] | None = None) -> int:
                 memory = Path("/proc/meminfo").read_text().splitlines()
                 total_mib = int(next(line.split()[1] for line in memory if line.startswith("MemTotal:"))) // 1024
                 runtime["max_rss_mib"] = max(256, min(24576, total_mib * 3 // 4))
-            if (config["workers"] < 1 or config["row_rounds"] < 1
+            if (not 1 <= config["generation_trials"] <= 6
+                    or config["workers"] < 1 or config["row_rounds"] < 1
                     or config["max_row_rounds"] < config["row_rounds"]
                     or config["scale"] < 1 or config["max_scale"] < config["scale"]
                     or sorted(set(budgets)) != budgets or budgets[0] < 1
@@ -1870,7 +1912,7 @@ def main(argv: list[str] | None = None) -> int:
             publish_findings(root, state)
             emit(root, f"[start] n=12 workers={config['workers']} scale={config['scale']} max-scale={config['max_scale']} "
                  f"verified={display(state['verified_low'])} search-high={display(state['search_high'])} "
-                 f"strategies={','.join(config['strategies'])}")
+                 f"strategies={','.join(config['strategies'])} generation-trials={config['generation_trials']}")
             if state.pop("anchor_needs_verification", False):
                 seed = Path(state["verified_certificate"])
                 anchor_dir = root / f"anchor-{digest(seed)[:16]}"
@@ -1885,14 +1927,14 @@ def main(argv: list[str] | None = None) -> int:
                 save_state(root, state)
             idle_since = None
             idle_message_at = 0.0
-            while (not stop.requested or state.get("active") is not None
+            while (not stop.requested or state.get("active") is not None or state.get("active_generation")
                    or any(a.get("status") in ("RUNNING", "INTERRUPTED") for a in state.get("repair_attempts", []))):
                 poll_stop()
                 active_repair = any(a.get("status") in ("RUNNING", "INTERRUPTED")
                                     for a in state.get("repair_attempts", []))
-                if stop.requested and state.get("active") is None and not active_repair:
+                if stop.requested and state.get("active") is None and not state.get("active_generation") and not active_repair:
                     break
-                if state.get("active") is None and not active_repair:
+                if state.get("active") is None and not state.get("active_generation") and not active_repair:
                     completed = sum(c["status"] in ("VERIFIED", "SEARCH_FAILED", "UNRESOLVED", "ERROR") for c in state["cycles"])
                     if args.max_cycles is not None and completed >= args.max_cycles:
                         break
@@ -1929,6 +1971,9 @@ def main(argv: list[str] | None = None) -> int:
                 try:
                     if work["kind"] == "repair":
                         run_repair(root, state)
+                    elif generation_parallelism(state, work):
+                        from devtools.frontier_generation_campaign import run_portfolio
+                        run_portfolio(root, state, sys.modules[__name__])
                     else:
                         run_cycle(root, state)
                 except frontier_runtime.LiveJob as error:
@@ -1943,7 +1988,7 @@ def main(argv: list[str] | None = None) -> int:
                     if stop.requested:
                         break
                 poll_stop()
-                if stop.requested and state.get("active") is None:
+                if stop.requested and state.get("active") is None and not state.get("active_generation"):
                     break
             save_state(root, state)
             write_views(root, state)
@@ -1959,7 +2004,7 @@ def main(argv: list[str] | None = None) -> int:
                     emit(root, summary(root, state, started))
             except (OSError, RuntimeError):
                 pass  # Never race another writer; the last atomic state survives.
-        print(f"frontier runner stopped safely: {error}", file=sys.stderr)
+        print(timestamped(f"frontier runner stopped safely: {error}"), file=sys.stderr)
     finally:
         for signum, handler in previous_handlers.items():
             signal.signal(signum, handler)

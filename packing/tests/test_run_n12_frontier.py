@@ -435,6 +435,8 @@ def test_stop_finishes_cycle_and_console_is_concise(
             [
                 "--root",
                 str(tmp_path),
+                "--generation-trials",
+                "1",
                 "--screen-rounds",
                 "1",
                 "--normal-rounds",

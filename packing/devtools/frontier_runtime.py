@@ -132,9 +132,9 @@ def _paths(args: list[str], cwd: Path) -> tuple[list[Path], list[Path]]:
     outputs: list[Path] = []
     for flag, collection in (
         ("--seed-certificate", inputs), ("--snapshot", inputs),
-        ("--source-result", inputs), ("--input", inputs),
+        ("--source-result", inputs), ("--input", inputs), ("--manifest", inputs),
         ("--json", outputs), ("--freeze", outputs), ("--raw-weights", outputs),
-        ("--report", outputs), ("--log", outputs), ("--row-log", outputs),
+        ("--report", outputs), ("--log", outputs), ("--row-log", outputs), ("--phase-log", outputs),
     ):
         if flag in args:
             path = Path(args[args.index(flag) + 1])
@@ -298,7 +298,9 @@ def supervise(spec_path: Path) -> int:
             return 0
         limits = {**DEFAULTS, **spec["limits"]}
         args = list(spec["command"])
-        kind = "search" if "devtools.run_fractional_colgen" in args else "verification"
+        kind = "search" if any(module in args for module in (
+            "devtools.run_fractional_colgen", "devtools.frontier_generation_queue"
+        )) else "verification"
         if "devtools.frontier_rationalise" in args:
             kind = "rationalisation"
         max_seconds = limits["stage_seconds"] if kind == "search" else limits["verify_seconds"]

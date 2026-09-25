@@ -10,11 +10,8 @@ This is scheduling, not proof logic. Only the existing full gate can retain a bo
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
 import multiprocessing as mp
 import os
-import sys
 import time
 import traceback
 import uuid
@@ -199,6 +196,7 @@ def run_jobs(jobs: list[dict], root: Path, *, slots: int, stage_seconds: float =
                "driver_cpu_seconds": 0.0, "coordinator_cpu_seconds": 0.0}
     began, cpu = time.monotonic(), time.process_time()
     next_notice = began
+    dispatch_turn = 0
     pool = ProcessPoolExecutor(max_workers=slots, mp_context=ctx)
 
     def complete(key: str, info: dict) -> None:
@@ -209,6 +207,9 @@ def run_jobs(jobs: list[dict], root: Path, *, slots: int, stage_seconds: float =
             if owner == key:
                 future.cancel()  # Running work continues to count until completion.
         code = int(info.get("returncode", 70))
+        if code == 0 and _identity(driver["job"], code_sha) != identities[key]:
+            code = 78
+            info = {**info, "error": "generation inputs changed during execution"}
         result_path = _flag(driver["job"]["command"], "--json")
         if code == 0 and (result_path is None or not result_path.is_file()):
             code = 70
@@ -274,12 +275,12 @@ def run_jobs(jobs: list[dict], root: Path, *, slots: int, stage_seconds: float =
                         Path(group["context"] + suffix).unlink(missing_ok=True)
             # Round-robin dispatch with no fixed strategy partitions.
             while len(serial) + len(futures) < slots and any(pending.values()):
-                for key in list(pending):
-                    if not pending[key] or len(serial) + len(futures) >= slots:
-                        continue
-                    index, context, tail = pending[key].popleft()
-                    future = pool.submit(_direction_work, context, tail)
-                    futures[future] = (key, index, context)
+                ready = [key for key in pending if pending[key]]
+                key = ready[dispatch_turn % len(ready)]
+                dispatch_turn += 1
+                index, context, tail = pending[key].popleft()
+                future = pool.submit(_direction_work, context, tail)
+                futures[future] = (key, index, context)
             metrics["max_busy"] = max(metrics["max_busy"], len(serial) + len(futures))
             if serial and futures:
                 metrics["overlap_samples"] += 1
@@ -309,6 +310,8 @@ def run_jobs(jobs: list[dict], root: Path, *, slots: int, stage_seconds: float =
                     pending[key] = deque((i, context, task[2:]) for i, task in enumerate(payload))
                 else:
                     raise RuntimeError(f"unsupported generation message: {kind}")
+            if not live:
+                time.sleep(0.005)
             now = time.monotonic()
             for key, driver in drivers.items():
                 if driver["done"]:
@@ -328,6 +331,10 @@ def run_jobs(jobs: list[dict], root: Path, *, slots: int, stage_seconds: float =
                     complete(key, {"returncode": 124, "error": "generation stage deadline/no-progress budget"})
                 elif not driver["process"].is_alive() and not driver["connection"].poll():
                     complete(key, {"returncode": 70, "error": "generation driver crashed"})
+            if len(results) == len(jobs) and futures:
+                # All useful owners ended (possibly a deadline). Do not wait for
+                # discarded work before reaching the bounded cleanup in finally.
+                break
             if now >= next_notice:
                 current = {**metrics, "serial_owners": len(serial), "direction_tasks": len(futures),
                            "completed_jobs": len(results), "jobs": len(jobs),
@@ -377,7 +384,7 @@ def main(argv: list[str] | None = None) -> int:
                   f"directions={metrics['direction_tasks']} slots={metrics['slots']} "
                   f"jobs={metrics['completed_jobs']}/{metrics['jobs']}", flush=True)
             last[0] = time.monotonic()
-    report = run_jobs(manifest["jobs"], args.report.parent, slots=args.workers,
+    report = run_jobs(manifest["jobs"], args.report.parent, slots=min(args.workers, int(os.environ.get("PACK_JOBS", args.workers))),
                       stage_seconds=args.stage_seconds, no_progress_seconds=args.no_progress_seconds,
                       on_progress=progress)
     if digest(args.manifest) != fingerprint:
