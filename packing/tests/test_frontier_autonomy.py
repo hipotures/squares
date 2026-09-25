@@ -154,7 +154,7 @@ def test_declaration_rejection_is_diagnosed_and_repaired(tmp_path, monkeypatch):
     rejected_cycle(tmp_path, state, side)
     calls = []
 
-    def gate(directory, _candidate, expected_side):
+    def gate(directory, _candidate, expected_side, **_kwargs):
         calls.append(directory)
         if len(calls) == 1:
             atomic_json(directory / "verification.json", {
