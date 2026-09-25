@@ -32,13 +32,20 @@ def verifier_fingerprint() -> str:
     return result.hexdigest()
 
 
-def checked_receipt(path: Path, source: Path, expected_side: Fraction) -> dict[str, Any] | None:
+def checked_receipt(
+    path: Path,
+    source: Path,
+    expected_side: Fraction,
+    *,
+    quick_first: bool = False,
+) -> dict[str, Any] | None:
     if not path.exists():
         return None
     report = read_json(path)
     if (report.get("source_sha256") != digest(source)
             or report.get("verifier_sha256") != verifier_fingerprint()
-            or Fraction(report.get("side", "0")) != expected_side):
+            or Fraction(report.get("side", "0")) != expected_side
+            or bool(report.get("quick_first", False)) != quick_first):
         return None
     if report.get("status") == "VERIFIED":
         verified = Path(report["verified_candidate"])
@@ -47,10 +54,16 @@ def checked_receipt(path: Path, source: Path, expected_side: Fraction) -> dict[s
     return report if report.get("finished") else None
 
 
-def decide(source: Path, directory: Path, expected_side: Fraction) -> dict[str, Any]:
+def decide(
+    source: Path,
+    directory: Path,
+    expected_side: Fraction,
+    *,
+    quick_first: bool = False,
+) -> dict[str, Any]:
     directory.mkdir(parents=True, exist_ok=True)
     receipt = directory / "verification.json"
-    cached = checked_receipt(receipt, source, expected_side)
+    cached = checked_receipt(receipt, source, expected_side, quick_first=quick_first)
     if cached is not None:
         return cached
     raw = source.read_bytes()
@@ -60,6 +73,7 @@ def decide(source: Path, directory: Path, expected_side: Fraction) -> dict[str, 
         "schema": 1, "source": str(source), "source_sha256": source_sha,
         "side": str(expected_side), "verifier_sha256": tool_sha,
         "status": "RUNNING", "category": None, "finished": False,
+        "quick_first": quick_first,
     }
     checkpoint = directory / "verification-progress.json"
     progress = read_json(checkpoint) if checkpoint.exists() else {}
@@ -90,6 +104,43 @@ def decide(source: Path, directory: Path, expected_side: Fraction) -> dict[str, 
         return report
 
     report["mass"] = str(certificate.total_mass)
+
+    # Repair creates several boosted candidates. Most die in the interval
+    # route, so reject them there before paying for the exact sweep. A quick
+    # acceptance is never retained; it only permits the unchanged full gate
+    # below to run.
+    if quick_first:
+        quick_log = directory / "verify-quick.log"
+        quick_stalls = directory / "quick-interval-stalls.json"
+        began = time.monotonic()
+        with quick_log.open("w", encoding="utf-8") as handle, redirect_stdout(handle):
+            quick_accepted = gate.decide(
+                source,
+                quick=True,
+                dump_stalls=quick_stalls,
+            )
+        report["quick_gate_seconds"] = time.monotonic() - began
+        if not quick_accepted:
+            stall_count = (
+                read_json(quick_stalls).get("stalled", 0)
+                if quick_stalls.exists()
+                else 0
+            )
+            refusals = [
+                line.split("REFUSED:", 1)[1].strip()
+                for line in quick_log.read_text(encoding="utf-8").splitlines()
+                if "REFUSED:" in line
+            ]
+            report.update(
+                status="REJECTED",
+                category="interval_stall" if stall_count else "quick_refusal",
+                stalled_boxes=stall_count,
+                refusals=refusals,
+                finished=True,
+            )
+            atomic_json(receipt, report)
+            return report
+
     pending = directory / "candidate.pending-verification.json"
     minimum = progress.get("minimum_cell_mass")
     if minimum is None:
@@ -145,9 +196,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--side", type=Fraction, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument(
+        "--quick-first",
+        action="store_true",
+        help="reject by the interval quick gate before paying for the exact sweep",
+    )
     args = parser.parse_args(argv)
     try:
-        report = decide(args.input, args.report.parent, args.side)
+        report = decide(
+            args.input,
+            args.report.parent,
+            args.side,
+            quick_first=args.quick_first,
+        )
         if args.report.name != "verification.json":
             atomic_json(args.report, report)
         print(f"verification status={report['status']} category={report['category']}", flush=True)
