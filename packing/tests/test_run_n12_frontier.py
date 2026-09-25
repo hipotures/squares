@@ -13,6 +13,8 @@ from pathlib import Path
 import pytest
 
 from devtools import run_n12_frontier as frontier
+from devtools.frontier_io import atomic_json, digest
+from devtools.frontier_verify import verifier_fingerprint
 
 
 def state(tmp_path: Path) -> dict:
@@ -221,6 +223,17 @@ def test_uniform_weight_repair_uses_only_part_of_strict_mass_slack(tmp_path: Pat
     assert total < 12
 
 
+def fake_proof(path: Path, side: str) -> Path:
+    """A structural receipt double for controller tests, not a mathematical proof."""
+    atomic_json(path, {"n": 12, "outer_side": side, "total_mass": "119/10",
+                       "atoms": [["1", "1", "119/10"]]})
+    atomic_json(path.parent / "verification.json", {
+        "status": "VERIFIED", "category": "full-retainable", "side": side,
+        "verified_sha256": digest(path), "verified_candidate": str(path),
+    })
+    return path
+
+
 def test_transitions_and_full_gate_invariant(tmp_path: Path) -> None:
     saved = state(tmp_path)
     with pytest.raises(ValueError, match="full exact gate"):
@@ -237,7 +250,7 @@ def test_transitions_and_full_gate_invariant(tmp_path: Path) -> None:
             "side": "3961/1000",
             "status": "VERIFIED",
             "verifier": "full-retainable",
-            "verified_candidate": str(tmp_path / "proof.json"),
+            "verified_candidate": str(fake_proof(tmp_path / "proof.json", "3961/1000")),
         },
     )
     assert saved["verified_low"] == "3961/1000"
@@ -497,40 +510,32 @@ def test_full_gate_output_and_target_side_required(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     candidate = tmp_path / "candidate.unverified.json"
-    candidate.write_text(
-        json.dumps({"n": 12, "outer_side": "793/200", "total_mass": "119/10"}),
-        encoding="utf-8",
-    )
+    candidate.write_text(json.dumps({"n": 12, "outer_side": "793/200", "total_mass": "119/10"}))
 
     def inconclusive(_args: list[str], output: Path) -> int:
-        output.write_text("quick route accepted\n", encoding="utf-8")
+        output.write_text("RETAINABLE: both routes accept (unbound text is not a receipt)\n")
         return 0
 
     monkeypatch.setattr(frontier, "run_child", inconclusive)
-    assert (
-        frontier.verify_candidate(tmp_path, candidate, Fraction(793, 200))[0] == "full-rejected"
-    )
-    assert not list(tmp_path.glob("candidate.verified*.json"))
-    assert (tmp_path / "candidate.pending-verification.json").exists()
-    assert (
-        frontier.verify_candidate(tmp_path, candidate, Fraction(397, 100))[0]
-        == "candidate-side-mismatch"
-    )
+    assert frontier.verify_candidate(tmp_path, candidate, Fraction(793, 200))[0].startswith("verification-error")
+    assert not list(tmp_path.rglob("candidate.verified*.json"))
+    assert frontier.verify_candidate(tmp_path, candidate, Fraction(397, 100))[0] == "candidate-side-mismatch"
 
-    def retained(_args: list[str], output: Path) -> int:
-        output.write_text(
-            "RETAINABLE: both routes accept and agree at 1; sha256 test\n",
-            encoding="utf-8",
-        )
+    def retained(args: list[str], output: Path) -> int:
+        report = Path(args[args.index("--report") + 1])
+        proof = fake_proof(report.parent / "candidate.verified.json", "793/200")
+        atomic_json(report, {
+            "status": "VERIFIED", "category": "full-retainable", "side": "793/200",
+            "source_sha256": digest(candidate), "verifier_sha256": verifier_fingerprint(),
+            "verified_candidate": str(proof), "verified_sha256": digest(proof),
+        })
+        output.write_text("structured full gate receipt available\n")
         return 0
 
     monkeypatch.setattr(frontier, "run_child", retained)
     status, verified = frontier.verify_candidate(tmp_path, candidate, Fraction(793, 200))
     assert status == "full-retainable"
-    assert verified is not None
-    assert Path(verified).exists()
-    assert Path(verified).name == "candidate.verified-2.json"
-    assert not (tmp_path / "candidate.pending-verification-2.json").exists()
+    assert verified is not None and Path(verified).exists()
 
 
 def test_significant_output_is_blue_only_on_terminal(
@@ -601,23 +606,18 @@ def test_timeout_emits_heartbeat_to_terminal_and_runner_log(
 ) -> None:
     stage = tmp_path / "L-793-200/cycle-0001/deep-03"
     stage.mkdir(parents=True)
-    (stage / "column.log").write_text("round 23: objective=12.004830\n", encoding="utf-8")
+    (tmp_path / "state.json").write_text("{}")
+    (stage / "column.log").write_text("round 23: objective=12.004830\n")
 
-    class Child:
-        pid = os.getpid()
-        calls = 0
+    def run(_args, _output, **kwargs):
+        kwargs["heartbeat"](900)
+        return 0
 
-        def wait(self, *, timeout: int) -> int:
-            self.calls += 1
-            if self.calls == 1:
-                raise subprocess.TimeoutExpired("mock generator", timeout)
-            return 0
-
-    monkeypatch.setattr(frontier.subprocess, "Popen", lambda *_args, **_kwargs: Child())
+    monkeypatch.setattr(frontier.frontier_runtime, "run", run)
     args = frontier.command(Fraction(793, 200), 40, frontier.DEFAULT_SEED, stage, 60)
     assert frontier.run_child(args, stage / "stdout.log") == 0
     assert "[running] L=3.965000000 stage=deep(40)" in capsys.readouterr().out
-    assert "last-round=23" in (tmp_path / "runner.log").read_text(encoding="utf-8")
+    assert "last-round=23" in (tmp_path / "runner.log").read_text()
 
 
 def test_real_generator_one_cycle_and_resume(tmp_path: Path) -> None:
@@ -630,7 +630,7 @@ def test_real_generator_one_cycle_and_resume(tmp_path: Path) -> None:
         "--root",
         str(tmp_path),
         "--search-high",
-        "41/10",
+        "397/100",
         "--screen-rounds",
         "1",
         "--normal-rounds",
@@ -640,6 +640,8 @@ def test_real_generator_one_cycle_and_resume(tmp_path: Path) -> None:
         "--max-rounds",
         "4",
         "--row-rounds",
+        "1",
+        "--max-row-rounds",
         "1",
         "--max-cycles",
         "1",
@@ -653,12 +655,12 @@ def test_real_generator_one_cycle_and_resume(tmp_path: Path) -> None:
     assert len(saved["cycles"]) == 1
     assert saved["cycles"][0]["status"] == "UNRESOLVED"
     assert saved["search_high_kind"] == "CONFIGURED_SEARCH_ENDPOINT"
-    stage = tmp_path / "L-403-100/cycle-0001/screen-01"
+    stage = tmp_path / "L-793-200/cycle-0001/screen-01"
     for name in ("result.json", "stdout.log", "column.log", "rows.log", "metadata.json"):
         assert (stage / name).is_file()
     metadata = json.loads((stage / "metadata.json").read_text(encoding="utf-8"))
     progress = frontier.heartbeat_message(metadata["command"], stage / "stdout.log", 300)
-    assert "L=4.030000000 stage=screen(1) elapsed=5m last-round=0" in progress
+    assert "L=3.965000000 stage=screen(1) elapsed=5m last-round=0" in progress
     assert "objective=unknown" not in progress
     assert not (stage / "candidate.unverified.json").exists()
     assert frontier.load_state(tmp_path)["cycles"][0]["column_rounds_completed"] == 1

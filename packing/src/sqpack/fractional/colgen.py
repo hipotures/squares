@@ -42,7 +42,7 @@ import logging
 import math
 import os
 import time
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -1344,6 +1344,7 @@ def generate_adaptive(
     timings: list[RoundTiming] | None = None,
     deadline: float | None = None,
     clip: CornerClip | None = None,
+    capture_solution: Callable[[SiteSet, np.ndarray], None] | None = None,
 ) -> tuple[Certificate | None, AdaptiveLog]:
     """Row- and column-generate; decide the result exactly only when asked.
 
@@ -1485,6 +1486,11 @@ def generate_adaptive(
             _write(handle, f"ceiling: proved={log.ceiling.proved} {log.ceiling.detail}")
         if not solution.converged:
             return None, log
+
+        if capture_solution is not None:
+            # Optional durable search evidence, before upward rounding.
+            # This callback cannot change the solver-owned weight vector.
+            capture_solution(sites, solution.weights.copy())
 
         atoms = rationalise_sites(sites, solution.weights, scale=scale)
         if not atoms:

@@ -291,6 +291,7 @@ def run(
     deadline_seconds: float | None = None,
     freeze_family: Path | None = None,
     merge_radius: Fraction | None = None,
+    raw_weights: Path | None = None,
 ) -> dict[str, object]:
     started = time.perf_counter()
     deadline = None if deadline_seconds is None else started + deadline_seconds
@@ -304,6 +305,20 @@ def run(
     )
     timings: RowLog | list[RoundTiming] = RowLog(row_log) if row_log is not None else []
     clip = clip_from_optional(settings.corner_clip, settings.outer_side, settings.square_side)
+    snapshot_options = {}
+    if raw_weights is not None:
+        if clip is not None:
+            raise ValueError("raw LP snapshots currently support unconditional searches only")
+        from devtools.frontier_snapshot import save as save_raw_snapshot
+
+        def capture(sites, weights):
+            save_raw_snapshot(
+                raw_weights, sites, weights, n=settings.n,
+                square_side=settings.square_side, angle_limit=settings.angle_limit,
+                direction_steps=settings.direction_steps,
+            )
+
+        snapshot_options["capture_solution"] = capture
     candidate, log = generate_adaptive(
         settings.n,
         settings.outer_side,
@@ -325,6 +340,7 @@ def run(
         timings=timings,
         deadline=deadline,
         clip=clip,
+        **snapshot_options,
     )
     seconds = time.perf_counter() - started
     if isinstance(timings, RowLog):
@@ -351,6 +367,9 @@ def run(
         frozen = freeze
     family_frozen = freeze_priced_family(settings, log, freeze_family)
     result = summary(settings, log, candidate, seconds, frozen)
+    result["work_kind"] = "generation"
+    result["column_rounds_executed"] = len(log.rounds)
+    result["raw_weights"] = str(raw_weights) if raw_weights is not None and raw_weights.exists() else None
     result["least_cell_mass"] = least_cell_mass
     result["family_frozen"] = None if family_frozen is None else str(family_frozen)
     result["priced_support_rows"] = (
@@ -528,6 +547,8 @@ def main(argv: list[str] | None = None) -> int:
         help="write the priced dual as a ceiling-family record",
     )
     parser.add_argument("--json", type=Path, default=None, help="write the run summary here")
+    parser.add_argument("--raw-weights", type=Path, default=None,
+                        help="preserve lossless raw LP weights for re-rationalisation")
     parser.add_argument(
         "--verify-serial",
         action="store_true",
@@ -603,6 +624,7 @@ def main(argv: list[str] | None = None) -> int:
         deadline_seconds=args.deadline_seconds,
         freeze_family=args.freeze_family,
         merge_radius=args.merge_radius,
+        raw_weights=args.raw_weights,
     )
     print(round_table_from(result), flush=True)
     print(
