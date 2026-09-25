@@ -386,13 +386,22 @@ def sweep_direction_minimum(
 #: process, where a failure's traceback is also the caller's own.
 _PARALLEL_ATOMS = 400
 
-#: Each worker holds one dense int64 event grid, (2N + 2)^2 entries for N atoms, so a
-#: host with many cores could turn one decision into an allocation of gigabytes. The
-#: pool is capped at this many workers and at this many bytes of grids in flight; a
-#: certificate whose single grid exceeds the budget runs one worker rather than
-#: refusing. PR 78's adversarial review, F38.
-_MAX_PARALLEL_WORKERS = 4
-_PARALLEL_GRID_BUDGET_BYTES = 512 * 1024 * 1024
+#: Each worker holds one dense int64 event grid, (2N + 2)^2 entries for N atoms.
+#: PACK_JOBS is the operator CPU cap. The old fixed four-worker/512-MiB gate left
+#: a 16-vCPU proof host mostly idle; the current cap can use that host while
+#: limiting grids to at most 25% of MemAvailable and 3 GiB in aggregate.
+_MAX_PARALLEL_WORKERS = 32
+_PARALLEL_GRID_BUDGET_BYTES = 3 * 1024 * 1024 * 1024
+
+
+def _available_memory_bytes() -> int | None:
+    try:
+        for line in Path("/proc/meminfo").read_text(encoding="utf-8").splitlines():
+            if line.startswith("MemAvailable:"):
+                return int(line.split()[1]) * 1024
+    except (OSError, ValueError, IndexError):
+        return None
+    return None
 
 
 def _estimated_grid_bytes(atom_count: int) -> int:
@@ -406,7 +415,11 @@ def _worker_count(certificate: Certificate, requested: int | None) -> int:
     available = os.process_cpu_count() or 1
     desired = available if requested is None else max(1, requested)
     per_worker = _estimated_grid_bytes(len(certificate.atoms))
-    by_memory = max(1, _PARALLEL_GRID_BUDGET_BYTES // max(1, per_worker))
+    memory = _available_memory_bytes()
+    budget = _PARALLEL_GRID_BUDGET_BYTES
+    if memory is not None:
+        budget = min(budget, max(per_worker, memory // 4))
+    by_memory = max(1, budget // max(1, per_worker))
     return min(
         desired,
         worker_count(available),
