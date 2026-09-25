@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: work/frontier-autonomy
+          ref: ${{ github.sha }}
           submodules: recursive
           sparse-checkout: |
             packing/src
@@ -30,7 +30,7 @@ jobs:
             packing/cases/n12_fractional_certificate
             packages/workbench
             vendor/kpress
-      - name: Apply reviewed implementation with per-file digests
+      - name: Apply implementation with per-file digests
         run: |
           mkdir -p frontier-artifacts
           python3 - <<'PY'
@@ -71,13 +71,16 @@ jobs:
           pathlib.Path('frontier-artifacts/paths.txt').write_text('\n'.join(sorted(allowed)) + '\n')
           print(f'Applied and SHA-256 verified {len(allowed)} intended source files')
           PY
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
         with:
           python-version: '3.14'
           enable-cache: false
       - name: Install locked project
         working-directory: packing
         run: uv sync --frozen
+      - name: Remove the three unused imports reported by the previous lint run
+        working-directory: packing
+        run: uv run --frozen ruff check --select F401 --fix tests/test_frontier_autonomy.py
       - name: Syntax, focused regression, real subprocess and exact-gate smoke tests
         working-directory: packing
         run: |
@@ -94,11 +97,15 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git diff --cached --stat
-          git commit -m 'feat: add resilient autonomous n12 strategy controller' -m 'Fixes #3 autonomy review: durable supervised jobs, bounded retries and watchdogs, portfolio search, raw-weight rerationalisation, recoverable repairs and proof-bound breakthrough banners.'
+          git commit -m 'feat: add resilient autonomous n12 strategy controller' -m 'Refs #3: durable supervised jobs, bounded retries and watchdogs, portfolio search, raw-weight rerationalisation, recoverable repairs and proof-bound breakthrough banners.'
           git push origin HEAD:work/frontier-autonomy
           git rev-parse HEAD | tee frontier-artifacts/tested-commit.txt
-          tar -czf frontier-artifacts/tested-source.tar.gz -T frontier-artifacts/paths.txt
-      - uses: actions/upload-artifact@v4
+      - name: Retain the exact source used by this run
+        if: always()
+        run: |
+          mkdir -p frontier-artifacts
+          tar --exclude='__pycache__' --exclude='*.pyc' -czf frontier-artifacts/review-source.tar.gz packing/src packing/devtools packing/tests packing/cases/n12_fractional_certificate packing/pyproject.toml packing/uv.lock packages/workbench
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: frontier-autonomy-tested-${{ github.sha }}
