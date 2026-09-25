@@ -10,9 +10,13 @@ import pytest
 
 from devtools import frontier_rationalise as refine
 from devtools import frontier_snapshot as snapshot
+from devtools import frontier_verify
 from devtools import run_n12_frontier as frontier
 from devtools.frontier_io import atomic_json, digest, read_json
+from sqpack.fractional import certificate as certificate_module
+from sqpack.fractional import interval as interval_module
 from sqpack.fractional.colgen import site_set_from_grids
+from sqpack.fractional.interval import doubled_net, interval_worker_count, verify_by_intervals
 
 
 def fresh(root: Path) -> dict:
@@ -175,3 +179,57 @@ def test_rerationalisation_cannot_overwrite_inputs(tmp_path, which):
         refine.main(["--snapshot", str(raw), "--source-result", str(source), "--scale", "3200000",
                      "--freeze", str(freeze), "--json", str(summary)])
     assert {path: path.read_bytes() for path in before} == before
+
+
+def test_interval_parallel_route_matches_serial_and_uses_pack_jobs(monkeypatch):
+    from cases.n12_fractional_certificate.replay import FIRST_RUNG_PATH, load
+
+    certificate = load(FIRST_RUNG_PATH)
+    labels = tuple(
+        rotation.label for rotation in doubled_net(certificate.half_tangents)[:40]
+    )
+    monkeypatch.setenv("PACK_JOBS", "4")
+    monkeypatch.setattr(interval_module.os, "process_cpu_count", lambda: 8)
+    monkeypatch.setattr(interval_module, "_available_memory_bytes", lambda: 8 * 1024**3)
+    assert interval_worker_count(len(labels)) == 4
+
+    serial = verify_by_intervals(certificate, directions=labels, workers=1)
+    parallel = verify_by_intervals(certificate, directions=labels, workers=4)
+    assert parallel.directions == serial.directions
+    assert parallel.conditions == serial.conditions
+    assert parallel.scale == serial.scale
+    assert parallel.total_mass == serial.total_mass
+
+
+def test_exact_sweep_can_use_sixteen_workers_when_memory_allows(monkeypatch):
+    from cases.n12_fractional_certificate.replay import load
+
+    certificate = load()
+    monkeypatch.setenv("PACK_JOBS", "16")
+    monkeypatch.setattr(certificate_module.os, "process_cpu_count", lambda: 16)
+    monkeypatch.setattr(
+        certificate_module, "_available_memory_bytes", lambda: 32 * 1024**3
+    )
+    assert certificate_module._worker_count(certificate, None) == 16
+
+
+def test_quick_first_repair_rejection_skips_exact_sweep(tmp_path, monkeypatch):
+    source = frontier.DEFAULT_SEED
+    side = Fraction("99/25")
+
+    def quick_reject(_path, *, quick, dump_stalls=None, **_kwargs):
+        assert quick is True
+        if dump_stalls is not None:
+            atomic_json(dump_stalls, {"stalled": 1})
+        return False
+
+    monkeypatch.setattr(frontier_verify.gate, "decide", quick_reject)
+    monkeypatch.setattr(
+        frontier_verify,
+        "verify",
+        lambda *_args, **_kwargs: pytest.fail("exact sweep ran before quick rejection"),
+    )
+    report = frontier_verify.decide(source, tmp_path, side, quick_first=True)
+    assert report["status"] == "REJECTED"
+    assert report["category"] == "interval_stall"
+    assert report["finished"] is True
