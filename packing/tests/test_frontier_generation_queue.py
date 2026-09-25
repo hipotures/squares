@@ -110,7 +110,8 @@ def test_tampered_generation_receipt_cannot_be_reused(tmp_path):
 
 
 def test_plan_cohort_is_distinct_bounded_and_respects_cycle_limit():
-    state = {"config": {"generation_trials": 3, "workers": 16,
+    state = {"verified_low": "99/25", "search_high": "397/100", "initial_width": "1/100",
+             "config": {"generation_trials": 3, "workers": 16,
                         "strategies": ["baseline", "centre", "pricing", "dense"],
                         "max_cycles": 2}, "cycles": [], "search_revision": 0}
     plan = {"kind": "search", "side": "793/200", "strategy": "centre", "reason": "new search"}
@@ -134,3 +135,24 @@ def test_deferred_stage_does_not_launch_process_and_resumes_same_artifact(tmp_pa
     assert len(state["cycles"][0]["stages"]) == 1
     assert "--phase-log" in first["command"]
     assert Fraction(state["verified_low"]) == Fraction(99, 25)
+
+
+
+def test_shared_generation_keeps_different_strategy_targets_independent(tmp_path, monkeypatch):
+    monkeypatch.setenv("PACK_JOBS", "1")
+    first = job(tmp_path, "side-a")
+    second = job(tmp_path, "side-b")
+    second["command"][second["command"].index("--side") + 1] = "397/100"
+    controls = []
+    for i, item in enumerate((first, second)):
+        control = job(tmp_path, f"control-{i}")
+        control["command"][control["command"].index("--side") + 1] = item["command"][item["command"].index("--side") + 1]
+        assert generate(control["command"][3:]) == 0
+        controls.append(Path(control["output"]).parent / "result.json")
+    report = queue.run_jobs([first, second], tmp_path / "broker-sides", slots=2,
+                            stage_seconds=30, no_progress_seconds=0)
+    assert all(r["returncode"] == 0 for r in report["jobs"].values())
+    for item, control in zip((first, second), controls, strict=True):
+        actual = Path(item["output"]).parent / "result.json"
+        assert mathematical_result(actual) == mathematical_result(control)
+        assert read_json(actual)["settings"]["outer_side"] == read_json(control)["settings"]["outer_side"]

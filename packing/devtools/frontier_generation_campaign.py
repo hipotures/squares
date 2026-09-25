@@ -26,16 +26,15 @@ def select_plans(state: dict[str, Any], first: dict[str, Any]) -> list[dict[str,
     # Do not let speculative generation delay an already useful precision fix.
     if first.get("reason", "").startswith("untried same-side rationalisation"):
         maximum = 1
-    side = Fraction(first["side"])
     plans = [first]
     for name in state["config"]["strategies"]:
         if len(plans) >= maximum:
             break
-        if name == first["strategy"] or frontier_policy.tried(state, side, name):
+        if name == first["strategy"]:
             continue
-        if frontier_policy.useful_for_side(name, side):
-            plans.append({"kind": "search", "side": str(side), "strategy": name,
-                          "reason": "bounded independent strategy sharing idle generation slots"})
+        choice = frontier_policy.strategy_proposal(state, name)
+        if choice is not None:
+            plans.append(choice)
     return plans
 
 
@@ -88,6 +87,36 @@ def _finish_wave(root: Path, state: dict[str, Any], frontier) -> None:
                   f"max_busy={metrics['max_busy']}/{metrics['slots']}")
 
 
+
+def retire_superseded(root: Path, state: dict[str, Any], frontier) -> None:
+    """Do not start further generation at/below an already certified side.
+
+    Called only after a wave drains, never while its children are running. A
+    generated result already on disk remains auditable; no verifier verdict is
+    invented. On crash/resume the terminal status makes retirement idempotent.
+    """
+    if state.get("generation_wave"):
+        return  # Its completion has not yet been adopted; never retire live work.
+    low = Fraction(state["verified_low"])
+    for index in list(state.get("active_generation", [])):
+        cycle = state["cycles"][index]
+        if cycle["status"] not in ("RUNNING", "INTERRUPTED") or Fraction(cycle["side"]) > low:
+            continue
+        cycle.update(status="UNRESOLVED", superseded_by=str(low),
+                     reason="superseded by a verified bound at or above this target; no further generation",
+                     finished_at=frontier.stamp())
+        for stage in cycle.get("stages", []):
+            if stage.get("status") == "queued":
+                stage.update(status="superseded", reason=cycle["reason"])
+                atomic_json(Path(stage["directory"]) / "metadata.json", stage)
+        state["active_generation"].remove(index)
+        if state.get("active") == index:
+            state["active"] = None
+        frontier.save_state(root, state)
+        frontier.emit(root, f"[superseded] cycle={index + 1} strategy={cycle.get('strategy', 'baseline')} "
+                      f"L={frontier.display(cycle['side'])} verified-through={frontier.display(low)}; no new stage")
+
+
 def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
     if frontier is None:
         from devtools import run_n12_frontier as frontier
@@ -111,17 +140,23 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
             state["active_generation"] = indices
             frontier.emit(root, f"[portfolio] admitted={len(indices)} slots={state['config']['workers']} "
                           f"strategies={','.join(p['strategy'] for p in plans)} "
-                          f"L={frontier.display(first['side'])}")
+                          f"targets={','.join(p['strategy'] + '@' + frontier.display(p['side']) for p in plans)}")
         state["active"] = None
         frontier.save_state(root, state)
     while state.get("active_generation"):
         if state.get("generation_wave"):
             _finish_wave(root, state, frontier)
+        retire_superseded(root, state, frontier)
         queued = []
         for index in list(state["active_generation"]):
+            if index not in state["active_generation"]:
+                continue  # A preceding proof may have retired this sibling.
             cycle = state["cycles"][index]
             if cycle["status"] not in ("RUNNING", "INTERRUPTED"):
                 state["active_generation"].remove(index)
+                continue
+            retire_superseded(root, state, frontier)
+            if index not in state["active_generation"]:
                 continue
             state["active"] = index
             stage = frontier.run_cycle(root, state, defer_generation=True)
@@ -139,6 +174,8 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
             else:
                 queued.append((index, cycle["stages"].index(stage), stage))
             frontier.save_state(root, state)
+        retire_superseded(root, state, frontier)
+        queued = [entry for entry in queued if entry[0] in state["active_generation"]]
         if not queued:
             continue
         number = int(state.get("generation_wave_count", 0)) + 1
@@ -167,3 +204,4 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
         _finish_wave(root, state, frontier)
     state["active"] = None
     frontier.save_state(root, state)
+    frontier.write_views(root, state)

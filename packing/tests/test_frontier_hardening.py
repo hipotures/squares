@@ -142,7 +142,8 @@ def test_controller_changes_strategy_after_three_failed_cycles(tmp_path, monkeyp
     state = read_json(tmp_path / "state.json")
     assert [c["strategy"] for c in state["cycles"]] == ["baseline", "baseline", "baseline", "centre"]
     assert len(commands) == 4
-    assert state["cycles"][-1]["side"] == state["cycles"][-2]["side"]
+    # The new strategy explores its own interval, not the old instrument's cap.
+    assert Fraction(state["cycles"][-1]["side"]) > Fraction(state["cycles"][-2]["side"])
     assert state["verified_low"] == "99/25"
 
 

@@ -49,12 +49,12 @@ jobs:
           set -euo pipefail
           mkdir -p ../frontier-artifacts
           uv run --frozen python -m compileall -q devtools/run_n12_frontier.py devtools/frontier_*.py devtools/bench_frontier_dispatch.py devtools/bench_frontier_generation.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py
-          uv run --frozen ruff check --select F,E9 devtools/run_n12_frontier.py devtools/frontier_*.py devtools/bench_frontier_dispatch.py devtools/bench_frontier_generation.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py | tee ../frontier-artifacts/lint.log
+          uv run --frozen ruff check --select F,E9 devtools/run_n12_frontier.py devtools/frontier_*.py devtools/bench_frontier_dispatch.py devtools/bench_frontier_generation.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py | tee ../frontier-artifacts/lint.log
       - name: Autonomy, shared generation, recovery, repair and exact-gate smoke tests
         working-directory: packing
         run: |
           set -euo pipefail
-          uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py -q --junitxml=../frontier-artifacts/autonomy.xml 2>&1 | tee ../frontier-artifacts/autonomy.log
+          uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py -q --junitxml=../frontier-artifacts/autonomy.xml 2>&1 | tee ../frontier-artifacts/autonomy.log
           uv run --frozen python -m devtools.run_n12_frontier --help > ../frontier-artifacts/help.txt
       - name: Generator, persistent LP and separation regression
         working-directory: packing

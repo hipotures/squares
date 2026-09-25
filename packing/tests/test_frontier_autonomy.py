@@ -122,7 +122,9 @@ def test_profile_containment_is_valid():
 
 def test_no_remaining_portfolio_returns_honest_idle(tmp_path):
     state = fresh(tmp_path)
-    high = Fraction(397, 100)
+    # All own brackets must actually be exhausted; a failed distant endpoint
+    # alone does not exhaust the still-untested interior.
+    high = Fraction(state["verified_low"]) + policy.search_resolution(state) / 2
     for item in policy.PROFILES:
         state["cycles"].append({"side": str(high), "strategy": item["name"], "status": "UNRESOLVED", "stages": []})
     work = policy.plan(state, next_side=high, soft_high=high, scale_pending=False,
@@ -214,7 +216,7 @@ def test_state_backup_recovers_truncated_current_and_preserves_bytes(tmp_path):
     (tmp_path / "state.json").write_text('{"schema":')
     restored = frontier.load_state(tmp_path)
     assert restored["verified_low"] == "99/25"
-    assert list(tmp_path.glob("state.damaged-*.json"))[0].read_text() == '{"schema":'
+    assert list(tmp_path.glob("state.damaged-*.json"))[0].read_bytes() == b'{"schema":'
 
 
 def test_schema2_history_is_backed_up_and_running_repair_preserved(tmp_path):
