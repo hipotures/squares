@@ -68,16 +68,20 @@ def test_exact_midpoint_and_unresolved_soft_ceiling(tmp_path: Path) -> None:
     assert frontier.next_side(saved) == Fraction(1585, 400)
 
 
-def test_sub_1e10_frontier_gap_keeps_bisecting(tmp_path: Path) -> None:
+def test_frontier_keeps_bisecting_after_float_midpoint_collapses(tmp_path: Path) -> None:
     saved = state(tmp_path)
-    low = Fraction(26588320349, 6710886400)
-    high = Fraction(53176640699, 13421772800)
-    assert high - low == Fraction(1, 13421772800)
-    assert high - low < Fraction(1, 10**10)
+    # Production cycle 60 reached adjacent double values. The exact midpoint
+    # rounds to the high endpoint in float64, but that must not stop the runner.
+    low = Fraction(871246081204179, 219902325555200)
+    high = Fraction(6969968649633433, 1759218604441600)
+    midpoint = (low + high) / 2
+    assert float(midpoint) == float(high)
+    assert midpoint != high
     saved["verified_low"] = str(low)
     saved["search_high"] = str(high)
     saved["unresolved"] = [str(high)]
-    assert frontier.next_side(saved) == (low + high) / 2
+    assert frontier.next_side(saved) == midpoint
+    assert frontier.display(low) != frontier.display(high)
 
 
 def test_scale_limited_unresolved_is_retried_before_bisection(tmp_path: Path) -> None:

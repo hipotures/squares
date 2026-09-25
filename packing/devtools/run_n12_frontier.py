@@ -76,7 +76,9 @@ def side_name(side: Fraction) -> str:
 
 
 def display(side: Fraction | str | None) -> str:
-    return "none" if side is None else f"{float(Fraction(side)):.9f}"
+    """Compact decimal diagnostic with enough precision to expose adjacent floats."""
+
+    return "none" if side is None else format(float(Fraction(side)), ".17g")
 
 
 def atomic_json(path: Path, value: dict[str, Any]) -> None:
@@ -247,15 +249,14 @@ def next_side(state: dict[str, Any]) -> Fraction | None:
                 return ceiling
             break
 
-    # With no explicit --target-width the runner is supposed to keep working
-    # until the numerical backend truly cannot distinguish another midpoint.
-    # The old 1e-10 cutoff stopped unattended runs hours too early even though
-    # double precision still had roughly five more decimal orders available.
-    midpoint = (low + ceiling) / 2
-    midpoint_float = float(midpoint)
-    if midpoint_float == float(low) or midpoint_float == float(ceiling):
-        return None
-    return midpoint
+    # Without an explicit --target-width, keep bisecting in exact Fraction
+    # arithmetic until the operator stops the campaign. The search backend is
+    # partly float-based and may eventually see numerically identical nearby
+    # sides, but that is not a valid reason to stop an unattended experiment:
+    # frozen candidates are still judged by the exact retention gate. If the
+    # operator wants a finite precision target, --target-width is the explicit
+    # stopping control.
+    return (low + ceiling) / 2
 
 
 def scale_limited_result(result: dict[str, Any]) -> bool:
@@ -1015,7 +1016,7 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             save_state(root, state)
             emit(
                 root,
-                f"[cycle {active + 1}] L={display(side)} seed={label} "
+                f"[cycle {active + 1}] L={display(side)} exact={side} seed={label} "
                 f"stage={name}({budgets[stage_index]}) scale={stage_scale_value}",
             )
             env = os.environ.copy()
@@ -1123,7 +1124,7 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
         write_views(root, state)
         emit(
             root,
-            f"[result] L={display(side)} {decision} reason={reason}",
+            f"[result] L={display(side)} exact={side} {decision} reason={reason}",
             significant=significant_result(decision, result),
         )
         emit(
@@ -1327,8 +1328,11 @@ The next side is the exact midpoint between the best VERIFIED low and the
 nearest UNRESOLVED point above it, or the SEARCH_FAILED/configured high if no
 such point exists. When a verified low improves and the gap to the nearest
 UNRESOLVED point is at most one sixteenth of the initial width, that point is
-retried once with the new seed. A gap below 1e-10 has no useful float input to
-the current generator, so the runner stops.
+retried once with the new seed. There is no implicit precision cutoff: without `--target-width`, exact
+rational bisection continues until the operator requests a graceful stop.
+The floating search backend may eventually map neighboring exact sides to the
+same machine value, but the retained-certificate gate remains exact, so that
+numerical coincidence is recorded rather than used as an automatic stop.
 
 The search policy escalates when the result is close to mass/objective 12, is
 improving with useful columns or priced depth, or has priced depth near the
