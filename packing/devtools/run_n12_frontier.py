@@ -659,7 +659,13 @@ def run_child(args: list[str], output: Path, env: dict[str, str] | None = None) 
     )
 
 
-def verify_candidate(directory: Path, candidate: Path, expected_side: Fraction) -> tuple[str, str | None]:
+def verify_candidate(
+    directory: Path,
+    candidate: Path,
+    expected_side: Fraction,
+    *,
+    quick_first: bool = False,
+) -> tuple[str, str | None]:
     """One durable structured verification job, sharing the normal job watchdog."""
     try:
         record = read_json(candidate, 8 * 1024 * 1024)
@@ -671,13 +677,26 @@ def verify_candidate(directory: Path, candidate: Path, expected_side: Fraction) 
         return "candidate-invalid", None
     from devtools.frontier_verify import verifier_fingerprint
     tool_sha = verifier_fingerprint()
-    gate_dir = directory / f"gate-{digest(candidate)[:16]}-{tool_sha[:12]}"
+    gate_dir = directory / (
+        f"gate-{digest(candidate)[:16]}-{tool_sha[:12]}-"
+        f"{'quick-first' if quick_first else 'full'}"
+    )
     gate_dir.mkdir(parents=True, exist_ok=True)
     report_path = gate_dir / "verification.json"
-    code = run_child([
-        sys.executable, "-m", "devtools.frontier_verify", "--input", str(candidate),
-        "--side", str(expected_side), "--report", str(report_path),
-    ], gate_dir / "stdout.log")
+    command = [
+        sys.executable,
+        "-m",
+        "devtools.frontier_verify",
+        "--input",
+        str(candidate),
+        "--side",
+        str(expected_side),
+        "--report",
+        str(report_path),
+    ]
+    if quick_first:
+        command.append("--quick-first")
+    code = run_child(command, gate_dir / "stdout.log")
     if code or not report_path.exists():
         return f"verification-error-{code}", None
     report = read_json(report_path)
@@ -694,7 +713,7 @@ def verify_candidate(directory: Path, candidate: Path, expected_side: Fraction) 
     category = report.get("category")
     if category == "coverage_deficit":
         return "declaration-rejected", None
-    if category == "interval_stall":
+    if category in ("interval_stall", "quick_refusal"):
         return "quick-rejected", None
     if category == "gate_refusal":
         return "full-rejected", None
@@ -971,7 +990,12 @@ def run_repair(root: Path, state: dict[str, Any]) -> bool:
             save_state(root, state)
         elif not boosted.exists():
             write_boosted_candidate(candidate, boosted, slack_fraction)
-        status, verified = verify_candidate(boost_dir, boosted, side)
+        status, verified = verify_candidate(
+            boost_dir,
+            boosted,
+            side,
+            quick_first=True,
+        )
         entry.update(status="VERIFIED" if verified else ("ERROR" if status.startswith("verification-error") else "REJECTED"),
                      verifier=status, verified_candidate=verified)
         save_state(root, state)
