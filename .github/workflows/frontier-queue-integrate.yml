@@ -1,0 +1,112 @@
+name: Integrate shared repair queue
+
+on:
+  push:
+    branches: [work/frontier-autonomy]
+    paths: ['.github/frontier-queue.patch', '.github/workflows/frontier-queue-integrate.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontier-queue-integrate
+  cancel-in-progress: false
+
+jobs:
+  validate-and-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PACK_JOBS: '2'
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          submodules: recursive
+          sparse-checkout: |
+            .github
+            packing/src
+            packing/devtools
+            packing/tests
+            packing/cases/n12_fractional_certificate
+            packages/workbench
+            vendor/kpress
+      - name: Apply small integration patch and bind reviewed bytes
+        run: |
+          set -euo pipefail
+          mkdir -p frontier-artifacts
+          git apply --check .github/frontier-queue.patch
+          git apply .github/frontier-queue.patch
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          expected = {
+              'packing/devtools/frontier_dispatch.py': '95e2512d9e4117f7f5591749064c930e605936826e8b789f8d35e4880b66d9fd',
+              'packing/devtools/frontier_boost_queue.py': '907714974304fa510c6eed6e293e7eef066dc1e2870e33464e521ceb9640f858',
+              'packing/devtools/frontier_repair_batch.py': '044de8843ef11c7984411ab084dcb4469e8c04069e71f54d9341c240859ff045',
+              'packing/devtools/frontier_verify.py': 'c720f7c4d8d3f912fc9ffef0f46a7c414f2bd85830b5c58345c614601004d611',
+              'packing/devtools/run_n12_frontier.py': 'ca92c6d194cc4e6d38be3a3a4cd6d69ac0186224e18952f14ea8d90ed3a4e24e',
+              'packing/devtools/bench_frontier_dispatch.py': 'b3f5a023394b276a48de7e1624eb7b83f185bebf6bcb7de114af2b3c2249e9c3',
+              'packing/tests/test_frontier_boost_queue.py': '63530a9191423f4b4ed17187df66b8c82504f2123a047e100921e0f35e4e5c55',
+              'packing/tests/test_frontier_repair_batch.py': '0b3453408b2b9e3551cb40bb22eab8c199b7d4e9932e295b4150040cd8d661dc',
+          }
+          for name, expected_sha in expected.items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected_sha, name
+          print('All reviewed source identities match')
+          PY
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          python-version: '3.14'
+          enable-cache: false
+      - name: Install locked project
+        working-directory: packing
+        run: uv sync --frozen
+      - name: Syntax and lint
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen python -m compileall -q devtools/frontier_*.py devtools/run_n12_frontier.py devtools/bench_frontier_dispatch.py
+          uv run --frozen ruff check --select F,E9 devtools/frontier_*.py devtools/run_n12_frontier.py devtools/bench_frontier_dispatch.py tests/test_frontier_*.py tests/test_run_n12_frontier.py | tee ../frontier-artifacts/lint.log
+      - name: Controller, queue, fault injection and real verifier regression
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py -q --junitxml=../frontier-artifacts/autonomy.xml 2>&1 | tee ../frontier-artifacts/autonomy.log
+          uv run --frozen python -m devtools.run_n12_frontier --help > ../frontier-artifacts/help.txt
+      - name: Existing generator regression
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen pytest tests/test_run_fractional_colgen.py tests/test_colgen_parallel_directions.py tests/test_colgen_persistent_lp.py tests/test_fractional_generate.py tests/test_declare_least_cell_mass.py -q --junitxml=../frontier-artifacts/generator.xml 2>&1 | tee ../frontier-artifacts/generator.log
+      - name: Measure dispatch service rate for one-second and ten-millisecond synthetic tasks
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen python -m devtools.bench_frontier_dispatch --workers 16 --samples 3 --target-seconds 12 --service-only --output ../frontier-artifacts/service-one-second.json | tee ../frontier-artifacts/service-one-second.log
+          uv run --frozen python -m devtools.bench_frontier_dispatch --workers 16 --samples 3 --target-seconds 12 --task-seconds 0.01 --service-only --output ../frontier-artifacts/service-short-tasks.json | tee ../frontier-artifacts/service-short-tasks.log
+      - name: Commit only tested source integration and remove temporary patch
+        run: |
+          set -euo pipefail
+          git add -- packing/devtools/run_n12_frontier.py packing/devtools/frontier_verify.py
+          git rm -- .github/frontier-queue.patch
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'perf: integrate shared repair task queue and normalize quick input' -m 'Refs #3. Use completion-driven batched direction scheduling across boosts; retain full exact gate and durable supervisor semantics.'
+          git push origin HEAD:work/frontier-autonomy
+          git rev-parse HEAD > frontier-artifacts/tested-commit.txt
+      - name: Preserve exact test source and artifacts
+        if: always()
+        run: |
+          mkdir -p frontier-artifacts
+          tar --exclude='__pycache__' --exclude='*.pyc' -czf frontier-artifacts/review-source.tar.gz packing/devtools packing/tests packing/src packing/cases/n12_fractional_certificate packing/pyproject.toml packing/uv.lock packages/workbench
+          git status --short > frontier-artifacts/working-tree.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: shared-repair-queue-${{ github.sha }}
+          path: frontier-artifacts/
+          retention-days: 30
