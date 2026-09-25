@@ -2,7 +2,7 @@ name: Frontier generation integration
 on:
   push:
     branches: [work/frontier-autonomy]
-    paths: [.github/workflows/frontier-generation-integrate.yml, .github/frontier-generation-upgrade.py]
+    paths: [.github/workflows/frontier-generation-integrate.yml, .github/frontier-generation-upgrade.py, .github/frontier-generation-harden.py]
 permissions:
   contents: write
 concurrency:
@@ -26,7 +26,9 @@ jobs:
           python-version: '3.14'
           enable-cache: false
       - name: Apply generation integration
-        run: uv run --project packing --frozen python .github/frontier-generation-upgrade.py
+        run: |
+          uv run --project packing --frozen python .github/frontier-generation-upgrade.py
+          uv run --project packing --frozen python .github/frontier-generation-harden.py
       - name: Locked environment
         working-directory: packing
         run: uv sync --frozen
@@ -36,16 +38,21 @@ jobs:
           set -euo pipefail
           mkdir -p ../generation-artifacts
           uv run --frozen python -m compileall -q devtools/frontier_generation*.py devtools/frontier_phase.py devtools/run_n12_frontier.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py
-          uv run --frozen ruff check --select F,E9 devtools/frontier_generation*.py devtools/frontier_phase.py tests/test_frontier_generation_queue.py
+          uv run --frozen ruff check --select F,E9 devtools/frontier_generation*.py devtools/frontier_phase.py devtools/bench_frontier_generation.py tests/test_frontier_generation_queue.py
           uv run --frozen pytest tests/test_frontier_generation_queue.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py -q --junitxml=../generation-artifacts/autonomy.xml 2>&1 | tee ../generation-artifacts/autonomy.log
           uv run --frozen pytest tests/test_run_fractional_colgen.py tests/test_colgen_parallel_directions.py tests/test_colgen_persistent_lp.py tests/test_fractional_generate.py tests/test_declare_least_cell_mass.py -q --junitxml=../generation-artifacts/generator.xml 2>&1 | tee ../generation-artifacts/generator.log
           uv run --frozen python -m devtools.run_n12_frontier --help > ../generation-artifacts/help.txt
+      - name: Measure real paired generation work
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen python -m devtools.bench_frontier_generation --root ../generation-artifacts/paired --workers 2 --samples 3 --target-seconds 12 2>&1 | tee ../generation-artifacts/benchmark.log
       - name: Publish only tested source
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add packing/devtools/frontier_generation_queue.py packing/devtools/frontier_generation_campaign.py packing/devtools/frontier_phase.py packing/devtools/run_n12_frontier.py packing/devtools/run_fractional_colgen.py packing/devtools/frontier_runtime.py packing/src/sqpack/fractional/colgen.py packing/tests/test_frontier_generation_queue.py
+          git add packing/devtools/frontier_generation_queue.py packing/devtools/frontier_generation_campaign.py packing/devtools/frontier_phase.py packing/devtools/run_n12_frontier.py packing/devtools/run_fractional_colgen.py packing/devtools/frontier_runtime.py packing/src/sqpack/fractional/colgen.py packing/tests/test_frontier_generation_queue.py packing/tests/test_frontier_hardening.py
           git commit -m 'feat: integrate CPU-budgeted generation cohorts and epoch phase logs' -m 'Refs #3 and PR #4. Only generated search artifacts are interpreted by the existing full proof gate.'
           git push origin HEAD:work/frontier-autonomy
       - name: Preserve exact tested changes
