@@ -31,6 +31,15 @@ SCHEMA = 2
 LEGACY_RATIONALISATION_SCALE = 200_000
 DEFAULT_RATIONALISATION_SCALE = 1_600_000
 DEFAULT_MAX_RATIONALISATION_SCALE = 25_600_000
+REPAIR_SLACK_FRACTIONS = (
+    Fraction(1, 2),
+    Fraction(3, 4),
+    Fraction(7, 8),
+    Fraction(15, 16),
+    Fraction(31, 32),
+    Fraction(63, 64),
+)
+REPAIRABLE_VERIFIERS = ("quick-rejected", "full-rejected")
 BLUE = "\033[94m"
 RESET = "\033[0m"
 STAGES = ("screen", "normal", "deep", "maximum")
@@ -167,6 +176,11 @@ def load_state(root: Path, config: dict[str, Any] | None = None) -> dict[str, An
         raise ValueError("active cycle is missing")
     if not Path(state["verified_certificate"]).exists():
         raise ValueError("verified certificate is missing")
+    state.setdefault("mode", "FRONTIER")
+    state.setdefault("repair_attempts", [])
+    for attempt in state["repair_attempts"]:
+        if attempt.get("status") == "RUNNING":
+            attempt["status"] = "INTERRUPTED"
     return state
 
 
@@ -267,6 +281,17 @@ def next_side(state: dict[str, Any]) -> Fraction | None:
     # operator wants a finite precision target, --target-width is the explicit
     # stopping control.
     return (low + ceiling) / 2
+
+
+def numeric_search_saturated(state: dict[str, Any]) -> bool:
+    """Whether exact bisection has moved below the float64 search resolution."""
+
+    low = Fraction(state["verified_low"])
+    ceiling = soft_high(state)
+    if ceiling <= low:
+        return False
+    midpoint = (low + ceiling) / 2
+    return float(midpoint) in (float(low), float(ceiling))
 
 
 def scale_limited_result(result: dict[str, Any]) -> bool:
@@ -673,6 +698,298 @@ def verify_candidate(  # noqa: PLR0911 - each exit names a retained gate outcome
     return "full-rejected", None
 
 
+def repair_candidate_key(candidate: dict[str, Any]) -> tuple[Fraction, Fraction, int]:
+    """Prefer the strongest exact side, then the candidate with more mass slack."""
+
+    return (
+        Fraction(candidate["side"]),
+        Fraction(12) - Fraction(candidate["total_mass"]),
+        int(candidate["cycle_index"]),
+    )
+
+
+def select_repair_candidate(state: dict[str, Any]) -> dict[str, Any] | None:
+    """Choose the best untried below-12 candidate rejected by an exact gate."""
+
+    low = Fraction(state["verified_low"])
+    completed = {
+        attempt.get("candidate")
+        for attempt in state.get("repair_attempts", [])
+        if attempt.get("status") in ("VERIFIED", "REJECTED")
+    }
+    candidates: list[dict[str, Any]] = []
+    for cycle_index, cycle in enumerate(state["cycles"], 1):
+        side = Fraction(cycle["side"])
+        if side <= low:
+            continue
+        for stage_index, stage in enumerate(cycle.get("stages") or [], 1):
+            if stage.get("verifier") not in REPAIRABLE_VERIFIERS:
+                continue
+            result = stage.get("result") or {}
+            mass_text = result.get("total_mass")
+            path_text = stage.get("candidate_unverified")
+            if mass_text is None or path_text is None:
+                continue
+            try:
+                mass = Fraction(mass_text)
+            except (ValueError, ZeroDivisionError):
+                continue
+            path = Path(path_text)
+            if mass >= 12 or not path.exists() or str(path) in completed:
+                continue
+            candidates.append(
+                {
+                    "side": str(side),
+                    "total_mass": str(mass),
+                    "candidate": str(path),
+                    "verifier": stage.get("verifier"),
+                    "cycle_index": cycle_index,
+                    "stage_index": stage_index,
+                    "stage": stage.get("name"),
+                    "scale": stage_scale(stage),
+                }
+            )
+    return max(candidates, key=repair_candidate_key) if candidates else None
+
+
+def diagnosis_from_log(log: Path, stalls: Path) -> dict[str, Any]:
+    refusals: list[str] = []
+    if log.exists():
+        for line in log.read_text(encoding="utf-8").splitlines():
+            if "REFUSED:" in line:
+                refusals.append(line.split("REFUSED:", 1)[1].strip())
+    stalled = None
+    if stalls.exists():
+        try:
+            stalled = json.loads(stalls.read_text(encoding="utf-8")).get("stalled")
+        except (OSError, ValueError, TypeError):
+            stalled = None
+    return {"refusals": refusals, "stalled_boxes": stalled}
+
+
+def diagnose_repair_candidate(
+    directory: Path, candidate: Path
+) -> tuple[dict[str, Any], Path | None]:
+    """Re-run the exact declaration and quick interval gate with stall evidence."""
+
+    directory.mkdir(parents=True, exist_ok=True)
+    declared = directory / "candidate.diagnosed.json"
+    shutil.copyfile(candidate, declared)
+    declare_log = directory / "declare.log"
+    declaration = run_child(
+        [sys.executable, "-m", "devtools.declare_least_cell_mass", str(declared)],
+        declare_log,
+    )
+    report: dict[str, Any] = {
+        "candidate": str(candidate),
+        "declaration_exit": declaration,
+        "quick_exit": None,
+        "refusals": [],
+        "stalled_boxes": None,
+    }
+    if declaration:
+        report["status"] = "declaration-rejected"
+        atomic_json(directory / "diagnosis.json", report)
+        return report, None
+
+    stalls = directory / "interval-stalls.json"
+    quick_log = directory / "quick.log"
+    quick = run_child(
+        [
+            sys.executable,
+            "-m",
+            "devtools.decide_certificate",
+            "--quick",
+            "--dump-stalls",
+            str(stalls),
+            str(declared),
+        ],
+        quick_log,
+    )
+    report["quick_exit"] = quick
+    report.update(diagnosis_from_log(quick_log, stalls))
+    report["status"] = "quick-accepted" if quick == 0 else "quick-rejected"
+    atomic_json(directory / "diagnosis.json", report)
+    return report, declared
+
+
+def write_boosted_candidate(
+    source: Path, destination: Path, slack_fraction: Fraction
+) -> Fraction:
+    """Uniformly increase every atom weight while keeping total mass strictly below 12."""
+
+    record = json.loads(source.read_text(encoding="utf-8"))
+    atoms = record.get("atoms")
+    if not isinstance(atoms, list):
+        raise ValueError("repair candidate has no atom list")
+    mass = sum((Fraction(atom[2]) for atom in atoms), start=Fraction(0))
+    if not 0 < mass < 12:
+        raise ValueError(f"repair candidate mass {mass} is not in (0, 12)")
+    target = mass + (Fraction(12) - mass) * slack_fraction
+    factor = target / mass
+    repaired_atoms: list[list[object]] = []
+    total = Fraction(0)
+    for atom in atoms:
+        if not isinstance(atom, list) or len(atom) != 3:
+            raise ValueError("repair candidate contains a malformed atom")
+        weight = Fraction(atom[2]) * factor
+        repaired_atoms.append([atom[0], atom[1], str(weight)])
+        total += weight
+    if not total < 12:
+        raise ValueError("repair would violate the strict mass condition")
+    record["atoms"] = repaired_atoms
+    record["total_mass"] = str(total)
+    record["least_cell_mass"] = None
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(record, indent=1) + "\n", encoding="utf-8")
+    return total
+
+
+def full_gate_on_declared(directory: Path, declared: Path) -> str | None:
+    full_log = directory / "full.log"
+    full = run_child(
+        [sys.executable, "-m", "devtools.decide_certificate", str(declared)], full_log
+    )
+    if full != 0:
+        return None
+    text = full_log.read_text(encoding="utf-8")
+    if "RETAINABLE: both routes accept" not in text:
+        return None
+    verified = directory / "candidate.verified.json"
+    shutil.copyfile(declared, verified)
+    return str(verified)
+
+
+def run_repair(root: Path, state: dict[str, Any]) -> bool:
+    """Select, diagnose, repair and reverify one promising rejected candidate."""
+
+    selected = select_repair_candidate(state)
+    if selected is None:
+        state["mode"] = "REPAIR_EXHAUSTED"
+        save_state(root, state)
+        emit(
+            root,
+            "[repair] no untried below-12 quick/full-rejected candidates remain",
+            significant=True,
+        )
+        return False
+
+    attempts = state.setdefault("repair_attempts", [])
+    attempt_number = len(attempts) + 1
+    side = Fraction(selected["side"])
+    candidate = Path(selected["candidate"])
+    directory = root / "repair" / f"attempt-{attempt_number:04d}-{side_name(side)}"
+    while directory.exists():
+        attempt_number += 1
+        directory = root / "repair" / f"attempt-{attempt_number:04d}-{side_name(side)}"
+    directory.mkdir(parents=True, exist_ok=False)
+
+    attempt: dict[str, Any] = {
+        "started_at": stamp(),
+        "status": "RUNNING",
+        **selected,
+        "directory": str(directory),
+        "repairs": [],
+    }
+    attempts.append(attempt)
+    state["mode"] = "REPAIR"
+    save_state(root, state)
+    emit(
+        root,
+        f"[repair] selected L={display(side)} exact={side} "
+        f"mass={selected['total_mass']} verifier={selected['verifier']}",
+        significant=True,
+    )
+
+    diagnosis, declared = diagnose_repair_candidate(directory / "diagnosis", candidate)
+    attempt["diagnosis"] = diagnosis
+    refusal_text = "; ".join(diagnosis.get("refusals") or []) or diagnosis["status"]
+    emit(
+        root,
+        f"[repair] diagnosis={refusal_text[:240]} "
+        f"stalled={diagnosis.get('stalled_boxes')}",
+        significant=True,
+    )
+
+    if declared is not None and diagnosis.get("status") == "quick-accepted":
+        verified = full_gate_on_declared(directory / "diagnosis", declared)
+        if verified is not None:
+            attempt.update(
+                {
+                    "status": "VERIFIED",
+                    "finished_at": stamp(),
+                    "verified_candidate": verified,
+                    "repair": "diagnosis candidate needed no weight boost",
+                }
+            )
+            state["verified_low"] = str(side)
+            state["verified_certificate"] = verified
+            state["mode"] = "FRONTIER"
+            save_state(root, state)
+            write_views(root, state)
+            emit(
+                root,
+                f"[repair] VERIFIED L={display(side)} exact={side} without weight boost",
+                significant=True,
+            )
+            return True
+
+    for slack_fraction in REPAIR_SLACK_FRACTIONS:
+        label = f"{slack_fraction.numerator}-{slack_fraction.denominator}"
+        boost_dir = directory / f"boost-{label}"
+        boost_dir.mkdir(parents=True, exist_ok=False)
+        boosted = boost_dir / "candidate.unverified.json"
+        total = write_boosted_candidate(candidate, boosted, slack_fraction)
+        status, verified = verify_candidate(boost_dir, boosted, side)
+        repair_record = {
+            "slack_fraction": str(slack_fraction),
+            "total_mass": str(total),
+            "status": status,
+            "verified_candidate": verified,
+        }
+        attempt["repairs"].append(repair_record)
+        save_state(root, state)
+        emit(
+            root,
+            f"[repair] boost={slack_fraction} total={total} -> {status}",
+            significant=status == "full-retainable",
+        )
+        if verified is None:
+            continue
+        attempt.update(
+            {
+                "status": "VERIFIED",
+                "finished_at": stamp(),
+                "verified_candidate": verified,
+                "repair": f"uniform-weight boost using {slack_fraction} of mass slack",
+            }
+        )
+        state["verified_low"] = str(side)
+        state["verified_certificate"] = verified
+        state["mode"] = "FRONTIER"
+        save_state(root, state)
+        write_views(root, state)
+        emit(
+            root,
+            f"[repair] VERIFIED L={display(side)} exact={side} "
+            f"with boost={slack_fraction}",
+            significant=True,
+        )
+        return True
+
+    attempt["status"] = "REJECTED"
+    attempt["finished_at"] = stamp()
+    state["mode"] = "REPAIR"
+    save_state(root, state)
+    write_views(root, state)
+    emit(
+        root,
+        f"[repair] candidate L={display(side)} exhausted; selecting the next candidate",
+        significant=True,
+    )
+    return True
+
+
 def write_views(root: Path, state: dict[str, Any]) -> None:
     rows: list[dict[str, Any]] = []
     for index, cycle in enumerate(state["cycles"], 1):
@@ -744,6 +1061,22 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
             f"{cycle.get('column_rounds_completed', 0)} | {result.get('objective', '')} "
             f"| {cycle.get('reason', '')} |"
         )
+    repairs = state.get("repair_attempts") or []
+    if repairs:
+        lines.extend(
+            [
+                "",
+                "## Automatic repair attempts",
+                "",
+                "| Side | Status | Source verifier | Candidate |",
+                "| --- | --- | --- | --- |",
+            ]
+        )
+        for attempt in repairs:
+            lines.append(
+                f"| {attempt.get('side', '')} | {attempt.get('status', '')} | "
+                f"{attempt.get('verifier', '')} | {attempt.get('candidate', '')} |"
+            )
     (root / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -767,6 +1100,8 @@ def summary(root: Path, state: dict[str, Any], started: float) -> str:
             ),
             f"frontier width: {high - low} = {display(high - low)}",
             f"exact verifications attempted: {attempts}",
+            f"automatic repair attempts: {len(state.get('repair_attempts') or [])}",
+            f"mode: {state.get('mode', 'FRONTIER')}",
             f"next suggested L: {next_side(state)}",
             f"state: {root / 'state.json'}",
             f"report: {root / 'report.md'}",
@@ -815,6 +1150,8 @@ def initial_state(config: dict[str, Any], seed: Path) -> dict[str, Any]:
         "cycles": [],
         "active": None,
         "last_target": None,
+        "mode": "FRONTIER",
+        "repair_attempts": [],
         "git_sha": git_sha(),
     }
 
@@ -1268,6 +1605,19 @@ def main(argv: list[str] | None = None) -> int:
                             <= args.target_width
                         ):
                             break
+                        if numeric_search_saturated(state):
+                            if state.get("mode") != "REPAIR":
+                                state["mode"] = "REPAIR"
+                                save_state(root, state)
+                                emit(
+                                    root,
+                                    "[frontier] float64 search saturated; switching to "
+                                    "automatic candidate diagnosis/repair",
+                                    significant=True,
+                                )
+                            if not run_repair(root, state):
+                                break
+                            continue
                         if next_side(state) is None:
                             break
                     run_cycle(root, state)
@@ -1338,11 +1688,23 @@ The next side is the exact midpoint between the best VERIFIED low and the
 nearest UNRESOLVED point above it, or the SEARCH_FAILED/configured high if no
 such point exists. When a verified low improves and the gap to the nearest
 UNRESOLVED point is at most one sixteenth of the initial width, that point is
-retried once with the new seed. There is no implicit precision cutoff: without `--target-width`, exact
-rational bisection continues until the operator requests a graceful stop.
-The floating search backend may eventually map neighboring exact sides to the
-same machine value, but the retained-certificate gate remains exact, so that
-numerical coincidence is recorded rather than used as an automatic stop.
+retried once with the new seed. There is no silent precision stop. When exact midpoint bisection collapses onto
+one of its endpoints in the float64 search backend, the runner switches from
+FRONTIER mode to automatic REPAIR mode instead of burning CPU on numerically
+identical searches.
+
+REPAIR mode scans the persisted state for the strongest untried side above the
+current VERIFIED bound whose rational mass is already below 12 but whose quick
+or full exact gate rejected it. The runner re-runs the quick gate with
+`--dump-stalls`, stores a structured diagnosis under `repair/`, then tries
+sound uniform weight boosts using progressively more of the remaining strict
+mass slack. Uniform scaling preserves the site set and D4 symmetry and can only
+increase covered mass; every repaired artifact still has total mass strictly
+below 12 and must pass declaration, quick interval verification, and the full
+two-route exact retention gate before it can update VERIFIED. Failed repairs
+are retained and the next candidate is selected automatically. If all persisted
+repairable candidates are exhausted, the runner stops explicitly in
+REPAIR_EXHAUSTED rather than repeating identical floating searches.
 
 The search policy escalates when the result is close to mass/objective 12, is
 improving with useful columns or priced depth, or has priced depth near the

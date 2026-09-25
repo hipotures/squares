@@ -84,6 +84,16 @@ def test_frontier_keeps_bisecting_after_float_midpoint_collapses(tmp_path: Path)
     assert frontier.display(low) != frontier.display(high)
 
 
+def test_numeric_saturation_is_detected_at_adjacent_float64_sides(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    low = Fraction(871246081204179, 219902325555200)
+    high = Fraction(6969968649633433, 1759218604441600)
+    saved["verified_low"] = str(low)
+    saved["search_high"] = str(high)
+    saved["unresolved"] = [str(high)]
+    assert frontier.numeric_search_saturated(saved) is True
+
+
 def test_scale_limited_unresolved_is_retried_before_bisection(tmp_path: Path) -> None:
     saved = state(tmp_path)
     side = Fraction(793, 200)
@@ -149,6 +159,66 @@ def test_rationalisation_scale_refines_only_when_rounding_is_blocker() -> None:
 
     already_below = result(side, objective=11.9994, mass="11999/1000")
     assert frontier.next_refinement_scale(already_below, 1_600_000, 25_600_000) is None
+
+
+def test_repair_candidate_selection_prefers_highest_untried_side(
+    tmp_path: Path,
+) -> None:
+    saved = state(tmp_path)
+    low = Fraction(saved["verified_low"])
+    candidates = []
+    for offset, verifier in ((1, "quick-rejected"), (2, "full-rejected")):
+        side = low + Fraction(offset, 10000)
+        directory = tmp_path / f"candidate-{offset}"
+        directory.mkdir()
+        candidate = directory / "candidate.unverified.json"
+        candidate.write_text("{}", encoding="utf-8")
+        candidates.append((side, candidate))
+        saved["cycles"].append(
+            {
+                "side": str(side),
+                "status": "UNRESOLVED",
+                "stages": [
+                    {
+                        "name": "screen",
+                        "verifier": verifier,
+                        "candidate_unverified": str(candidate),
+                        "result": {"total_mass": "11999/1000"},
+                    }
+                ],
+            }
+        )
+    selected = frontier.select_repair_candidate(saved)
+    assert selected is not None
+    assert Fraction(selected["side"]) == candidates[-1][0]
+    saved["repair_attempts"].append(
+        {"candidate": str(candidates[-1][1]), "status": "REJECTED"}
+    )
+    assert Fraction(frontier.select_repair_candidate(saved)["side"]) == candidates[0][0]
+
+
+def test_uniform_weight_repair_uses_only_part_of_strict_mass_slack(tmp_path: Path) -> None:
+    source = tmp_path / "source.json"
+    source.write_text(
+        json.dumps(
+            {
+                "total_mass": "11",
+                "least_cell_mass": "1",
+                "atoms": [["0", "0", "5"], ["1", "1", "6"]],
+            }
+        ),
+        encoding="utf-8",
+    )
+    destination = tmp_path / "boosted.json"
+    total = frontier.write_boosted_candidate(
+        source, destination, Fraction(3, 4)
+    )
+    record = json.loads(destination.read_text(encoding="utf-8"))
+    assert total == Fraction(47, 4)
+    assert Fraction(record["total_mass"]) == Fraction(47, 4)
+    assert sum(Fraction(atom[2]) for atom in record["atoms"]) == Fraction(47, 4)
+    assert record["least_cell_mass"] is None
+    assert total < 12
 
 
 def test_transitions_and_full_gate_invariant(tmp_path: Path) -> None:
