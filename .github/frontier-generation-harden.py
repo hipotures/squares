@@ -32,6 +32,10 @@ change('packing/devtools/frontier_generation_queue.py', '            if now >= n
                 # discarded work before reaching the bounded cleanup in finally.
                 break
             if now >= next_notice:''')
+change('packing/devtools/frontier_generation_queue.py', '        code = int(info.get("returncode", 70))', '''        code = int(info.get("returncode", 70))
+        if code == 0 and _identity(driver["job"], code_sha) != identities[key]:
+            code = 78
+            info = {**info, "error": "generation inputs changed during execution"}''')
 change('packing/devtools/run_n12_frontier.py', '''                    elif (work["kind"] == "resume-generation"
                           or (config["generation_trials"] > 1 and config["workers"] > 1)):''', '''                    elif generation_parallelism(state, work):''')
 change('packing/devtools/run_n12_frontier.py', 'def choose_work(state: dict[str, Any]) -> dict[str, Any]:', '''def generation_parallelism(state: dict[str, Any], work: dict[str, Any]) -> bool:
@@ -47,4 +51,13 @@ change('packing/devtools/run_n12_frontier.py', 'def choose_work(state: dict[str,
 
 def choose_work(state: dict[str, Any]) -> dict[str, Any]:''')
 change('packing/tests/test_frontier_hardening.py', '''["--root", str(tmp_path), "--strategies", "baseline,centre", "--max-cycles", "4"]''', '''["--root", str(tmp_path), "--strategies", "baseline,centre", "--generation-trials", "1", "--max-cycles", "4"]''')
-print('Fair shared dispatch and explicit sequential-policy control applied.')
+p = Path('packing/tests/test_run_n12_frontier.py')
+text = p.read_text()
+head, tail = text.split('def test_stop_finishes_cycle_and_console_is_concise(', 1)
+body, rest = tail.split('\ndef ', 1)
+old = '                "--screen-rounds",'
+if body.count(old) != 1:
+    raise RuntimeError('single-cycle stop test changed')
+body = body.replace(old, '                "--generation-trials",\n                "1",\n' + old)
+p.write_text(head + 'def test_stop_finishes_cycle_and_console_is_concise(' + body + '\ndef ' + rest)
+print('Fair shared dispatch, input identity and explicit sequential controls applied.')
