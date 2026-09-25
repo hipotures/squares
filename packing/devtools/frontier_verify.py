@@ -112,10 +112,12 @@ def decide(
     if quick_first:
         quick_log = directory / "verify-quick.log"
         quick_stalls = directory / "quick-interval-stalls.json"
+        quick_input = directory / "candidate.quick-input.json"
+        atomic_json(quick_input, record)
         began = time.monotonic()
         with quick_log.open("w", encoding="utf-8") as handle, redirect_stdout(handle):
             quick_accepted = gate.decide(
-                source,
+                quick_input,
                 quick=True,
                 dump_stalls=quick_stalls,
             )

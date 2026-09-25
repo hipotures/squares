@@ -638,6 +638,17 @@ def latest_progress(directory: Path) -> tuple[str, str, str]:
 def heartbeat_message(args: list[str], output: Path, elapsed: float) -> str:
     """One concise progress line for a long-running real subprocess."""
     minutes = max(1, round(elapsed / 60))
+    if "devtools.frontier_boost_queue" in args:
+        checkpoint = output.parent / "queue-checkpoint.json"
+        try:
+            record = read_json(checkpoint)
+            metrics = record["metrics"]
+            return (f"[running] repair-queue elapsed={minutes}m "
+                    f"directions={metrics['completed_items']} "
+                    f"in-flight={metrics['in_flight']}/{metrics['slots']} "
+                    f"coordinator-cpu={metrics['coordinator_cpu_seconds']:.3f}s")
+        except (OSError, ValueError, KeyError):
+            return f"[running] repair-queue initialising elapsed={minutes}m"
     if "--side" not in args or "--column-rounds" not in args:
         return f"[running] {output.name} elapsed={minutes}m"
     side = display(Fraction(args[args.index("--side") + 1]))
@@ -972,6 +983,9 @@ def run_repair(root: Path, state: dict[str, Any]) -> bool:
             # Exact diagnostic chooses the first useful target, rather than
             # blindly spending six gates on boosts below the measured deficit.
             slack_fractions = [((necessary + 12) / 2 - mass) / (12 - mass)]
+    if len(slack_fractions) > 1:
+        from devtools.frontier_repair_batch import run_boosts
+        return run_boosts(root, state, attempt, slack_fractions, sys.modules[__name__])
     for slack_fraction in slack_fractions:
         label = f"{slack_fraction.numerator}-{slack_fraction.denominator}"
         # Large exact denominators need not become oversized filesystem names.
