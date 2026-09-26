@@ -379,3 +379,48 @@ def test_status_labels_legacy_globals_and_shows_strategy_local_frontiers():
     assert "windows:" in text and "own-high=" in text
     assert "centre:" in text and "(observed)" in text
     assert "soft-high=" not in text.replace("legacy-soft-high=", "")
+
+
+
+def test_stop_between_generation_stages_preserves_resumable_cohort(tmp_path):
+    state = campaign()
+    side = LOG_LOW + 10 * RESOLUTION
+    cycles = []
+    for name in ("fine-net", "baseline", "centre"):
+        cycles.append(
+            outcome(
+                state,
+                side,
+                name,
+                "RUNNING",
+                stages=[
+                    {
+                        "status": "complete",
+                        "decision": "ESCALATE",
+                        "reason": "fixture needs a later budget",
+                        "name": "screen",
+                        "budget": 8,
+                    }
+                ],
+            )
+        )
+    state["active_generation"] = [0, 1, 2]
+    state["generation_wave"] = None
+    calls = []
+    stub = SimpleNamespace(
+        stamp=lambda: "fixture",
+        display=str,
+        save_state=lambda *_: None,
+        write_views=lambda *_: None,
+        emit=lambda *args: calls.append(args),
+        stop_requested=lambda: True,
+        run_cycle=lambda *_args, **_kwargs: pytest.fail("stop must not admit another stage"),
+    )
+
+    run_portfolio(tmp_path, state, frontier=stub)
+
+    assert state["active_generation"] == [0, 1, 2]
+    assert state["generation_wave"] is None
+    assert all(cycle["status"] == "INTERRUPTED" for cycle in cycles)
+    assert all(len(cycle["stages"]) == 1 for cycle in cycles)
+    assert any("no later stage was started" in args[1] for args in calls)
