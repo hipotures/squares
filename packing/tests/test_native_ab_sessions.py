@@ -1,8 +1,8 @@
 """Real kernel/generator controls plus session accounting and process tests."""
+
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 import sys
 from fractions import Fraction
@@ -49,9 +49,11 @@ def test_cumulative_snapshots_are_not_double_counted(tmp_path, monkeypatch):
 def test_capture_is_lazy_and_bounded(tmp_path, monkeypatch):
     monkeypatch.setenv("PACK_NATIVE_CAPTURE", str(tmp_path))
     called = []
+
     def payload():
         called.append(1)
         return {"x": 1}, None
+
     for _ in range(5):
         metrics.capture("exact", "same-bucket", payload)
     assert len(called) == 1
@@ -66,17 +68,31 @@ def make_real_corpus(path: Path, monkeypatch):
     from sqpack.fractional.model import rotation_from_half_tangent
     from sqpack.fractional.colgen import Square, _arrangement_lines, _vertices
     from sqpack.fractional.exact_slabs import PreparedDepth
+
     certificate = load(FIRST_RUNG_PATH)
     points = np.array([[float(a.x), float(a.y)] for a in certificate.atoms])
     weights = np.array([float(a.weight) for a in certificate.atoms])
     monkeypatch.setenv("PACK_NATIVE_CAPTURE", str(path))
     for tangent in (Fraction(1, 8), Fraction(1, 5)):
         direction = rotation_from_half_tangent(str(tangent), tangent)
-        placement_cells(points, weights, direction, float(certificate.outer_side),
-                        float(certificate.square_side), keep=3)
+        placement_cells(
+            points,
+            weights,
+            direction,
+            float(certificate.outer_side),
+            float(certificate.square_side),
+            keep=3,
+        )
     # Capture actual geometry built by the generator, not a timing sleep workload.
-    square = Square(Fraction(1), Fraction(0), Fraction(0), Fraction(1),
-                    Fraction(0), Fraction(0), Fraction(1, 2))
+    square = Square(
+        Fraction(1),
+        Fraction(0),
+        Fraction(0),
+        Fraction(1),
+        Fraction(0),
+        Fraction(0),
+        Fraction(1, 2),
+    )
     weighted = ((square, Fraction(1, 3)),)
     _vertices(_arrangement_lines(weighted, Fraction(4)), Fraction(4))
     prepared = PreparedDepth(weighted)
@@ -87,15 +103,37 @@ def make_real_corpus(path: Path, monkeypatch):
 
 
 @pytest.mark.parametrize("workers", [1, 2, 4])
-def test_real_replay_uses_same_sealed_inputs_and_native_profiles(tmp_path, monkeypatch, workers):
+def test_real_replay_uses_same_sealed_inputs_and_native_profiles(
+    tmp_path, monkeypatch, workers
+):
     corpus = tmp_path / "corpus"
     manifest = make_real_corpus(corpus, monkeypatch)
     assert manifest["id"] == validate_corpus(corpus)["id"]
     output = tmp_path / "runs"
-    result = subprocess.run([sys.executable, "-m", "devtools.native_ab", "replay",
-        "--corpus", str(corpus), "--output", str(output), "--native", "all",
-        "--workers", str(workers), "--minutes", "0", "--rounds", "2"],
-        cwd=PACKING, capture_output=True, text=True, timeout=90)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "devtools.native_ab",
+            "replay",
+            "--corpus",
+            str(corpus),
+            "--output",
+            str(output),
+            "--native",
+            "all",
+            "--workers",
+            str(workers),
+            "--minutes",
+            "0",
+            "--rounds",
+            "2",
+        ],
+        cwd=PACKING,
+        capture_output=True,
+        text=True,
+        timeout=90,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     report = json.loads(next(output.glob("*/performance.json")).read_text())
     assert report["session"]["corpus_id"] == manifest["id"]
@@ -124,10 +162,21 @@ def test_report_has_throughput_and_separate_drain(tmp_path, monkeypatch):
 
 def test_real_generator_preserves_mathematical_output(monkeypatch, tmp_path):
     from devtools.run_fractional_colgen import RunSettings, run
-    settings = RunSettings(n=12, outer_side=Fraction(198111, 50000), square_side=Fraction(9977, 10000),
-        grid_counts=(5, 7, 9), inset=Fraction(1, 2), angle_limit=Fraction(207107, 500000),
-        direction_steps=12, scale=1600000, column_rounds=2, max_rounds=60, rows_per_direction=3,
-        support_cap=8)
+
+    settings = RunSettings(
+        n=12,
+        outer_side=Fraction(198111, 50000),
+        square_side=Fraction(9977, 10000),
+        grid_counts=(5, 7, 9),
+        inset=Fraction(1, 2),
+        angle_limit=Fraction(207107, 500000),
+        direction_steps=12,
+        scale=1600000,
+        column_rounds=2,
+        max_rounds=60,
+        rows_per_direction=3,
+        support_cap=8,
+    )
     monkeypatch.setenv("PACK_JOBS", "2")
     results = []
     for mode in ("none", "all"):
@@ -142,20 +191,51 @@ def test_real_generator_preserves_mathematical_output(monkeypatch, tmp_path):
         assert results[0][0][key] == results[1][0][key]
     assert results[0][1] is not None
     assert results[0][1] == results[1][1]
+
     def rounds(result):
         return [{k: v for k, v in row.items() if k != "seconds"} for row in result["rounds"]]
+
     assert rounds(results[0][0]) == rounds(results[1][0])
 
 
 def test_real_campaign_graceful_budget_and_resume(tmp_path):
     root = tmp_path / "campaign"
-    common = [sys.executable, "-m", "devtools.native_ab", "campaign", "--root", str(root),
-        "--workers", "2", "--generation-trials", "1", "--minutes", "0.02",
-        "--screen-rounds", "1", "--normal-rounds", "2", "--deep-rounds", "3",
-        "--max-rounds", "4", "--row-rounds", "1", "--max-row-rounds", "1", "--max-cycles", "1"]
+    common = [
+        sys.executable,
+        "-m",
+        "devtools.native_ab",
+        "campaign",
+        "--root",
+        str(root),
+        "--workers",
+        "2",
+        "--generation-trials",
+        "1",
+        "--minutes",
+        "0.02",
+        "--screen-rounds",
+        "1",
+        "--normal-rounds",
+        "2",
+        "--deep-rounds",
+        "3",
+        "--max-rounds",
+        "4",
+        "--row-rounds",
+        "1",
+        "--max-row-rounds",
+        "1",
+        "--max-cycles",
+        "1",
+    ]
     for mode, extra in (("none", []), ("compact", ["--resume"])):
-        result = subprocess.run([*common, "--native", mode, *extra], cwd=PACKING,
-                                capture_output=True, text=True, timeout=120)
+        result = subprocess.run(
+            [*common, "--native", mode, *extra],
+            cwd=PACKING,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
         assert result.returncode == 0, result.stdout + result.stderr
         assert "NATIVE A/B THROUGHPUT SUMMARY" in result.stdout
     assert (root / "state.json").exists()

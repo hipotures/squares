@@ -4,6 +4,7 @@ No compilation on import, no native threads, and no silent missing-library
 fallback. `none` disables even the two previously accepted C helpers for an
 unambiguous Python/NumPy reference. HiGHS and NumPy themselves remain native.
 """
+
 from __future__ import annotations
 
 import ctypes as ct
@@ -26,6 +27,7 @@ SOURCES = ("native_ab_core.c", "_prefix_rows_native.c", "_top13.c", "native_ab_e
 FLAGS = ("-O3", "-fno-fast-math", "-ffp-contract=off", "-fPIC", "-shared")
 
 
+@lru_cache(maxsize=128)
 def parse_selection(text: str) -> tuple[str, ...]:
     if text == "none":
         return ()
@@ -35,7 +37,9 @@ def parse_selection(text: str) -> tuple[str, ...]:
         return ("prefix", "topk")
     names = text.split(",")
     if not names or any(name not in KERNELS for name in names):
-        raise ValueError(f"unknown native selection {text!r}; use none, all, production or {KERNELS}")
+        raise ValueError(
+            f"unknown native selection {text!r}; use none, all, production or {KERNELS}"
+        )
     if len(set(names)) != len(names):
         raise ValueError("duplicate native switch")
     return tuple(name for name in KERNELS if name in names)
@@ -49,6 +53,7 @@ def enabled(name: str) -> bool:
     return name in selection()
 
 
+@lru_cache(maxsize=1)
 def source_digest() -> str:
     h = hashlib.sha256()
     for name in SOURCES:
@@ -59,7 +64,9 @@ def source_digest() -> str:
 
 
 def build_directory() -> Path:
-    base = Path(os.environ.get("PACK_NATIVE_BUILD_ROOT", str(Path.home() / ".cache/squares-native-ab")))
+    base = Path(
+        os.environ.get("PACK_NATIVE_BUILD_ROOT", str(Path.home() / ".cache/squares-native-ab"))
+    )
     return base / f"{platform.system()}-{platform.machine()}-{source_digest()[:24]}"
 
 
@@ -75,6 +82,7 @@ def atomic_json(path: Path, value: object) -> None:
 
 
 def build(*, core_only: bool = False) -> dict:
+    source_digest.cache_clear()
     if sys.platform != "linux":
         raise RuntimeError("the native A/B build currently targets Linux only")
     directory = build_directory()
@@ -87,10 +95,20 @@ def build(*, core_only: bool = False) -> dict:
     for name, compiler, standard, files in targets:
         with tempfile.TemporaryDirectory(dir=directory) as temp:
             output = Path(temp) / f"{name}.so"
-            command = [*shlex.split(compiler), standard, *FLAGS,
-                       *(str(sources / f) for f in files), "-o", str(output)]
-            version = subprocess.run([*shlex.split(compiler), "--version"], check=True,
-                                     capture_output=True, text=True).stdout
+            command = [
+                *shlex.split(compiler),
+                standard,
+                *FLAGS,
+                *(str(sources / f) for f in files),
+                "-o",
+                str(output),
+            ]
+            version = subprocess.run(
+                [*shlex.split(compiler), "--version"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout
             completed = subprocess.run(command, capture_output=True, text=True)
             if completed.returncode:
                 raise RuntimeError(
@@ -99,24 +117,37 @@ def build(*, core_only: bool = False) -> dict:
                 )
             target = directory / f"{name}.so"
             output.replace(target)
-            metadata["libraries"][name] = {"path": str(target), "compiler": version,
-                "command": command, "sha256": hashlib.sha256(target.read_bytes()).hexdigest()}
+            metadata["libraries"][name] = {
+                "path": str(target),
+                "compiler": version,
+                "command": command,
+                "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+            }
     atomic_json(directory / "build.json", metadata)
-    library.cache_clear()
+    _library.cache_clear()
     return metadata
 
 
-@lru_cache(maxsize=4)
 def library(name: str) -> ct.CDLL:
-    directory = build_directory()
+    return _library(name, str(build_directory()))
+
+
+@lru_cache(maxsize=8)
+def _library(name: str, location: str) -> ct.CDLL:
+    directory = Path(location)
     try:
         meta = json.loads((directory / "build.json").read_text())
         info = meta["libraries"][name]
         path = directory / f"{name}.so"
-        if meta["source_sha256"] != source_digest() or hashlib.sha256(path.read_bytes()).hexdigest() != info["sha256"]:
+        if (
+            meta["source_sha256"] != source_digest()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != info["sha256"]
+        ):
             raise ValueError("native binary/source identity mismatch")
     except (OSError, KeyError, ValueError) as exc:
-        raise RuntimeError("selected native kernel is unavailable; run python -m devtools.native_ab build") from exc
+        raise RuntimeError(
+            "selected native kernel is unavailable; run python -m devtools.native_ab build"
+        ) from exc
     lib = ct.CDLL(str(path))
     p, z, i = ct.c_void_p, ct.c_size_t, ct.c_int
     if name == "core":
@@ -151,11 +182,16 @@ def library(name: str) -> ct.CDLL:
 
 def preflight() -> dict:
     selected = selection()
-    for name in ({"core"} if any(k != "exact-depth" for k in selected) else set()) | ({"exact"} if "exact-depth" in selected else set()):
+    for name in ({"core"} if any(k != "exact-depth" for k in selected) else set()) | (
+        {"exact"} if "exact-depth" in selected else set()
+    ):
         library(name)
-    result = {"kernels": list(selected), "source_sha256": source_digest(),
-              "baseline": "Python/NumPy references; HiGHS and NumPy are still native",
-              "threads_per_native_call": 1}
+    result = {
+        "kernels": list(selected),
+        "source_sha256": source_digest(),
+        "baseline": "Python/NumPy references; HiGHS and NumPy are still native",
+        "threads_per_native_call": 1,
+    }
     if selected:
         result["build"] = json.loads((build_directory() / "build.json").read_text())
     return result
@@ -173,10 +209,15 @@ def int_array(values: np.ndarray) -> np.ndarray:
     return np.ascontiguousarray(values, dtype=np.int64)
 
 
-def require_float(array: np.ndarray, ndim: int, *, contiguous: bool = True, writable: bool = False) -> None:
-    if (array.dtype != np.float64 or array.ndim != ndim
-            or (contiguous and not array.flags.c_contiguous)
-            or (writable and not array.flags.writeable)):
+def require_float(
+    array: np.ndarray, ndim: int, *, contiguous: bool = True, writable: bool = False
+) -> None:
+    if (
+        array.dtype != np.float64
+        or array.ndim != ndim
+        or (contiguous and not array.flags.c_contiguous)
+        or (writable and not array.flags.writeable)
+    ):
         raise ValueError("native array dtype/layout/writeability precondition failed")
 
 
@@ -185,7 +226,11 @@ class ExactDepth:
         self.lib = library("exact")
         rows = [str(len(weighted))]
         for first, second, weight in weighted:
-            rows.append(" ".join(str(v) for v in (*first, *second, weight.numerator, weight.denominator)))
+            rows.append(
+                " ".join(
+                    str(v) for v in (*first, *second, weight.numerator, weight.denominator)
+                )
+            )
         self.handle = self.lib.ab_exact_create("\n".join(rows).encode("ascii"))
         if not self.handle:
             raise RuntimeError(self.lib.ab_exact_error().decode())

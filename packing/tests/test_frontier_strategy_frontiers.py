@@ -364,6 +364,7 @@ def test_grid_proposals_stay_inside_own_bracket_and_keep_meaningful_gaps(offset)
 
 def test_status_labels_legacy_globals_and_shows_strategy_local_frontiers():
     state = campaign()
+    state["unresolved"] = []
     state["config"]["strategies"] = ["windows", "centre"]
     prove_fixture(state, LOG_LOW)
     outcome(state, LOG_LOW + 4 * RESOLUTION, "centre", "UNRESOLVED")

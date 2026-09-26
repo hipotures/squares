@@ -164,7 +164,7 @@ def _receipt_valid(receipt: dict[str, Any], fingerprint: str) -> bool:
 def code_fingerprint(cwd: Path) -> str:
     """Fingerprint executable search/verification code, not changing research data."""
     paths = sorted(p for p in (cwd / "src/sqpack/fractional").iterdir()
-                   if p.suffix in (".py", ".c"))
+                   if p.suffix in (".py", ".c", ".cpp"))
     paths += sorted((cwd / "devtools").glob("frontier*.py"))
     paths += [cwd / "devtools/run_fractional_colgen.py", cwd / "devtools/decide_certificate.py",
               cwd / "src/sqpack/workers.py", cwd / "uv.lock"]
@@ -193,7 +193,8 @@ def run(
     settings = {**DEFAULTS, **(limits or {})}
     environment = dict(os.environ if env is None else env)
     overrides = {key: environment[key] for key in (
-        "PACK_JOBS", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"
+        "PACK_JOBS", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+        "PACK_NATIVE_KERNELS", "PACK_NATIVE_BUILD_ROOT"
     ) if key in environment}
     spec_path = output.with_name(output.name + ".job.json")
     receipt_path = output.with_name(output.name + ".receipt.json")

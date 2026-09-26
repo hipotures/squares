@@ -1993,6 +1993,9 @@ def main(argv: list[str] | None = None) -> int:
             _ACTIVE_STOP = stop
             for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
                 previous_handlers[signum] = signal.signal(signum, stop.handle)
+            ready_file = os.environ.get("PACK_NATIVE_STARTED_FILE")
+            if ready_file:
+                atomic_json(Path(ready_file), {"pid": os.getpid(), "ready": True})
             if args.resume:
                 state = load_state(root)
                 config = dict(state["config"])
