@@ -120,17 +120,19 @@ git switch work/frontier-native-ab
 git submodule update --init --recursive
 cd packing
 uv sync --frozen
-uv run --frozen python -m devtools.native_ab build
-uv run --frozen python -m devtools.native_ab doctor --native all
+uv run --frozen python -m devtools.native_ab doctor
 ```
 
-The explicit build needs a C compiler, a C++17 compiler and Boost headers. On
-Ubuntu/Debian an administrator can install `build-essential libboost-dev`.
-`build --core-only` builds all switches except `exact-depth`; the Python
-reference requires no additional compiler. Binaries live in a source-keyed
-`~/.cache/squares-native-ab/` directory, not in Git. Compiler commands, versions,
-source and binary hashes are included in session metadata. Re-run `build` after
-pulling changes to native sources. Do not rebuild libraries during a session.
+The accepted production core (prefix/topk/scatter/compact) is compiled by the
+package build hook during `uv sync` and installed with sqpack. There is no
+runtime Python fallback in the normal production workflow: an unavailable
+production core is an error.
+
+The explicit `python -m devtools.native_ab build` command remains only for the
+unaccepted `exact-depth` experiment and diagnostic A/B cache builds. That path
+needs a C++17 compiler and Boost headers; on Ubuntu/Debian an administrator can
+install `build-essential libboost-dev`. Do not rebuild libraries during a live
+session.
 
 First reference hour, continuing the existing campaign and sampling real inputs:
 
