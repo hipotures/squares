@@ -19,6 +19,8 @@ from sqpack.fractional import native_ab_metrics as metrics
 from sqpack.fractional import native_ab_runtime as runtime
 
 PACKING = Path(__file__).resolve().parents[1]
+_ERROR_BELL_SENT = False
+
 UNITS = {
     "direction": "site_visits",
     "event-cells": "event_cells",
@@ -42,7 +44,10 @@ def emit(message: str) -> None:
 def terminal_bell(message: str, *, error: bool = False) -> None:
     """Emit a console BEL plus a visible reason; errors use a double bell."""
 
+    global _ERROR_BELL_SENT
     bells = "\a\a" if error else "\a"
+    if error:
+        _ERROR_BELL_SENT = True
     print(f"{bells}[native-ab] {message}", file=sys.stderr, flush=True)
 
 
@@ -424,6 +429,7 @@ if __name__ == "__main__":
     try:
         status = main()
     except BaseException as exc:
-        terminal_bell(f"ERROR {type(exc).__name__}: {exc}", error=True)
+        if not _ERROR_BELL_SENT:
+            terminal_bell(f"ERROR {type(exc).__name__}: {exc}", error=True)
         raise
     raise SystemExit(status)
