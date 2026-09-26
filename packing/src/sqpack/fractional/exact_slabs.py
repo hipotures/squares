@@ -10,13 +10,13 @@ Preparation is local to one pricing/ceiling call. It is not a global cache and
 never modifies or serialises the caller's squares. The float candidate survey
 and exact-intersection construction remain the caller's responsibility.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterable
 from fractions import Fraction
 from math import gcd, lcm
 from typing import Protocol
-
 
 type IntegerSlab = tuple[int, int, int, int]
 type HomogeneousPoint = tuple[int, int, int]
@@ -74,16 +74,22 @@ class PreparedDepth:
 
     def __init__(self, weighted: Iterable[tuple[SlabSquare, Fraction]]) -> None:
         self._weighted = tuple(
-            (_slab(square.ax, square.ay, square.u, square.half),
-             _slab(square.bx, square.by, square.v, square.half), weight)
+            (
+                _slab(square.ax, square.ay, square.u, square.half),
+                _slab(square.bx, square.by, square.v, square.half),
+                weight,
+            )
             for square, weight in weighted
         )
 
     def at(self, x: Fraction, y: Fraction) -> Fraction:
         point = _point(x, y)
         return sum(
-            (weight for first, second, weight in self._weighted
-             if _contains(first, second, point)),
+            (
+                weight
+                for first, second, weight in self._weighted
+                if _contains(first, second, point)
+            ),
             start=Fraction(0),
         )
 
