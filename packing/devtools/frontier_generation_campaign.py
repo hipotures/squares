@@ -121,6 +121,8 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
     if frontier is None:
         from devtools import run_n12_frontier as frontier
 
+    stop_requested = getattr(frontier, "stop_requested", lambda: False)
+
     if not state.get("active_generation"):
         if state.get("active") is not None:
             # Finish an existing pre-upgrade cycle before admitting new siblings.
@@ -161,7 +163,7 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
             has_generated = any(
                 stage.get("status") == "generated" for stage in cycle.get("stages", [])
             )
-            if frontier.stop_requested() and not has_generated:
+            if stop_requested() and not has_generated:
                 if cycle["status"] == "RUNNING":
                     cycle.update(
                         status="INTERRUPTED",
@@ -176,7 +178,7 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
             if stage is None:
                 if cycle["status"] not in ("RUNNING", "INTERRUPTED"):
                     state["active_generation"].remove(index)
-            elif frontier.stop_requested():
+            elif stop_requested():
                 cycle.update(
                     status="INTERRUPTED",
                     reason="operator stop before queued continuation; stage preserved for resume",
@@ -197,7 +199,7 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
             frontier.save_state(root, state)
         retire_superseded(root, state, frontier)
         queued = [entry for entry in queued if entry[0] in state["active_generation"]]
-        if frontier.stop_requested():
+        if stop_requested():
             for index in state.get("active_generation", []):
                 cycle = state["cycles"][index]
                 if cycle["status"] == "RUNNING":
