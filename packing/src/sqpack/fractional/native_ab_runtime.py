@@ -49,7 +49,7 @@ def parse_selection(text: str) -> tuple[str, ...]:
 
 
 def selection() -> tuple[str, ...]:
-    return parse_selection(os.environ.get("PACK_NATIVE_KERNELS", "none"))
+    return parse_selection(os.environ.get("PACK_NATIVE_KERNELS", "production"))
 
 
 def enabled(name: str) -> bool:
@@ -128,10 +128,20 @@ def build(*, core_only: bool = False) -> dict:
             }
     atomic_json(directory / "build.json", metadata)
     _library.cache_clear()
+    _bound_library.cache_clear()
     return metadata
 
 
+def packaged_core_path() -> Path:
+    suffix = ".dylib" if sys.platform == "darwin" else ".so"
+    return Path(__file__).with_name("_native_ab_core" + suffix)
+
+
 def library(name: str) -> ct.CDLL:
+    if name == "core":
+        packaged = packaged_core_path()
+        if packaged.is_file():
+            return _bound_library(name, str(packaged))
     return _library(name, str(build_directory()))
 
 
@@ -149,9 +159,15 @@ def _library(name: str, location: str) -> ct.CDLL:
             raise ValueError("native binary/source identity mismatch")
     except (OSError, KeyError, ValueError) as exc:
         raise RuntimeError(
-            "selected native kernel is unavailable; run python -m devtools.native_ab build"
+            "selected native kernel is unavailable; production core is built by the package; "
+            "experimental kernels require python -m devtools.native_ab build"
         ) from exc
-    lib = ct.CDLL(str(path))
+    return _bound_library(name, str(path))
+
+
+@lru_cache(maxsize=8)
+def _bound_library(name: str, path: str) -> ct.CDLL:
+    lib = ct.CDLL(path)
     p, z, i = ct.c_void_p, ct.c_size_t, ct.c_int
     if name == "core":
         lib.ab_version.restype = i
@@ -197,8 +213,17 @@ def preflight() -> dict:
         "baseline": "HiGHS and NumPy remain native where used outside accepted kernels",
         "threads_per_native_call": 1,
     }
-    if selected:
-        result["build"] = json.loads((build_directory() / "build.json").read_text())
+    resolved = {}
+    if any(k != "exact-depth" for k in selected):
+        packaged = packaged_core_path()
+        resolved["core"] = str(packaged if packaged.is_file() else build_directory() / "core.so")
+    if "exact-depth" in selected:
+        resolved["exact"] = str(build_directory() / "exact.so")
+    if resolved:
+        result["resolved_libraries"] = resolved
+    metadata = build_directory() / "build.json"
+    if metadata.is_file():
+        result["experimental_build"] = json.loads(metadata.read_text())
     return result
 
 
