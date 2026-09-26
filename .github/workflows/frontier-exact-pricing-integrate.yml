@@ -31,6 +31,15 @@ jobs:
           test "$(git hash-object packing/src/sqpack/fractional/colgen.py)" = 91620323e9cbd4d0223e9a08f1cbec12519fb458
           git apply --check .github/frontier-exact-pricing.patch
           git apply .github/frontier-exact-pricing.patch
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('packing/devtools/bench_exact_pricing.py')
+          text = path.read_text()
+          text = text.replace("base + ['--child', mode, '--root', str(directory)]", "[*base, '--child', mode, '--root', str(directory)]")
+          text = text.replace("'paired identical full generator inputs, includes process startup; not a live campaign'", "'paired full generator, includes startup; not a live campaign'")
+          text = text.replace("'identical ordered rounds, objectives, exact ceiling and frozen certificate'", "'identical rounds, objectives, ceiling and frozen certificate'")
+          path.write_text(text)
+          PY
       - name: Locked environment and new-file quality checks
         working-directory: packing
         run: |
