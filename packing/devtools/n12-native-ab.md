@@ -66,11 +66,21 @@ Relevant implementation documentation:
 - [Boost.Multiprecision cpp_int](https://www.boost.org/latest/libs/multiprecision/doc/html/boost_multiprecision/tut/ref/cpp_int_ref.html)
 - [Python ctypes](https://docs.python.org/3/library/ctypes.html)
 
-## Switches and baseline semantics
+## Production profile and reference semantics
 
-`--native none` is the default. It disables **all six** optional paths, including
-our previously accepted prefix and top-k helpers. It means the Python/NumPy
-reference, not an interpreter-only implementation of NumPy or HiGHS.
+The accepted production profile is now the default:
+
+```text
+production = prefix,topk,scatter,compact
+```
+
+A normal `campaign`, `replay`, or `doctor` command therefore uses these four
+native kernels without an explicit `--native` argument. The previous Python/NumPy
+path is no longer the production workflow.
+
+`--native none` is retained only as an explicit differential/reference oracle for
+regression tests, corpus sealing, and diagnostic A/B work. It disables all six
+optional paths; NumPy and HiGHS themselves still execute native code.
 
 Each name independently enables one native path:
 
@@ -87,7 +97,7 @@ Aliases:
 
 ```text
 none                      all switches off
-production                prefix,topk (the previous accepted mixed implementation)
+production                prefix,topk,scatter,compact (accepted default)
 all                       all six switches on
 prefix,topk,compact        an explicit cumulative combination
 ```
@@ -149,7 +159,7 @@ double BEL and a visible error message; if cleanup/draining continues after an e
 a second completion/error notification is emitted when that cleanup has really ended.
 Terminal bell behavior still depends on the user's terminal emulator settings.
 
-Next hour, changing only one switch:
+For historical/diagnostic A/B work, one switch can still be selected explicitly:
 
 ```bash
 uv run --frozen python -m devtools.native_ab campaign \
@@ -161,8 +171,8 @@ uv run --frozen python -m devtools.native_ab campaign \
 Use the same command with `scatter`, `vertices`, `exact-depth`, `prefix`, or
 `topk`. For causal isolation, return to `none` between independent experiments.
 Use cumulative combinations only after individual switches have evidence.
-Also measure `production` so we do not mistake recovery of an already accepted
-C optimization for a new improvement.
+The production profile has been accepted from the measured campaign/replay results;
+single-switch modes remain available only for diagnostics and regression work.
 
 A job recovered from an already-owned specification keeps its original native
 choice. Its actual backend is reported. Completed reused artifacts get no new
