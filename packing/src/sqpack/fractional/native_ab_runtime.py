@@ -1,8 +1,10 @@
-"""Experimental native selection, explicit local build, and checked C ABI.
+"""Native production kernels, explicit local build, and checked C ABI.
 
-No compilation on import, no native threads, and no silent missing-library
-fallback. `none` disables even the two previously accepted C helpers for an
-unambiguous Python/NumPy reference. HiGHS and NumPy themselves remain native.
+The accepted production profile is prefix+topk+scatter+compact. Python/NumPy
+implementations remain only as an explicit reference oracle for differential
+tests and sealed replay; they are not the production workflow. No compilation
+happens on import, native kernels create no threads, and a missing/stale library
+is a hard error rather than a silent fallback.
 """
 
 from __future__ import annotations
@@ -22,7 +24,8 @@ from pathlib import Path
 
 import numpy as np
 
-KERNELS = ("prefix", "topk", "scatter", "compact", "vertices", "exact-depth")
+PRODUCTION_KERNELS = ("prefix", "topk", "scatter", "compact")
+KERNELS = (*PRODUCTION_KERNELS, "vertices", "exact-depth")
 SOURCES = ("native_ab_core.c", "_prefix_rows_native.c", "_top13.c", "native_ab_exact.cpp")
 FLAGS = ("-O3", "-fno-fast-math", "-ffp-contract=off", "-fPIC", "-shared")
 
@@ -34,7 +37,7 @@ def parse_selection(text: str) -> tuple[str, ...]:
     if text == "all":
         return KERNELS
     if text == "production":
-        return ("prefix", "topk")
+        return PRODUCTION_KERNELS
     names = text.split(",")
     if not names or any(name not in KERNELS for name in names):
         raise ValueError(
@@ -189,7 +192,9 @@ def preflight() -> dict:
     result = {
         "kernels": list(selected),
         "source_sha256": source_digest(),
-        "baseline": "Python/NumPy references; HiGHS and NumPy are still native",
+        "production_default": list(PRODUCTION_KERNELS),
+        "reference_mode": "none = Python/NumPy differential oracle; not production",
+        "baseline": "HiGHS and NumPy remain native where used outside accepted kernels",
         "threads_per_native_call": 1,
     }
     if selected:
