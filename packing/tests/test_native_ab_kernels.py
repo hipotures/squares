@@ -181,6 +181,8 @@ def test_empty_exact_family(monkeypatch):
 def test_selection_is_explicit_and_missing_native_fails(monkeypatch, tmp_path):
     assert runtime.parse_selection("none") == ()
     assert runtime.parse_selection("production") == ("prefix", "topk", "scatter", "compact")
+    monkeypatch.delenv("PACK_NATIVE_KERNELS")
+    assert runtime.selection() == runtime.PRODUCTION_KERNELS
     with pytest.raises(ValueError):
         runtime.parse_selection("compcat")
     with pytest.raises(ValueError):
@@ -188,4 +190,4 @@ def test_selection_is_explicit_and_missing_native_fails(monkeypatch, tmp_path):
     monkeypatch.setenv("PACK_NATIVE_BUILD_ROOT", str(tmp_path))
     select(monkeypatch, "none")
     with pytest.raises(RuntimeError, match="unavailable"):
-        select(monkeypatch, "compact")
+        select(monkeypatch, "exact-depth")
