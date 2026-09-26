@@ -114,6 +114,12 @@ def job(root, name, *, real=False):
                "--direction-steps", "12", "--column-rounds", "2", "--max-rounds", "60",
                "--support-cap", "128", "--json", str(directory / "result.json")]
     if real:
+        # The original 5/7/9 fixture correctly stayed below the parallel cutoff.
+        # Use actual larger geometry; do not lower the production cutoff just
+        # to make an unexercised differential test pass.
+        command[command.index("--grid-counts") + 1] = "13,17,21"
+        command[command.index("--direction-steps") + 1] = "24"
+        command[command.index("--max-rounds") + 1] = "90"
         command.extend(["--freeze", str(directory / "candidate.json"),
                         "--log", str(directory / "column.log"),
                         "--row-log", str(directory / "rows.log"),
@@ -159,6 +165,7 @@ def test_real_generator_parallel_depth_matches_serial_depth(tmp_path, monkeypatc
         item = job(tmp_path, f"mode-{mode}", real=True)
         report = queue.run_jobs([item], tmp_path / f"broker-{mode}", slots=2,
                                 stage_seconds=90, no_progress_seconds=0)
+        print("real generator depth control:", mode, report["metrics"], flush=True)
         assert report["jobs"][item["id"]]["returncode"] == 0
         results.append(read_json(Path(item["output"]).parent / "result.json"))
         reports.append(report)
@@ -170,7 +177,6 @@ def test_real_generator_parallel_depth_matches_serial_depth(tmp_path, monkeypatc
     assert (tmp_path / "mode-0/candidate.json").read_bytes() == (tmp_path / "mode-1/candidate.json").read_bytes()
     assert reports[0]["metrics"]["depth_requests"] == 0
     assert reports[1]["metrics"]["depth_requests"] > 0
-    print("real generator depth control:", [r["metrics"] for r in reports])
 
 
 def controller_state(tmp_path, names):
