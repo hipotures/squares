@@ -19,6 +19,7 @@ from sqpack.fractional import native_ab_metrics as metrics
 from sqpack.fractional import native_ab_runtime as runtime
 
 PACKING = Path(__file__).resolve().parents[1]
+DEFAULT_NATIVE = "production"
 _ERROR_BELL_SENT = False
 
 UNITS = {
@@ -386,13 +387,13 @@ def main(argv: list[str] | None = None) -> int:
     doctor = commands.add_parser(
         "doctor", help="show selected profile, build identity and native readiness"
     )
-    doctor.add_argument("--native", default="none")
+    doctor.add_argument("--native", default=DEFAULT_NATIVE)
     run = commands.add_parser(
         "campaign", help="run real frontier work with an isolated measurement session"
     )
     run.add_argument("--root", type=Path, required=True)
     run.add_argument("--resume", action="store_true")
-    run.add_argument("--native", default="none")
+    run.add_argument("--native", default=DEFAULT_NATIVE)
     run.add_argument("--workers", type=int, default=16)
     run.add_argument("--generation-trials", type=int, default=3)
     run.add_argument("--minutes", type=float, default=60)
@@ -407,7 +408,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     replay.add_argument("--corpus", type=Path, required=True)
     replay.add_argument("--output", type=Path, required=True)
-    replay.add_argument("--native", default="none")
+    replay.add_argument("--native", default=DEFAULT_NATIVE)
     replay.add_argument("--workers", type=int, default=16)
     replay.add_argument("--minutes", type=float, default=60)
     replay.add_argument("--label", default="replay")
