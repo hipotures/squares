@@ -143,21 +143,11 @@ def finish_report(
 ) -> dict:
     counts = metrics.aggregate(directory / "processes")
     rows = _rate_rows(counts, wall)
-    measurement_wall = (
-        float(first_window["wall_seconds"])
-        if first_window is not None
-        else wall
-    )
-    measurement_counts = (
-        first_window.get("metrics", {})
-        if first_window is not None
-        else counts
-    )
+    measurement_wall = float(first_window["wall_seconds"]) if first_window is not None else wall
+    measurement_counts = first_window.get("metrics", {}) if first_window is not None else counts
     measurement_rows = _rate_rows(measurement_counts, measurement_wall)
     measurement_delta = (
-        first_window.get("campaign_delta")
-        if first_window is not None
-        else campaign_delta
+        first_window.get("campaign_delta") if first_window is not None else campaign_delta
     )
     expected = {
         "prefix": ("prefix/c",),
@@ -174,9 +164,7 @@ def finish_report(
     ]
     desired = "+".join(manifest["native"]["kernels"]) or "none"
     observed = sorted(
-        key.split("/", 1)[1]
-        for key in measurement_rows
-        if key.startswith("direction/")
+        key.split("/", 1)[1] for key in measurement_rows if key.startswith("direction/")
     )
     mixed = bool(observed and observed != [desired])
     report = {
