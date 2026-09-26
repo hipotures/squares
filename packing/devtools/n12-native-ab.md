@@ -139,6 +139,12 @@ already-admitted work**, so the final elapsed time can exceed 60 minutes.
 startup is deferred until the controller has installed its signal handlers.
 Repeated Ctrl-C does not silently escalate to destructive termination.
 
+When draining is actually finished and the final throughput report has been written,
+the wrapper emits a terminal BEL plus a visible completion message. Errors emit a
+double BEL and a visible error message; if cleanup/draining continues after an error,
+a second completion/error notification is emitted when that cleanup has really ended.
+Terminal bell behavior still depends on the user's terminal emulator settings.
+
 Next hour, changing only one switch:
 
 ```bash
