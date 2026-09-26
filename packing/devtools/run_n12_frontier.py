@@ -1415,7 +1415,11 @@ class StopFlag:
     def poll(self) -> None:
         if self.requested and not self.announced:
             self.announced = True
-            emit(self.root, f"[stop] signal {self.signum} requested; finishing current cycle, then stopping")
+            emit(
+                self.root,
+                f"[stop] signal {self.signum} requested; finishing only already-running "
+                "stage/wave, then stopping; later escalation is preserved for resume",
+            )
 
 
 def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = False) -> dict | None:
@@ -1715,6 +1719,22 @@ def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = Fal
             significant=significant_result(decision, result),
         )
         if decision in ("ESCALATE", "REFINE_SCALE"):
+            if stop_requested():
+                cycle.update(
+                    status="INTERRUPTED",
+                    reason=(
+                        f"operator stop after completed {generated['name']} stage; "
+                        f"{decision} deferred for resume"
+                    ),
+                    interrupted_at=stamp(),
+                )
+                save_state(root, state)
+                emit(
+                    root,
+                    f"[stop] cycle={active + 1} L={display(side)} completed "
+                    f"{generated['name']} stage; {decision} deferred for resume",
+                )
+                return
             continue
         if result.get("converged") is not True and not cycle.get("row_retry_done"):
             old_rows = int(cycle.get("row_rounds", state["config"]["row_rounds"]))
@@ -1724,6 +1744,22 @@ def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = Fal
                 cycle["row_retry_done"] = True
                 generated["decision"] = "RETRY_ROWS"
                 save_state(root, state)
+                if stop_requested():
+                    cycle.update(
+                        status="INTERRUPTED",
+                        reason=(
+                            f"operator stop after completed {generated['name']} stage; "
+                            "RETRY_ROWS deferred for resume"
+                        ),
+                        interrupted_at=stamp(),
+                    )
+                    save_state(root, state)
+                    emit(
+                        root,
+                        f"[stop] cycle={active + 1} L={display(side)} completed "
+                        f"{generated['name']} stage; RETRY_ROWS deferred for resume",
+                    )
+                    return
                 emit(root, f"[plan] inner row budget {old_rows} -> {cycle['row_rounds']}; no failure inference")
                 continue
         cycle.update({"status": decision, "reason": reason, "finished_at": stamp()})
@@ -1749,6 +1785,10 @@ def tail_text(path: Path, count: int = 32768) -> str:
 def poll_stop() -> None:
     if _ACTIVE_STOP is not None:
         _ACTIVE_STOP.poll()
+
+
+def stop_requested() -> bool:
+    return bool(_ACTIVE_STOP is not None and _ACTIVE_STOP.requested)
 
 
 def controlled_env(state: dict[str, Any]) -> dict[str, str]:
@@ -2173,7 +2213,7 @@ def main(argv: list[str] | None = None) -> int:
                     if stop.requested:
                         break
                 poll_stop()
-                if stop.requested and state.get("active") is None and not state.get("active_generation"):
+                if stop.requested:
                     break
             save_state(root, state)
             write_views(root, state)
@@ -2208,7 +2248,9 @@ Run from packing/:
     PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search
     PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search --resume
 
-Ctrl-C finishes the active bounded cycle/repair, saves state and prints a summary.
+Ctrl-C finishes only the already-running bounded stage/wave (and interprets its
+completed result), defers any later escalation for --resume, saves state and prints
+a summary. It does not start normal/deep/maximum merely to finish a cycle.
 Use --status to inspect a saved campaign without starting jobs. A stopped VM must
 still be restarted externally; run in tmux for ordinary SSH sessions.
 
