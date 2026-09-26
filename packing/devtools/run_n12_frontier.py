@@ -29,6 +29,7 @@ from typing import Any
 from devtools import frontier_policy, frontier_runtime
 from devtools.frontier_phase import timestamped
 from devtools.frontier_io import atomic_json as durable_json, atomic_text, digest, read_json
+from sqpack.fractional import native_ab_runtime
 
 REPO = Path(__file__).resolve().parents[2]
 DEFAULT_SEED = REPO / "packing/cases/n12_fractional_certificate/certificate.json"
@@ -1415,7 +1416,11 @@ class StopFlag:
     def poll(self) -> None:
         if self.requested and not self.announced:
             self.announced = True
-            emit(self.root, f"[stop] signal {self.signum} requested; finishing current cycle, then stopping")
+            emit(
+                self.root,
+                f"[stop] signal {self.signum} requested; finishing only already-running "
+                "stage/wave, then stopping; later escalation is preserved for resume",
+            )
 
 
 def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = False) -> dict | None:
@@ -1715,6 +1720,22 @@ def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = Fal
             significant=significant_result(decision, result),
         )
         if decision in ("ESCALATE", "REFINE_SCALE"):
+            if stop_requested():
+                cycle.update(
+                    status="INTERRUPTED",
+                    reason=(
+                        f"operator stop after completed {generated['name']} stage; "
+                        f"{decision} deferred for resume"
+                    ),
+                    interrupted_at=stamp(),
+                )
+                save_state(root, state)
+                emit(
+                    root,
+                    f"[stop] cycle={active + 1} L={display(side)} completed "
+                    f"{generated['name']} stage; {decision} deferred for resume",
+                )
+                return
             continue
         if result.get("converged") is not True and not cycle.get("row_retry_done"):
             old_rows = int(cycle.get("row_rounds", state["config"]["row_rounds"]))
@@ -1724,6 +1745,22 @@ def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = Fal
                 cycle["row_retry_done"] = True
                 generated["decision"] = "RETRY_ROWS"
                 save_state(root, state)
+                if stop_requested():
+                    cycle.update(
+                        status="INTERRUPTED",
+                        reason=(
+                            f"operator stop after completed {generated['name']} stage; "
+                            "RETRY_ROWS deferred for resume"
+                        ),
+                        interrupted_at=stamp(),
+                    )
+                    save_state(root, state)
+                    emit(
+                        root,
+                        f"[stop] cycle={active + 1} L={display(side)} completed "
+                        f"{generated['name']} stage; RETRY_ROWS deferred for resume",
+                    )
+                    return
                 emit(root, f"[plan] inner row budget {old_rows} -> {cycle['row_rounds']}; no failure inference")
                 continue
         cycle.update({"status": decision, "reason": reason, "finished_at": stamp()})
@@ -1749,6 +1786,10 @@ def tail_text(path: Path, count: int = 32768) -> str:
 def poll_stop() -> None:
     if _ACTIVE_STOP is not None:
         _ACTIVE_STOP.poll()
+
+
+def stop_requested() -> bool:
+    return bool(_ACTIVE_STOP is not None and _ACTIVE_STOP.requested)
 
 
 def controlled_env(state: dict[str, Any]) -> dict[str, str]:
@@ -1982,6 +2023,7 @@ def main(argv: list[str] | None = None) -> int:
         state = read_json(root / "state.json")
         print(timestamped(summary(root, state, started)))
         return 0
+    native_profile = native_ab_runtime.preflight()
     previous_handlers = {}
     previous_workers_env = os.environ.get("PACK_JOBS")
     previous_stop, previous_limits = _ACTIVE_STOP, _RUNTIME_LIMITS
@@ -1993,6 +2035,9 @@ def main(argv: list[str] | None = None) -> int:
             _ACTIVE_STOP = stop
             for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
                 previous_handlers[signum] = signal.signal(signum, stop.handle)
+            ready_file = os.environ.get("PACK_NATIVE_STARTED_FILE")
+            if ready_file:
+                atomic_json(Path(ready_file), {"pid": os.getpid(), "ready": True})
             if args.resume:
                 state = load_state(root)
                 config = dict(state["config"])
@@ -2094,7 +2139,8 @@ def main(argv: list[str] | None = None) -> int:
             publish_findings(root, state)
             emit(root, f"[start] n=12 workers={config['workers']} scale={config['scale']} max-scale={config['max_scale']} "
                  f"verified={display(state['verified_low'])} search-high={display(state['search_high'])} "
-                 f"strategies={','.join(config['strategies'])} generation-trials={config['generation_trials']}")
+                 f"strategies={','.join(config['strategies'])} generation-trials={config['generation_trials']} "
+                 f"native={'+'.join(native_profile['kernels']) or 'reference-none'}")
             if state.pop("anchor_needs_verification", False):
                 seed = Path(state["verified_certificate"])
                 anchor_dir = root / f"anchor-{digest(seed)[:16]}"
@@ -2170,7 +2216,7 @@ def main(argv: list[str] | None = None) -> int:
                     if stop.requested:
                         break
                 poll_stop()
-                if stop.requested and state.get("active") is None and not state.get("active_generation"):
+                if stop.requested:
                     break
             save_state(root, state)
             write_views(root, state)
@@ -2200,12 +2246,18 @@ def main(argv: list[str] | None = None) -> int:
 
 README = """# Persistent autonomous n=12 search
 
-Run from packing/:
+Run from packing/. The accepted prefix+topk+scatter+compact native core is
+the default production path and is built by `uv sync --frozen`:
 
     PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search
     PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search --resume
 
-Ctrl-C finishes the active bounded cycle/repair, saves state and prints a summary.
+`PACK_NATIVE_KERNELS=none` is retained only as a differential/reference mode,
+not as a production workflow.
+
+Ctrl-C finishes only the already-running bounded stage/wave (and interprets its
+completed result), defers any later escalation for --resume, saves state and prints
+a summary. It does not start normal/deep/maximum merely to finish a cycle.
 Use --status to inspect a saved campaign without starting jobs. A stopped VM must
 still be restarted externally; run in tmux for ordinary SSH sessions.
 

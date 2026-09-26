@@ -1,0 +1,69 @@
+name: Frontier utilization
+on:
+  push:
+    branches: [work/frontier-native-ab]
+    paths: ['packing/**', '.github/workflows/frontier-utilization.yml']
+  pull_request:
+    paths: ['packing/**', '.github/workflows/frontier-utilization.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: frontier-utilization-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PACK_JOBS: '2'
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          submodules: recursive
+          sparse-checkout: |
+            packing/src
+            packing/devtools
+            packing/tests
+            packing/cases/n12_fractional_certificate
+            packages/workbench
+            vendor/kpress
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          python-version: '3.14'
+          enable-cache: false
+      - name: Install native production package and check syntax
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          mkdir -p ../utilization-artifacts
+          uv sync --frozen
+          uv run --frozen python -m devtools.native_ab doctor > ../utilization-artifacts/doctor.json
+          uv run --frozen python -m compileall -q src/sqpack/fractional/depth_parallel.py devtools/frontier_generation_queue.py devtools/frontier_generation_campaign.py tests/test_frontier_utilization.py
+          uv run --frozen ruff check --select F,E9 src/sqpack/fractional/depth_parallel.py devtools/frontier_generation_queue.py devtools/frontier_generation_campaign.py tests/test_frontier_utilization.py
+      - name: Ordered depth, shared leases, refill and immediate scale adoption
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen pytest tests/test_frontier_utilization.py -q -s --junitxml=../utilization-artifacts/utilization.xml 2>&1 | tee ../utilization-artifacts/utilization.log
+      - name: Existing stop, recovery, full gate and policy regressions
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py tests/test_frontier_hardening.py -q --junitxml=../utilization-artifacts/regression.xml 2>&1 | tee ../utilization-artifacts/regression.log
+      - name: Record tested revision
+        if: always()
+        run: |
+          mkdir -p utilization-artifacts
+          git rev-parse HEAD > utilization-artifacts/tested-commit.txt
+          git status --short > utilization-artifacts/working-tree.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: frontier-utilization-${{ github.sha }}
+          path: utilization-artifacts/
+          retention-days: 30
