@@ -422,12 +422,19 @@ def test_resume_incomplete_stage_without_result_keeps_files(
     assert saved["cycles"][0]["status"] == "SEARCH_FAILED"
 
 
-def test_stop_finishes_cycle_and_console_is_concise(
+def test_stop_finishes_only_current_stage_and_defers_escalation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    def stop_after_stage(args: list[str], output: Path, env: dict | None = None) -> int:
+    def stop_after_stage(args: list[str], output: Path, _env: dict | None = None) -> int:
+        output.write_text("many detailed LP rounds stay here\n", encoding="utf-8")
+        side = Fraction(args[args.index("--side") + 1])
+        target = Path(args[args.index("--json") + 1])
+        target.write_text(
+            json.dumps(result(side, objective=12.004, mass="1201/100")),
+            encoding="utf-8",
+        )
         signal.raise_signal(signal.SIGINT)
-        return fake_child(args, output, env)
+        return 0
 
     monkeypatch.setattr(frontier, "run_child", stop_after_stage)
     assert (
@@ -451,12 +458,19 @@ def test_stop_finishes_cycle_and_console_is_concise(
     )
     saved = frontier.load_state(tmp_path)
     assert len(saved["cycles"]) == 1
-    assert saved["cycles"][0]["status"] == "SEARCH_FAILED"
+    cycle = saved["cycles"][0]
+    assert cycle["status"] == "INTERRUPTED"
+    assert saved["active"] == 0
+    assert len(cycle["stages"]) == 1
+    assert cycle["stages"][0]["name"] == "screen"
+    assert cycle["stages"][0]["decision"] == "ESCALATE"
+    assert frontier.choose_work(saved)["kind"] == "resume-cycle"
     output = capsys.readouterr().out
     assert "[stop]" in output
+    assert "ESCALATE deferred for resume" in output
     assert "many detailed LP rounds" not in output
-    assert "cycles completed: 1" in output
-    assert "next suggested L:" in output
+    assert "cycles completed: 0" in output
+    assert "next action: resume-cycle" in output
     assert (tmp_path / "summary.csv").exists()
     assert (tmp_path / "report.md").exists()
 
