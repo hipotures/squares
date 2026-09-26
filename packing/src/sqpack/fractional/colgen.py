@@ -42,8 +42,8 @@ import logging
 import math
 import os
 import time
-from collections.abc import Iterable
-from concurrent.futures import ProcessPoolExecutor
+from collections.abc import Callable, Iterable
+from concurrent.futures import Executor, ProcessPoolExecutor
 from dataclasses import dataclass, field
 from fractions import Fraction
 from itertools import combinations
@@ -57,6 +57,7 @@ from scipy.sparse import csr_matrix
 
 from sqpack.fractional.certificate import Certificate, d4_images, verify
 from sqpack.fractional.corner_clip import CornerClip
+from sqpack.fractional.exact_slabs import PreparedDepth
 from sqpack.fractional.generate import (
     LP_FEASIBILITY,
     build_site_grid,
@@ -459,6 +460,11 @@ def solve_lp(sites: SiteSet, rows: Rows) -> tuple[np.ndarray, np.ndarray, float]
     return np.asarray(result.x, dtype=float), duals, float(result.fun)
 
 
+def _phase(callback, name: str, event: str) -> None:
+    if callback is not None:
+        callback(name, event)
+
+
 class _PersistentLp:
     """Own one HiGHS model for one fixed site set and append its held rows.
 
@@ -472,6 +478,10 @@ class _PersistentLp:
         for name, value in (("output_flag", False), ("solver", "simplex")):
             if self.highs.setOptionValue(name, value) != highspy.HighsStatus.kOk:
                 raise RuntimeError(f"HiGHS refused {name}={value!r}")
+        if os.environ.get("PACK_GENERATION_MANAGED") == "1":
+            for name, value in (("threads", 1), ("parallel", "off")):
+                if self.highs.setOptionValue(name, value) != highspy.HighsStatus.kOk:
+                    raise RuntimeError(f"HiGHS refused managed option {name}")
         columns = len(costs)
         status = self.highs.addCols(
             columns,
@@ -571,7 +581,7 @@ def _direction_chunk_task(
 
 
 def _ordered_direction_chunks(
-    pool: ProcessPoolExecutor,
+    pool: Executor,
     points: np.ndarray,
     weights: np.ndarray,
     directions: tuple[Direction, ...],
@@ -610,7 +620,8 @@ def _solve_rows_serial_or_pool(
     timings: list[RoundTiming] | None = None,
     deadline: float | None = None,
     clip: CornerClip | None = None,
-    _direction_pool: ProcessPoolExecutor | None = None,
+    _direction_pool: Executor | None = None,
+    phase_callback: Callable[[str, str], None] | None = None,
 ) -> LpSolution:
     """Row-generate on a fixed site set until no placement is short of mass 1.
 
@@ -649,7 +660,9 @@ def _solve_rows_serial_or_pool(
     # separation pass on placements the previous site set never violated.
     if len(rows) > 0:
         started = time.perf_counter()
+        _phase(phase_callback, "lp", "start")
         warm = lp_model.solve(rows)
+        _phase(phase_callback, "lp", "end")
         elapsed = time.perf_counter() - started
         if warm is not None:
             weights, duals, objective = warm
@@ -673,6 +686,7 @@ def _solve_rows_serial_or_pool(
             solution.stopped = f"deadline reached after {round_index} rounds"
             return solution
         solution.rounds = round_index + 1
+        _phase(phase_callback, "separation", "start")
         separation_started = time.perf_counter()
         site_weights = weights[membership]
         # The separation grid is built from the sites that carry weight, so the
@@ -734,6 +748,7 @@ def _solve_rows_serial_or_pool(
         solution.rows = len(rows)
         solution.least_covered = least_covered
         separation_seconds = time.perf_counter() - separation_started
+        _phase(phase_callback, "separation", "end")
 
         if violated == 0 or (added == 0 and least >= 1 - LP_FEASIBILITY):
             # Nothing violated, or every violation is a row already held and
@@ -772,7 +787,9 @@ def _solve_rows_serial_or_pool(
             return solution
 
         lp_started = time.perf_counter()
+        _phase(phase_callback, "lp", "start")
         solved = lp_model.solve(rows)
+        _phase(phase_callback, "lp", "end")
         lp_seconds = time.perf_counter() - lp_started
         if solved is None:
             solution.stopped = "linear program refused the generated rows"
@@ -820,6 +837,8 @@ def solve_rows(
     deadline: float | None = None,
     clip: CornerClip | None = None,
     workers: int | None = None,
+    direction_executor: Executor | None = None,
+    phase_callback: Callable[[str, str], None] | None = None,
 ) -> LpSolution:
     """Row generation with an optional persistent direction process pool.
 
@@ -843,7 +862,10 @@ def solve_rows(
         "timings": timings,
         "deadline": deadline,
         "clip": clip,
+        "phase_callback": phase_callback,
     }
+    if direction_executor is not None:
+        return _solve_rows_serial_or_pool(*args, _direction_pool=direction_executor, **options)
     if count == 1:
         return _solve_rows_serial_or_pool(*args, **options)
     with ProcessPoolExecutor(max_workers=count) as pool:
@@ -1086,6 +1108,7 @@ def rank_candidates(
     depths = _depths(points, axes, offsets, weights, half, slack=1e-9)
     ranked = np.argsort(-depths)[: max(survey, wanted)]
 
+    exact_depth = PreparedDepth(weighted)
     centre = sites.outer_side / 2
     held = {point for orbit in sites.orbits for point in orbit}
     found: list[Candidate] = []
@@ -1102,7 +1125,7 @@ def rank_candidates(
             if site in held:
                 continue
             orbit = d4_orbit(site[0], site[1], sites.outer_side)
-            cost = reduced_cost(orbit, weighted, sites.outer_side)
+            cost = exact_depth.reduced_cost(orbit, sites.outer_side)
             if cost >= 0:
                 continue
             held.update(orbit)
@@ -1189,15 +1212,13 @@ def check_ceiling(
     depths = _depths(points, axes, offsets, floats, half, slack=1e-9)
     near = np.flatnonzero(depths >= 1 - screen)
 
+    exact_depth = PreparedDepth(weighted)
     worst = Fraction(0)
     for index in near:
         exact = _exact_intersection(lines[sources[index][0]], lines[sources[index][1]])
         if exact is None:
             continue
-        depth = sum(
-            (weight for square, weight in weighted if square.covers(exact[0], exact[1])),
-            start=Fraction(0),
-        )
+        depth = exact_depth.at(exact[0], exact[1])
         worst = max(worst, depth)
     feasible = total if worst <= 1 else total / worst
     proved = feasible >= n
@@ -1344,6 +1365,9 @@ def generate_adaptive(
     timings: list[RoundTiming] | None = None,
     deadline: float | None = None,
     clip: CornerClip | None = None,
+    capture_solution: Callable[[SiteSet, np.ndarray], None] | None = None,
+    direction_executor: Executor | None = None,
+    phase_callback: Callable[[str, str], None] | None = None,
 ) -> tuple[Certificate | None, AdaptiveLog]:
     """Row- and column-generate; decide the result exactly only when asked.
 
@@ -1376,6 +1400,7 @@ def generate_adaptive(
     """
 
     half_tangents = net_half_tangents(angle_limit, direction_steps)
+    _phase(phase_callback, "site_setup", "start")
     sites = site_set_from_grids(outer_side, grid_counts, inset)
     extra = set(seed_points)
     if extra:
@@ -1383,10 +1408,17 @@ def generate_adaptive(
             if not (0 <= x <= outer_side and 0 <= y <= outer_side):
                 raise ValueError(f"seed site ({x}, {y}) lies outside the container")
         sites = site_set_from_points(outer_side, set(sites.positions()) | extra)
+    _phase(phase_callback, "site_setup", "end")
     rows = Rows()
     log = AdaptiveLog()
     handle = log_path.open("a") if log_path is not None else None
     solution = LpSolution(np.zeros(len(sites.orbits)), np.zeros(0))
+    owned_pool = None
+    if direction_executor is None and os.environ.get("PACK_JOBS"):
+        count = worker_count(len(half_tangents) + 1)
+        if count > 1:
+            owned_pool = ProcessPoolExecutor(max_workers=count)
+            direction_executor = owned_pool
     try:
         for index in range(column_rounds):
             started = time.perf_counter()
@@ -1400,6 +1432,8 @@ def generate_adaptive(
                 timings=timings,
                 deadline=deadline,
                 clip=clip,
+                direction_executor=direction_executor,
+                phase_callback=phase_callback,
             )
             seconds = time.perf_counter() - started
             note = solution.stopped
@@ -1415,7 +1449,9 @@ def generate_adaptive(
                     square_side,
                     support_cap=support_cap,
                 )
+                _phase(phase_callback, "pricing", "start")
                 found = rank_candidates(sites, weighted, wanted=columns_per_round)
+                _phase(phase_callback, "pricing", "end")
                 if found:
                     depth = float(found[0].averaged_depth)
                     cost = float(found[0].cost)
@@ -1481,12 +1517,21 @@ def generate_adaptive(
                 square_side,
                 support_cap=support_cap,
             )
+            _phase(phase_callback, "ceiling", "start")
             log.ceiling = check_ceiling(n, symmetrise(weighted), outer_side, clip=clip)
+            _phase(phase_callback, "ceiling", "end")
             _write(handle, f"ceiling: proved={log.ceiling.proved} {log.ceiling.detail}")
         if not solution.converged:
             return None, log
 
+        if capture_solution is not None:
+            # Optional durable search evidence, before upward rounding.
+            # This callback cannot change the solver-owned weight vector.
+            capture_solution(sites, solution.weights.copy())
+
+        _phase(phase_callback, "rationalisation", "start")
         atoms = rationalise_sites(sites, solution.weights, scale=scale)
+        _phase(phase_callback, "rationalisation", "end")
         if not atoms:
             log.stopped = "every site rounded to zero weight"
             return None, log
@@ -1517,6 +1562,8 @@ def generate_adaptive(
             )
         return candidate_certificate, log
     finally:
+        if owned_pool is not None:
+            owned_pool.shutdown(wait=True, cancel_futures=True)
         if handle is not None:
             handle.close()
 

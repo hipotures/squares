@@ -11,6 +11,7 @@ import csv
 import fcntl
 import json
 import math
+import hashlib
 import os
 import shutil
 import signal
@@ -25,12 +26,17 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
+from devtools import frontier_policy, frontier_runtime
+from devtools.frontier_phase import timestamped
+from devtools.frontier_io import atomic_json as durable_json, atomic_text, digest, read_json
+
 REPO = Path(__file__).resolve().parents[2]
 DEFAULT_SEED = REPO / "packing/cases/n12_fractional_certificate/certificate.json"
-SCHEMA = 2
+SCHEMA = 3
 LEGACY_RATIONALISATION_SCALE = 200_000
 DEFAULT_RATIONALISATION_SCALE = 1_600_000
 DEFAULT_MAX_RATIONALISATION_SCALE = 25_600_000
+NOTABLE_OBJECTIVE_GAIN = 1e-3
 REPAIR_SLACK_FRACTIONS = (
     Fraction(1, 2),
     Fraction(3, 4),
@@ -39,7 +45,10 @@ REPAIR_SLACK_FRACTIONS = (
     Fraction(31, 32),
     Fraction(63, 64),
 )
-REPAIRABLE_VERIFIERS = ("quick-rejected", "full-rejected")
+REPAIRABLE_VERIFIERS = ("quick-rejected", "full-rejected", "declaration-rejected")
+_RUNTIME_LIMITS = dict(frontier_runtime.DEFAULTS)
+_ACTIVE_STOP = None
+
 BLUE = "\033[94m"
 RESET = "\033[0m"
 STAGES = ("screen", "normal", "deep", "maximum")
@@ -101,92 +110,116 @@ def display(side: Fraction | str | None) -> str:
 
 
 def atomic_json(path: Path, value: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    with temporary.open("w", encoding="utf-8") as handle:
-        json.dump(value, handle, indent=2, allow_nan=False)
-        handle.write("\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-    temporary.replace(path)
-    directory = os.open(path.parent, os.O_RDONLY)
-    try:
-        os.fsync(directory)
-    finally:
-        os.close(directory)
+    durable_json(path, value)
 
 
 def load_state(root: Path, config: dict[str, Any] | None = None) -> dict[str, Any]:
-    state = json.loads((root / "state.json").read_text(encoding="utf-8"))
-    if state.get("schema") != SCHEMA or state.get("n") != 12:
+    state_path = root / "state.json"
+    try:
+        state = read_json(state_path)
+    except (ValueError, OSError):
+        backup = root / "state.previous.json"
+        if not backup.exists():
+            raise
+        state = read_json(backup)
+        if state_path.exists():
+            damaged = root / f"state.damaged-{time.time_ns()}.json"
+            shutil.copyfile(state_path, damaged)
+        atomic_json(state_path, state)
+    if state.get("schema") not in (2, SCHEMA) or state.get("n") != 12:
         raise ValueError("incompatible frontier state schema or n")
+    old_schema = state["schema"]
+    if old_schema != SCHEMA:
+        backup = root / f"state.schema-{old_schema}-{digest(state_path)[:12]}.json"
+        if not backup.exists():
+            shutil.copyfile(state_path, backup)
+        state["schema"] = SCHEMA
+        state.setdefault("migrations", []).append({"at": stamp(), "from_schema": old_schema,
+                                                  "to_schema": SCHEMA})
+    stored_config = state.get("config")
+    if not isinstance(stored_config, dict):
+        raise ValueError("invalid frontier state config")
     if config is not None:
-        stored_config = state.get("config")
-        if not isinstance(stored_config, dict):
-            raise ValueError("invalid frontier state config")
-        if any(
-            stored_config.get(key) != config.get(key)
-            for key in (
-                "verified_low",
-                "search_high",
-                "seed_certificate",
-                "workers",
-                "budgets",
-                "row_rounds",
-            )
-        ):
+        if any(stored_config.get(key) != config.get(key) for key in (
+            "verified_low", "search_high", "seed_certificate", "workers", "budgets", "row_rounds"
+        )):
             raise ValueError("resume settings differ from the saved experiment")
-        requested_scale = config.get("scale")
-        stored_scale = stored_config.get("scale")
-        if stored_scale is None and requested_scale is not None:
-            # Schema-2 states written before the scale became configurable used
-            # 200000 unconditionally. Preserve that history in old stage results,
-            # then upgrade only future work to the requested nested refinement.
-            stored_config["scale"] = requested_scale
-            state.setdefault("migrations", []).append(
-                {
-                    "at": stamp(),
-                    "kind": "rationalisation-scale",
-                    "from": LEGACY_RATIONALISATION_SCALE,
-                    "to": requested_scale,
-                }
-            )
-        elif stored_scale != requested_scale:
-            raise ValueError("resume rationalisation scale differs from the saved experiment")
-        requested_max_scale = config.get("max_scale")
-        stored_max_scale = stored_config.get("max_scale")
-        if stored_max_scale is None and requested_max_scale is not None:
-            stored_config["max_scale"] = requested_max_scale
-            state.setdefault("migrations", []).append(
-                {
-                    "at": stamp(),
-                    "kind": "max-rationalisation-scale",
-                    "from": None,
-                    "to": requested_max_scale,
-                }
-            )
-        elif stored_max_scale != requested_max_scale:
-            raise ValueError(
-                "resume maximum rationalisation scale differs from the saved experiment"
-            )
-    low, high = Fraction(state["verified_low"]), Fraction(state["search_high"])
-    if not low < high or not isinstance(state.get("cycles"), list):
+        for key, legacy in (("scale", LEGACY_RATIONALISATION_SCALE), ("max_scale", None)):
+            requested = config.get(key)
+            if key not in stored_config and requested is not None:
+                stored_config[key] = requested
+                state.setdefault("migrations", []).append({
+                    "at": stamp(), "kind": "rationalisation-scale" if key == "scale" else "max-rationalisation-scale", "from": legacy, "to": requested,
+                })
+            elif stored_config.get(key) != requested:
+                raise ValueError("resume rationalisation scale differs from the saved experiment")
+    stored_config.setdefault("scale", DEFAULT_RATIONALISATION_SCALE)
+    stored_config.setdefault("max_scale", DEFAULT_MAX_RATIONALISATION_SCALE)
+    stored_config.setdefault("row_rounds", 60)
+    stored_config.setdefault("max_row_rounds", max(60, stored_config["row_rounds"] * 2))
+    stored_config.setdefault("strategies", [item["name"] for item in frontier_policy.PROFILES])
+    stored_config.setdefault("strategy_width", "1/100000")
+    if not isinstance(state.get("cycles"), list):
         raise ValueError("invalid frontier state")
-    if state.get("active") is not None and state["active"] >= len(state["cycles"]):
+    active = state.get("active")
+    if active is not None and (type(active) is not int or not 0 <= active < len(state["cycles"])):
         raise ValueError("active cycle is missing")
-    if not Path(state["verified_certificate"]).exists():
+    certificate = Path(state["verified_certificate"])
+    if not certificate.exists():
         raise ValueError("verified certificate is missing")
+    record = read_json(certificate)
+    if record.get("n") != 12 or Fraction(record["outer_side"]) != Fraction(state["verified_low"]):
+        raise ValueError("verified certificate no longer matches the saved lower bound")
+    if state.get("verified_sha256") is not None and digest(certificate) != state["verified_sha256"]:
+        raise ValueError("verified certificate changed after acceptance")
+    # Legacy states are retained intact; their best artifact is checked by the
+    # full gate once before scheduling new work if no digest was recorded.
+    if "verified_sha256" not in state:
+        state["anchor_needs_verification"] = True
+        state["verified_sha256"] = digest(certificate)
+    if not 0 < Fraction(state["verified_low"]) < 4:
+        raise ValueError("verified endpoint is outside the supported n=12 campaign range")
+    if not isinstance(state.get("unresolved"), list):
+        raise ValueError("invalid unresolved history")
+    frontier_policy.reconcile(state)
     state.setdefault("mode", "FRONTIER")
     state.setdefault("repair_attempts", [])
-    for attempt in state["repair_attempts"]:
-        if attempt.get("status") == "RUNNING":
-            attempt["status"] = "INTERRUPTED"
+    state.setdefault("discoveries", [])
+    state.setdefault("operational_errors", [])
+    state.setdefault("policy_version", frontier_policy.POLICY_VERSION)
+    state.setdefault("search_revision", 0)
+    active_generation = state.setdefault("active_generation", [])
+    if (not isinstance(active_generation, list) or len(set(active_generation)) != len(active_generation)
+            or any(type(i) is not int or not 0 <= i < len(state["cycles"]) for i in active_generation)):
+        raise ValueError("invalid active generation cohort")
+    # Do not mark a repair INTERRUPTED merely because the controller restarted:
+    # its supervisor may still be running and must be reattached to first.
     return state
 
 
 def save_state(root: Path, state: dict[str, Any]) -> None:
+    # Raw results remain immutable per-stage evidence. Avoid copying a large LP
+    # trace into every state backup and every cheap precision-refinement stage.
+    for cycle in state.get("cycles", []):
+        for stage in cycle.get("stages", []):
+            result = stage.get("result")
+            if isinstance(result, dict) and "lp_log" in result and stage.get("directory"):
+                source = Path(stage["directory"]) / "result.json"
+                if source.is_file():
+                    stage["result_file"] = str(source)
+                    stage["result_sha256"] = digest(source)
+                    stage["state_omitted_fields"] = ["lp_log"]
+                    result.pop("lp_log")
     state["updated_at"] = stamp()
-    atomic_json(root / "state.json", state)
+    current = root / "state.json"
+    if current.exists():
+        try:
+            previous = read_json(current)
+        except (ValueError, OSError):
+            previous = None
+        if previous is not None:
+            atomic_json(root / "state.previous.json", previous)
+    atomic_json(current, state)
 
 
 @contextmanager
@@ -207,6 +240,50 @@ def active_unresolved(state: dict[str, Any]) -> list[Fraction]:
 
 def soft_high(state: dict[str, Any]) -> Fraction:
     return min(active_unresolved(state), default=Fraction(state["search_high"]))
+
+
+def strategy_frontier_lines(state: dict[str, Any]) -> list[str]:
+    """Readable strategy-local search state; legacy globals are diagnostics only."""
+
+    active: dict[str, Fraction] = {}
+    for cycle in state.get("cycles", []):
+        if cycle.get("status") not in ("RUNNING", "INTERRUPTED"):
+            continue
+        strategy = cycle.get("strategy", "baseline")
+        side = Fraction(cycle["side"])
+        active[strategy] = max(side, active.get(strategy, side))
+
+    lines: list[str] = []
+    for strategy in state.get("config", {}).get(
+        "strategies", [profile["name"] for profile in frontier_policy.PROFILES]
+    ):
+        bounds = frontier_policy.strategy_frontier(state, strategy)
+        kind = "observed" if bounds["observed_ceiling"] else "horizon"
+        if strategy in active:
+            cursor = f"active={display(active[strategy])}"
+        else:
+            proposal = frontier_policy.strategy_proposal(state, strategy)
+            cursor = (
+                f"next={display(proposal['side'])}"
+                if proposal is not None
+                else "next=none"
+            )
+        lines.append(
+            f"{strategy}:{cursor},own-high={display(bounds['ceiling'])}({kind})"
+        )
+    return lines
+
+
+def frontier_status(state: dict[str, Any]) -> str:
+    """Current proof endpoint plus the strategy-local frontiers that drive work."""
+
+    legacy = (
+        f"[frontier] verified={display(state['verified_low'])} "
+        f"legacy-soft-high={display(soft_high(state))} "
+        f"legacy-search-high={display(state['search_high'])}"
+    )
+    strategies = "[strategy-frontiers] " + "; ".join(strategy_frontier_lines(state))
+    return legacy + "\n" + strategies
 
 
 def stage_scale(stage: dict[str, Any]) -> int | None:
@@ -273,13 +350,9 @@ def next_side(state: dict[str, Any]) -> Fraction | None:
                 return ceiling
             break
 
-    # Without an explicit --target-width, keep bisecting in exact Fraction
-    # arithmetic until the operator stops the campaign. The search backend is
-    # partly float-based and may eventually see numerically identical nearby
-    # sides, but that is not a valid reason to stop an unattended experiment:
-    # frozen candidates are still judged by the exact retention gate. If the
-    # operator wants a finite precision target, --target-width is the explicit
-    # stopping control.
+    # Return the exact midpoint proposal. The policy layer must still reject
+    # duplicate float-backend work and select precision, repair, or another
+    # instrument before idle exhaustion; a Fraction alone is not a useful trial.
     return (low + ceiling) / 2
 
 
@@ -346,24 +419,100 @@ def significant_result(decision: str, result: dict[str, Any]) -> bool:
     )
 
 
+def record_notable_search(
+    state: dict[str, Any], cycle: dict[str, Any], stage: dict[str, Any]
+) -> dict[str, Any] | None:
+    """Record a materially better same-backend, same-stage search objective.
+
+    Search objectives are evidence about the instrument, not proofs. Comparing
+    only the same stage avoids calling a deeper-budget result an improvement
+    merely because it received more column rounds.
+    """
+
+    result = stage.get("result") or {}
+    objective = result.get("objective")
+    if (
+        stage.get("work_kind") == "rerationalisation"
+        or result.get("converged") is not True
+        or not isinstance(objective, int | float)
+        or not math.isfinite(float(objective))
+    ):
+        return None
+    side = Fraction(cycle["side"])
+    backend = frontier_policy.backend_key(side)
+    revision = cycle.get("search_revision", 0)
+    best: tuple[float, str] | None = None
+    for prior_cycle in state.get("cycles", []):
+        if prior_cycle is cycle:
+            candidates = prior_cycle.get("stages", [])
+        else:
+            if (
+                frontier_policy.backend_key(Fraction(prior_cycle["side"])) != backend
+                or prior_cycle.get("search_revision", 0) != revision
+            ):
+                continue
+            candidates = prior_cycle.get("stages", [])
+        for prior_stage in candidates:
+            if prior_stage is stage or prior_stage.get("name") != stage.get("name"):
+                continue
+            prior_result = prior_stage.get("result") or {}
+            prior_objective = prior_result.get("objective")
+            if (
+                prior_stage.get("status") != "complete"
+                or prior_stage.get("work_kind") == "rerationalisation"
+                or prior_result.get("converged") is not True
+                or not isinstance(prior_objective, int | float)
+                or not math.isfinite(float(prior_objective))
+            ):
+                continue
+            value = float(prior_objective)
+            if best is None or value < best[0]:
+                best = (value, prior_cycle.get("strategy", "baseline"))
+    if best is None:
+        return None
+    gain = best[0] - float(objective)
+    if gain < NOTABLE_OBJECTIVE_GAIN:
+        return None
+    identity = hashlib.sha256(
+        f"{stage.get('directory')}|{objective}|{best[0]}".encode()
+    ).hexdigest()
+    events = state.setdefault("search_findings", [])
+    if any(event.get("id") == identity for event in events):
+        return None
+    event = {
+        "id": identity,
+        "at": stamp(),
+        "side": str(side),
+        "stage": stage.get("name"),
+        "strategy": cycle.get("strategy", "baseline"),
+        "objective": float(objective),
+        "previous_best_objective": best[0],
+        "previous_best_strategy": best[1],
+        "gain": gain,
+        "directory": stage.get("directory"),
+        "proof": False,
+    }
+    events.append(event)
+    return event
+
+
 def apply_result(state: dict[str, Any], cycle: dict[str, Any]) -> None:
     side = Fraction(cycle["side"])
     status = cycle["status"]
     if status == "VERIFIED":
         if cycle.get("verifier") != "full-retainable" or not cycle.get("verified_candidate"):
             raise ValueError("VERIFIED requires a successful full exact gate")
-        if side > Fraction(state["verified_low"]):
-            state["verified_low"] = str(side)
-            state["verified_certificate"] = cycle["verified_candidate"]
+        promote_verified(state, side, Path(cycle["verified_candidate"]), "search")
+        state["preferred_strategy"] = cycle.get("strategy", "baseline")
     elif status == "SEARCH_FAILED":
-        if side <= Fraction(state["search_high"]):
+        if Fraction(state["verified_low"]) < side <= Fraction(state["search_high"]):
             state["search_high"] = str(side)
             state["search_high_kind"] = "SEARCH_FAILED"
     elif status == "UNRESOLVED":
         if str(side) not in state["unresolved"]:
             state["unresolved"].append(str(side))
             state["unresolved"].sort(key=Fraction)
-    else:
+    elif status != "ERROR":
         raise ValueError(f"invalid cycle result {status!r}")
     state["active"] = None
 
@@ -444,15 +593,19 @@ def decide_stage(
 
 
 def emit(root: Path, message: str, *, significant: bool = False) -> None:
-    colour = (
-        significant
-        and "NO_COLOR" not in os.environ
-        and (sys.stdout.isatty() or os.environ.get("FORCE_COLOR") == "1")
+    message = timestamped(message)
+    colour = significant and "NO_COLOR" not in os.environ and (
+        sys.stdout.isatty() or os.environ.get("FORCE_COLOR") == "1"
     )
-    print(f"{BLUE}{message}{RESET}" if colour else message, flush=True)
+    code = "\033[1;32m" if "VERIFIED LOWER BOUND" in message else BLUE
+    try:
+        print(f"{code}{message}{RESET}" if colour else message, flush=True)
+    except (BrokenPipeError, OSError):
+        # A closed SSH terminal must not destroy the current result/checkpoint.
+        pass
     with (root / "runner.log").open("a", encoding="utf-8") as handle:
-        # Persistent logs remain plain text even when the terminal line is blue.
         handle.write(f"{stamp()} {message}\n")
+        handle.flush()
 
 
 def seed_for(state: dict[str, Any], side: Fraction) -> tuple[Path, str]:
@@ -496,8 +649,9 @@ def command(
     directory: Path,
     row_rounds: int,
     scale: int = DEFAULT_RATIONALISATION_SCALE,
+    strategy: str = "baseline",
 ) -> list[str]:
-    return [
+    args = [
         sys.executable,
         "-m",
         "devtools.run_fractional_colgen",
@@ -536,32 +690,39 @@ def command(
         "--row-log",
         str(directory / "rows.log"),
     ]
+    options = frontier_policy.profile(strategy)["options"]
+    for key, value in options.items():
+        flag = f"--{key}"
+        if flag in args:
+            args[args.index(flag) + 1] = value
+        else:
+            args.extend([flag, value])
+    args.extend(["--raw-weights", str(directory / "raw-lp.json"),
+                 "--phase-log", str(directory / "phase.log")])
+    return args
 
 
 def process_start_ticks(pid: int) -> str | None:
-    """Linux process identity, including its start time to exclude PID reuse."""
-    try:
-        stat = Path(f"/proc/{pid}/stat").read_text(encoding="utf-8")
-    except OSError, ValueError:
-        return None
-    fields = stat.rsplit(") ", 1)
-    if len(fields) != 2:
-        return None
-    parts = fields[1].split()
-    return parts[19] if len(parts) > 19 else None
+    info = frontier_runtime.process_info(pid)
+    return None if info is None else info["ticks"]
 
 
 def active_child(directory: Path) -> int | None:
-    """Return a retained child still writing this stage, if any."""
-    for record_path in directory.glob("*.child.json"):
+    """Legacy-child protection is recursive and boot-aware for repair substeps."""
+    for record_path in directory.rglob("*.child.json"):
         try:
-            record = json.loads(record_path.read_text(encoding="utf-8"))
-            pid = int(record["pid"])
-            ticks = record["start_ticks"]
-        except OSError, ValueError, KeyError, TypeError:
+            record = read_json(record_path)
+            if "boot_id" in record:
+                if frontier_runtime.is_alive(record):
+                    return int(record["pid"])
+            else:
+                # Pre-upgrade records cannot safely authorize a signal. They
+                # can only block a duplicate when the live identity still matches.
+                pid = int(record["pid"])
+                if record.get("start_ticks") is not None and process_start_ticks(pid) == record["start_ticks"]:
+                    return pid
+        except (OSError, ValueError, KeyError, TypeError):
             continue
-        if ticks is not None and process_start_ticks(pid) == ticks:
-            return pid
     return None
 
 
@@ -572,7 +733,7 @@ def latest_progress(directory: Path) -> tuple[str, str, str]:
     objective = "unknown"
     column_log = directory / "column.log"
     if column_log.exists():
-        for line in reversed(column_log.read_text(encoding="utf-8").splitlines()):
+        for line in reversed(tail_text(column_log).splitlines()):
             parts = line.split()
             if len(parts) < 3 or parts[0] != "round" or not parts[1].endswith(":"):
                 continue
@@ -587,7 +748,7 @@ def latest_progress(directory: Path) -> tuple[str, str, str]:
             break
     row_log = directory / "rows.log"
     if row_log.exists():
-        for line in reversed(row_log.read_text(encoding="utf-8").splitlines()):
+        for line in reversed(tail_text(row_log).splitlines()):
             parts = line.split()
             if len(parts) < 6 or not parts[0].lstrip("-").isdigit():
                 continue
@@ -606,6 +767,26 @@ def latest_progress(directory: Path) -> tuple[str, str, str]:
 def heartbeat_message(args: list[str], output: Path, elapsed: float) -> str:
     """One concise progress line for a long-running real subprocess."""
     minutes = max(1, round(elapsed / 60))
+    if "devtools.frontier_generation_queue" in args:
+        try:
+            progress = read_json(output.parent / "generation-progress.json")
+            return (f"[running] generation-queue elapsed_s={elapsed:.1f} "
+                    f"serial={progress['serial_owners']} directions={progress['direction_tasks']} "
+                    f"slots={progress['slots']} jobs={progress['completed_jobs']}/{progress['jobs']} "
+                    f"coordinator_cpu={progress['coordinator_cpu_seconds']:.3f}s")
+        except (OSError, ValueError, KeyError):
+            return f"[running] generation-queue starting elapsed_s={elapsed:.1f}"
+    if "devtools.frontier_boost_queue" in args:
+        checkpoint = output.parent / "queue-checkpoint.json"
+        try:
+            record = read_json(checkpoint)
+            metrics = record["metrics"]
+            return (f"[running] repair-queue elapsed={minutes}m "
+                    f"directions={metrics['completed_items']} "
+                    f"in-flight={metrics['in_flight']}/{metrics['slots']} "
+                    f"coordinator-cpu={metrics['coordinator_cpu_seconds']:.3f}s")
+        except (OSError, ValueError, KeyError):
+            return f"[running] repair-queue initialising elapsed={minutes}m"
     if "--side" not in args or "--column-rounds" not in args:
         return f"[running] {output.name} elapsed={minutes}m"
     side = display(Fraction(args[args.index("--side") + 1]))
@@ -619,83 +800,73 @@ def heartbeat_message(args: list[str], output: Path, elapsed: float) -> str:
 
 
 def run_child(args: list[str], output: Path, env: dict[str, str] | None = None) -> int:
-    with output.open("w", encoding="utf-8") as handle:
-        process = subprocess.Popen(
-            args,
-            cwd=REPO / "packing",
-            stdout=handle,
-            stderr=subprocess.STDOUT,
-            start_new_session=True,
-            env=env,
-        )
-        atomic_json(
-            output.with_name(output.name + ".child.json"),
-            {
-                "pid": process.pid,
-                "start_ticks": process_start_ticks(process.pid),
-                "started_at": stamp(),
-                "command": args,
-            },
-        )
-        started = time.monotonic()
-        while True:
-            try:
-                return process.wait(timeout=300)
-            except subprocess.TimeoutExpired:
-                if output.parent.parent.name.startswith("cycle-"):
-                    emit(
-                        output.parents[3],
-                        heartbeat_message(args, output, time.monotonic() - started),
-                    )
+    root = next((parent for parent in output.parents if (parent / "state.json").exists()), output.parent)
+    return frontier_runtime.run(
+        args, output, cwd=REPO / "packing", env=env, limits=_RUNTIME_LIMITS,
+        heartbeat=lambda elapsed: emit(root, heartbeat_message(args, output, elapsed)),
+        on_poll=poll_stop,
+    )
 
 
-def verify_candidate(  # noqa: PLR0911 - each exit names a retained gate outcome
-    directory: Path, candidate: Path, expected_side: Fraction
+def verify_candidate(
+    directory: Path,
+    candidate: Path,
+    expected_side: Fraction,
+    *,
+    quick_first: bool = False,
 ) -> tuple[str, str | None]:
-    """Declare by exact sweep, then require the full two-route retention decision."""
+    """One durable structured verification job, sharing the normal job watchdog."""
     try:
-        record = json.loads(candidate.read_text(encoding="utf-8"))
-        candidate_side = Fraction(record["outer_side"])
-        candidate_mass = Fraction(record["total_mass"])
-    except ValueError, KeyError, TypeError, json.JSONDecodeError:
+        record = read_json(candidate, 8 * 1024 * 1024)
+        if record.get("n") != 12 or Fraction(record["outer_side"]) != expected_side:
+            return "candidate-side-mismatch", None
+        if Fraction(record["total_mass"]) >= 12:
+            return "mass-not-below-12", None
+    except (OSError, ValueError, KeyError, TypeError):
         return "candidate-invalid", None
-    if record.get("n") != 12 or candidate_side != expected_side:
-        return "candidate-side-mismatch", None
-    if candidate_mass >= 12:
-        return "mass-not-below-12", None
-    attempt = 1
-    while (directory / f"verify-declare-{attempt}.log").exists():
-        attempt += 1
-    pending = directory / (
-        "candidate.pending-verification.json"
-        if attempt == 1
-        else f"candidate.pending-verification-{attempt}.json"
+    from devtools.frontier_verify import verifier_fingerprint
+    tool_sha = verifier_fingerprint()
+    gate_dir = directory / (
+        f"gate-{digest(candidate)[:16]}-{tool_sha[:12]}-"
+        f"{'quick-first' if quick_first else 'full'}"
     )
-    verified = directory / (
-        "candidate.verified.json" if attempt == 1 else f"candidate.verified-{attempt}.json"
-    )
-    shutil.copyfile(candidate, pending)
-    declaration = run_child(
-        [sys.executable, "-m", "devtools.declare_least_cell_mass", str(pending)],
-        directory / f"verify-declare-{attempt}.log",
-    )
-    if declaration:
-        return "declaration-rejected", None
-    quick_log = directory / f"verify-quick-{attempt}.log"
-    quick = run_child(
-        [sys.executable, "-m", "devtools.decide_certificate", "--quick", str(pending)],
-        quick_log,
-    )
-    if quick:
-        return "quick-rejected", None
-    full_log = directory / f"verify-full-{attempt}.log"
-    full = run_child(
-        [sys.executable, "-m", "devtools.decide_certificate", str(pending)], full_log
-    )
-    if full == 0 and "RETAINABLE: both routes accept" in full_log.read_text(encoding="utf-8"):
-        pending.replace(verified)
+    gate_dir.mkdir(parents=True, exist_ok=True)
+    report_path = gate_dir / "verification.json"
+    command = [
+        sys.executable,
+        "-m",
+        "devtools.frontier_verify",
+        "--input",
+        str(candidate),
+        "--side",
+        str(expected_side),
+        "--report",
+        str(report_path),
+    ]
+    if quick_first:
+        command.append("--quick-first")
+    code = run_child(command, gate_dir / "stdout.log")
+    if code or not report_path.exists():
+        return f"verification-error-{code}", None
+    report = read_json(report_path)
+    if (report.get("source_sha256") != digest(candidate)
+            or report.get("verifier_sha256") != tool_sha
+            or Fraction(report.get("side", "0")) != expected_side):
+        return "candidate-invalid", None
+    atomic_json(directory / "verification.json", report)
+    if report.get("status") == "VERIFIED" and report.get("category") == "full-retainable":
+        verified = Path(report["verified_candidate"])
+        if not verified.is_file() or digest(verified) != report.get("verified_sha256"):
+            return "candidate-invalid", None
         return "full-retainable", str(verified)
-    return "full-rejected", None
+    category = report.get("category")
+    if category == "coverage_deficit":
+        return "declaration-rejected", None
+    if category in ("interval_stall", "quick_refusal"):
+        return "quick-rejected", None
+    if category == "gate_refusal":
+        return "full-rejected", None
+    return "candidate-invalid", None
 
 
 def repair_candidate_key(candidate: dict[str, Any]) -> tuple[Fraction, Fraction, int]:
@@ -712,11 +883,12 @@ def select_repair_candidate(state: dict[str, Any]) -> dict[str, Any] | None:
     """Choose the best untried below-12 candidate rejected by an exact gate."""
 
     low = Fraction(state["verified_low"])
-    completed = {
-        attempt.get("candidate")
-        for attempt in state.get("repair_attempts", [])
-        if attempt.get("status") in ("VERIFIED", "REJECTED")
-    }
+    finished = [a for a in state.get("repair_attempts", [])
+                if a.get("status") in ("VERIFIED", "REJECTED")
+                or (a.get("status") == "ERROR"
+                    and a.get("error_epoch", 0) >= state.get("error_epoch", 0))]
+    completed = {attempt.get("candidate") for attempt in finished}
+    completed_digests = {attempt.get("candidate_sha256") for attempt in finished}
     candidates: list[dict[str, Any]] = []
     for cycle_index, cycle in enumerate(state["cycles"], 1):
         side = Fraction(cycle["side"])
@@ -736,6 +908,8 @@ def select_repair_candidate(state: dict[str, Any]) -> dict[str, Any] | None:
                 continue
             path = Path(path_text)
             if mass >= 12 or not path.exists() or str(path) in completed:
+                continue
+            if digest(path) in completed_digests:
                 continue
             candidates.append(
                 {
@@ -825,6 +999,8 @@ def write_boosted_candidate(
     mass = sum((Fraction(atom[2]) for atom in atoms), start=Fraction(0))
     if not 0 < mass < 12:
         raise ValueError(f"repair candidate mass {mass} is not in (0, 12)")
+    if not 0 < slack_fraction < 1:
+        raise ValueError("repair slack fraction must be strictly between zero and one")
     target = mass + (Fraction(12) - mass) * slack_fraction
     factor = target / mass
     repaired_atoms: list[list[object]] = []
@@ -832,6 +1008,8 @@ def write_boosted_candidate(
     for atom in atoms:
         if not isinstance(atom, list) or len(atom) != 3:
             raise ValueError("repair candidate contains a malformed atom")
+        if Fraction(atom[2]) < 0:
+            raise ValueError("repair candidate contains negative weights")
         weight = Fraction(atom[2]) * factor
         repaired_atoms.append([atom[0], atom[1], str(weight)])
         total += weight
@@ -841,7 +1019,7 @@ def write_boosted_candidate(
     record["total_mass"] = str(total)
     record["least_cell_mass"] = None
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(record, indent=1) + "\n", encoding="utf-8")
+    atomic_json(destination, record)
     return total
 
 
@@ -860,133 +1038,136 @@ def full_gate_on_declared(directory: Path, declared: Path) -> str | None:
     return str(verified)
 
 
+def repair_job_failure(state: dict[str, Any], attempt: dict[str, Any], status: str) -> None:
+    attempt.update(status="ERROR", reason=status, finished_at=stamp(),
+                   error_epoch=state.get("error_epoch", 0))
+    state["consecutive_job_errors"] = int(state.get("consecutive_job_errors", 0)) + 1
+    state.setdefault("operational_errors", []).append({
+        "at": stamp(), "side": attempt["side"], "reason": status,
+        "repair": attempt["directory"],
+    })
+    if status.endswith("-78") or state["consecutive_job_errors"] >= 3:
+        state["mode"] = "BLOCKED"
+
+
 def run_repair(root: Path, state: dict[str, Any]) -> bool:
-    """Select, diagnose, repair and reverify one promising rejected candidate."""
-
-    selected = select_repair_candidate(state)
-    if selected is None:
-        state["mode"] = "REPAIR_EXHAUSTED"
-        save_state(root, state)
-        emit(
-            root,
-            "[repair] no untried below-12 quick/full-rejected candidates remain",
-            significant=True,
-        )
-        return False
-
+    """Resume the same candidate/boost after interruption; never duplicate a live job."""
     attempts = state.setdefault("repair_attempts", [])
-    attempt_number = len(attempts) + 1
-    side = Fraction(selected["side"])
-    candidate = Path(selected["candidate"])
-    directory = root / "repair" / f"attempt-{attempt_number:04d}-{side_name(side)}"
-    while directory.exists():
-        attempt_number += 1
-        directory = root / "repair" / f"attempt-{attempt_number:04d}-{side_name(side)}"
-    directory.mkdir(parents=True, exist_ok=False)
-
-    attempt: dict[str, Any] = {
-        "started_at": stamp(),
-        "status": "RUNNING",
-        **selected,
-        "directory": str(directory),
-        "repairs": [],
-    }
-    attempts.append(attempt)
+    attempt = next((a for a in attempts if a.get("status") in ("RUNNING", "INTERRUPTED")), None)
+    if attempt is None:
+        selected = select_repair_candidate(state)
+        if selected is None:
+            return False
+        number = len(attempts) + 1
+        directory = root / "repair" / f"attempt-{number:04d}-{side_name(Fraction(selected['side']))}"
+        while directory.exists():
+            number += 1
+            directory = root / "repair" / f"attempt-{number:04d}-{side_name(Fraction(selected['side']))}"
+        directory.mkdir(parents=True, exist_ok=False)
+        attempt = {**selected, "status": "RUNNING", "started_at": stamp(),
+                   "directory": str(directory), "repairs": [], "candidate_sha256": digest(Path(selected['candidate']))}
+        attempts.append(attempt)
+    directory = Path(attempt["directory"])
+    candidate = Path(attempt["candidate"])
+    side = Fraction(attempt["side"])
+    if attempt.get("candidate_sha256") and digest(candidate) != attempt["candidate_sha256"]:
+        raise ValueError("repair source changed after selection")
+    if not list(directory.rglob("*.job.json")) and (pid := active_child(directory)) is not None:
+        raise frontier_runtime.LiveJob(f"prior repair child pid {pid} is still running; waiting before resume")
     state["mode"] = "REPAIR"
+    attempt["status"] = "RUNNING"
     save_state(root, state)
-    emit(
-        root,
-        f"[repair] selected L={display(side)} exact={side} "
-        f"mass={selected['total_mass']} verifier={selected['verifier']}",
-        significant=True,
-    )
-
-    diagnosis, declared = diagnose_repair_candidate(directory / "diagnosis", candidate)
-    attempt["diagnosis"] = diagnosis
-    refusal_text = "; ".join(diagnosis.get("refusals") or []) or diagnosis["status"]
-    emit(
-        root,
-        f"[repair] diagnosis={refusal_text[:240]} "
-        f"stalled={diagnosis.get('stalled_boxes')}",
-        significant=True,
-    )
-
-    if declared is not None and diagnosis.get("status") == "quick-accepted":
-        verified = full_gate_on_declared(directory / "diagnosis", declared)
-        if verified is not None:
-            attempt.update(
-                {
-                    "status": "VERIFIED",
-                    "finished_at": stamp(),
-                    "verified_candidate": verified,
-                    "repair": "diagnosis candidate needed no weight boost",
-                }
-            )
-            state["verified_low"] = str(side)
-            state["verified_certificate"] = verified
-            state["mode"] = "FRONTIER"
-            save_state(root, state)
-            write_views(root, state)
-            emit(
-                root,
-                f"[repair] VERIFIED L={display(side)} exact={side} without weight boost",
-                significant=True,
-            )
-            return True
-
-    for slack_fraction in REPAIR_SLACK_FRACTIONS:
-        label = f"{slack_fraction.numerator}-{slack_fraction.denominator}"
-        boost_dir = directory / f"boost-{label}"
-        boost_dir.mkdir(parents=True, exist_ok=False)
-        boosted = boost_dir / "candidate.unverified.json"
-        total = write_boosted_candidate(candidate, boosted, slack_fraction)
-        status, verified = verify_candidate(boost_dir, boosted, side)
-        repair_record = {
-            "slack_fraction": str(slack_fraction),
-            "total_mass": str(total),
-            "status": status,
-            "verified_candidate": verified,
-        }
-        attempt["repairs"].append(repair_record)
-        save_state(root, state)
-        emit(
-            root,
-            f"[repair] boost={slack_fraction} total={total} -> {status}",
-            significant=status == "full-retainable",
-        )
-        if verified is None:
-            continue
-        attempt.update(
-            {
-                "status": "VERIFIED",
-                "finished_at": stamp(),
-                "verified_candidate": verified,
-                "repair": f"uniform-weight boost using {slack_fraction} of mass slack",
-            }
-        )
-        state["verified_low"] = str(side)
-        state["verified_certificate"] = verified
-        state["mode"] = "FRONTIER"
+    emit(root, f"[repair] L={display(side)} exact={side} attempt={directory.name}")
+    recovered = next((entry for entry in attempt.get("repairs", [])
+                      if entry.get("status") == "VERIFIED" and entry.get("verified_candidate")), None)
+    if recovered is not None:
+        promote_verified(state, side, Path(recovered["verified_candidate"]), "resumed-uniform-weight-repair")
+        attempt.update(status="VERIFIED", verified_candidate=recovered["verified_candidate"], finished_at=stamp())
         save_state(root, state)
         write_views(root, state)
-        emit(
-            root,
-            f"[repair] VERIFIED L={display(side)} exact={side} "
-            f"with boost={slack_fraction}",
-            significant=True,
-        )
+        publish_findings(root, state)
         return True
-
-    attempt["status"] = "REJECTED"
-    attempt["finished_at"] = stamp()
-    state["mode"] = "REPAIR"
+    diagnosis_dir = directory / "diagnosis"
+    diagnosis_dir.mkdir(exist_ok=True)
+    status, verified = verify_candidate(diagnosis_dir, candidate, side)
+    diagnosis_path = diagnosis_dir / "verification.json"
+    diagnosis = read_json(diagnosis_path) if diagnosis_path.exists() else {"category": "operational", "status": status}
+    attempt["diagnosis"] = diagnosis
+    save_state(root, state)
+    if verified is not None:
+        promote_verified(state, side, Path(verified), "repair-diagnosis")
+        attempt.update(status="VERIFIED", verified_candidate=verified, finished_at=stamp())
+        save_state(root, state)
+        write_views(root, state)
+        publish_findings(root, state)
+        return True
+    if status.startswith("verification-error"):
+        repair_job_failure(state, attempt, status)
+        save_state(root, state)
+        return True
+    state["consecutive_job_errors"] = 0
+    category = diagnosis.get("category")
+    if category in ("invalid_input", "precondition") or diagnosis.get("uniform_repair_possible") is False:
+        attempt.update(status="REJECTED", reason=f"uniform repair inappropriate: {category}", finished_at=stamp())
+        save_state(root, state)
+        emit(root, f"[repair] abandoning candidate: {attempt['reason']}")
+        return True
+    slack_fractions = list(REPAIR_SLACK_FRACTIONS)
+    minimum = diagnosis.get("minimum_cell_mass")
+    mass = Fraction(attempt["total_mass"])
+    if minimum is not None and 0 < Fraction(minimum) < 1:
+        necessary = mass / Fraction(minimum)
+        if necessary < 12:
+            # Exact diagnostic chooses the first useful target, rather than
+            # blindly spending six gates on boosts below the measured deficit.
+            slack_fractions = [((necessary + 12) / 2 - mass) / (12 - mass)]
+    if len(slack_fractions) > 1:
+        from devtools.frontier_repair_batch import run_boosts
+        return run_boosts(root, state, attempt, slack_fractions, sys.modules[__name__])
+    for slack_fraction in slack_fractions:
+        label = f"{slack_fraction.numerator}-{slack_fraction.denominator}"
+        # Large exact denominators need not become oversized filesystem names.
+        name = hashlib.sha256(label.encode()).hexdigest()[:16]
+        boost_dir = directory / f"boost-{name}"
+        boost_dir.mkdir(exist_ok=True)
+        boosted = boost_dir / "candidate.unverified.json"
+        entry = next((r for r in attempt["repairs"] if r.get("slack_fraction") == str(slack_fraction)), None)
+        if entry is not None and entry.get("status") in ("REJECTED", "VERIFIED", "ERROR"):
+            continue
+        if entry is None:
+            total = write_boosted_candidate(candidate, boosted, slack_fraction)
+            entry = {"slack_fraction": str(slack_fraction), "total_mass": str(total),
+                     "directory": str(boost_dir), "status": "RUNNING"}
+            attempt["repairs"].append(entry)
+            save_state(root, state)
+        elif not boosted.exists():
+            write_boosted_candidate(candidate, boosted, slack_fraction)
+        status, verified = verify_candidate(
+            boost_dir,
+            boosted,
+            side,
+            quick_first=True,
+        )
+        entry.update(status="VERIFIED" if verified else ("ERROR" if status.startswith("verification-error") else "REJECTED"),
+                     verifier=status, verified_candidate=verified)
+        save_state(root, state)
+        poll_stop()
+        emit(root, f"[repair] boost={slack_fraction} mass={entry['total_mass']} -> {status}")
+        if verified is not None:
+            promote_verified(state, side, Path(verified), "uniform-weight-repair")
+            attempt.update(status="VERIFIED", verified_candidate=verified, finished_at=stamp())
+            save_state(root, state)
+            write_views(root, state)
+            publish_findings(root, state)
+            return True
+        if entry["status"] == "ERROR":
+            repair_job_failure(state, attempt, status)
+            save_state(root, state)
+            return True
+    attempt.update(status="REJECTED", reason="configured uniform repairs exhausted", finished_at=stamp())
+    state["mode"] = "FRONTIER"
     save_state(root, state)
     write_views(root, state)
-    emit(
-        root,
-        f"[repair] candidate L={display(side)} exhausted; selecting the next candidate",
-        significant=True,
-    )
     return True
 
 
@@ -1035,11 +1216,15 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
             f"(certificate `{state['verified_certificate']}`)."
         ),
         (
-            f"Search high: `{state['search_high']}` "
-            f"({state['search_high_kind']}; search evidence only)."
+            f"Legacy search high: `{state['search_high']}` "
+            f"({state['search_high_kind']}; historical diagnostic only)."
         ),
-        f"UNRESOLVED sides: {unresolved}.",
-        f"Next side: `{next_side(state)}`.",
+        f"Legacy UNRESOLVED sides: {unresolved}.",
+        "Strategy-local frontiers:",
+        "",
+        *[f"- {line}" for line in strategy_frontier_lines(state)],
+        "",
+        f"Next policy action: `{choose_work(state)}`.",
         "",
         (
             "SEARCH_FAILED records failure of the stated instrument and budget; "
@@ -1050,14 +1235,14 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
             "a positive full two-route exact decision."
         ),
         "",
-        "| Side | Status | Scale | Column rounds | Last objective | Reason |",
-        "| --- | --- | ---: | ---: | ---: | --- |",
+        "| Side | Strategy | Status | Scale | Column rounds | Last objective | Reason |",
+        "| --- | --- | --- | ---: | ---: | ---: | --- |",
     ]
     for cycle in state["cycles"]:
         last = cycle["stages"][-1] if cycle["stages"] else {}
         result = last.get("result") or {}
         lines.append(
-            f"| {cycle['side']} | {cycle['status']} | {stage_scale(last) or ''} | "
+            f"| {cycle['side']} | {cycle.get('strategy', 'baseline')} | {cycle['status']} | {stage_scale(last) or ''} | "
             f"{cycle.get('column_rounds_completed', 0)} | {result.get('objective', '')} "
             f"| {cycle.get('reason', '')} |"
         )
@@ -1077,7 +1262,7 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
                 f"| {attempt.get('side', '')} | {attempt.get('status', '')} | "
                 f"{attempt.get('verifier', '')} | {attempt.get('candidate', '')} |"
             )
-    (root / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    atomic_text(root / "report.md", "\n".join(lines) + "\n")
 
 
 def summary(root: Path, state: dict[str, Any], started: float) -> str:
@@ -1093,16 +1278,25 @@ def summary(root: Path, state: dict[str, Any], started: float) -> str:
             f"cycles completed: {sum(c['status'] in ('VERIFIED', 'SEARCH_FAILED', 'UNRESOLVED') for c in state['cycles'])}",  # noqa: E501
             f"session wall time: {time.monotonic() - started:.0f}s",
             f"best VERIFIED: {low} = {display(low)}",
-            f"current search high ({state['search_high_kind']}): {high} = {display(high)}",
             (
-                "nearest active UNRESOLVED: "
+                f"legacy search high ({state['search_high_kind']}): "
+                f"{high} = {display(high)}"
+            ),
+            (
+                "legacy nearest active UNRESOLVED: "
                 f"{display(soft_high(state)) if active_unresolved(state) else 'none'}"
             ),
-            f"frontier width: {high - low} = {display(high - low)}",
+            (
+                "legacy heuristic width (diagnostic, not a mathematical upper bound): "
+                f"{high - low} = {display(high - low)}"
+            ),
+            "strategy-local frontiers:",
+            *[f"  {line}" for line in strategy_frontier_lines(state)],
             f"exact verifications attempted: {attempts}",
             f"automatic repair attempts: {len(state.get('repair_attempts') or [])}",
             f"mode: {state.get('mode', 'FRONTIER')}",
-            f"next suggested L: {next_side(state)}",
+            f"next suggested L: {choose_work(state).get('side', 'none')}",
+            f"next action: {choose_work(state)['kind']}",
             f"state: {root / 'state.json'}",
             f"report: {root / 'report.md'}",
         ]
@@ -1144,6 +1338,11 @@ def initial_state(config: dict[str, Any], seed: Path) -> dict[str, Any]:
         "initial_width": str(high - low),
         "verified_low": str(low),
         "verified_certificate": str(seed),
+        "verified_sha256": digest(seed),
+        "discoveries": [],
+        "search_findings": [],
+        "operational_errors": [],
+        "policy_version": frontier_policy.POLICY_VERSION,
         "search_high": str(high),
         "search_high_kind": "CONFIGURED_SEARCH_ENDPOINT",
         "unresolved": [],
@@ -1204,24 +1403,33 @@ class StopFlag:
     def __init__(self, root: Path) -> None:
         self.root = root
         self.requested = False
+        self.announced = False
+        self.signum = None
 
     def handle(self, signum: int, _frame: Any) -> None:
-        if not self.requested:
-            self.requested = True
-            emit(
-                self.root,
-                f"[stop] signal {signum} requested; finishing current L cycle, then stopping",
-            )
+        # Signal handlers do no I/O: interrupting print/json-write must not cause
+        # reentrant stream errors or an inconsistent checkpoint.
+        self.requested = True
+        self.signum = signum
+
+    def poll(self) -> None:
+        if self.requested and not self.announced:
+            self.announced = True
+            emit(self.root, f"[stop] signal {self.signum} requested; finishing current cycle, then stopping")
 
 
-def run_cycle(root: Path, state: dict[str, Any]) -> None:
+def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = False) -> dict | None:
     active = state["active"]
     if active is None:
-        side = next_side(state)
+        plan = state.pop("scheduled_work", {})
+        side = Fraction(plan["side"]) if plan.get("side") else next_side(state)
         if side is None:
             return
         cycle = {
             "side": str(side),
+            "strategy": plan.get("strategy", "baseline"),
+            "search_revision": state.get("search_revision", 0),
+            "plan_reason": plan.get("reason", "exact midpoint"),
             "status": "RUNNING",
             "started_at": stamp(),
             "seed_verified_low": state["verified_low"],
@@ -1236,8 +1444,9 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
     side = Fraction(cycle["side"])
     budgets = state["config"]["budgets"]
     for stage in cycle["stages"]:
-        if "directory" in stage and (pid := active_child(Path(stage["directory"]))) is not None:
-            raise RuntimeError(
+        if ("directory" in stage and not list(Path(stage["directory"]).rglob("*.job.json"))
+                and (pid := active_child(Path(stage["directory"]))) is not None):
+            raise frontier_runtime.LiveJob(
                 f"prior child pid {pid} is still running for {stage['directory']}; "
                 "wait for it to finish, then resume"
             )
@@ -1246,6 +1455,7 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
         if last["status"] == "complete" and last["decision"] not in (
             "ESCALATE",
             "REFINE_SCALE",
+            "RETRY_ROWS",
         ):
             cycle.update(
                 {"status": last["decision"], "reason": last["reason"], "finished_at": stamp()}
@@ -1253,13 +1463,22 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             apply_result(state, cycle)
             save_state(root, state)
             write_views(root, state)
+            publish_findings(root, state)
             return
     while True:
         incomplete = next(
-            (stage for stage in reversed(cycle["stages"]) if stage["status"] == "running"), None
+            (stage for stage in reversed(cycle["stages"]) if stage["status"] in ("running", "queued")), None
         )
         if incomplete is not None:
-            result_path = Path(incomplete["directory"]) / "result.json"
+            if incomplete["status"] == "queued" and defer_generation:
+                return incomplete
+            old_dir = Path(incomplete["directory"])
+            if incomplete["status"] == "queued" or (old_dir / "stdout.log.job.json").exists():
+                code = run_child(incomplete["command"], old_dir / "stdout.log", controlled_env(state))
+                if code:
+                    record_job_failure(root, state, cycle, incomplete, code)
+                    return
+            result_path = old_dir / "result.json"
             if result_path.exists():
                 try:
                     result = json.loads(result_path.read_text(encoding="utf-8"))
@@ -1294,6 +1513,9 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             if previous_complete is None:
                 stage_index = 0
                 stage_scale_value = starting_scale(state, side)
+            elif previous_complete["decision"] == "RETRY_ROWS":
+                stage_index = STAGES.index(previous_complete["name"])
+                stage_scale_value = stage_scale(previous_complete) or int(state["config"]["scale"])
             elif previous_complete["decision"] == "REFINE_SCALE":
                 stage_index = STAGES.index(previous_complete["name"])
                 stage_scale_value = int(previous_complete["refine_scale_to"])
@@ -1340,9 +1562,17 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                 budgets[stage_index],
                 seed,
                 stage_dir,
-                state["config"]["row_rounds"],
+                int(cycle.get("row_rounds", state["config"]["row_rounds"])),
                 stage_scale_value,
+                cycle.get("strategy", "baseline"),
             )
+            raw_source = raw_source_for(state, cycle, side, stage_scale_value)
+            if raw_source is not None:
+                source_stage, snapshot = raw_source
+                args = [sys.executable, "-m", "devtools.frontier_rationalise",
+                        "--snapshot", str(snapshot), "--source-result", str(Path(source_stage["directory"]) / "result.json"),
+                        "--scale", str(stage_scale_value), "--freeze", str(stage_dir / "candidate.unverified.json"),
+                        "--json", str(stage_dir / "result.json")]
             generated = {
                 "name": name,
                 "budget": budgets[stage_index],
@@ -1354,6 +1584,9 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                 if label.startswith("search")
                 else "verified-search-seed",
                 "command": args,
+                "strategy": cycle.get("strategy", "baseline"),
+                "work_kind": "rerationalisation" if raw_source is not None else "generation",
+                "started_epoch": int(time.time()),
                 "git_sha": git_sha(),
                 "started_at": stamp(),
                 "status": "running",
@@ -1364,20 +1597,21 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             emit(
                 root,
                 f"[cycle {active + 1}] L={display(side)} exact={side} seed={label} "
-                f"stage={name}({budgets[stage_index]}) scale={stage_scale_value}",
+                f"stage={name}({budgets[stage_index]}) scale={stage_scale_value} "
+                f"strategy={cycle.get('strategy', 'baseline')} work={generated['work_kind']}",
             )
-            env = os.environ.copy()
-            env.update(
-                {"OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"}
-            )
+            if defer_generation:
+                generated["status"] = "queued"
+                save_state(root, state)
+                return generated
+            env = controlled_env(state)
             code = run_child(args, stage_dir / "stdout.log", env)
             if code or not (stage_dir / "result.json").exists():
                 generated["status"] = "interrupted"
                 generated["reason"] = f"generator exit {code}; preserved for resume"
                 save_state(root, state)
-                raise RuntimeError(
-                    f"generator failed at L={side}; see {stage_dir / 'stdout.log'}"
-                )
+                record_job_failure(root, state, cycle, generated, code)
+                return
             generated["result"] = json.loads(
                 (stage_dir / "result.json").read_text(encoding="utf-8")
             )
@@ -1397,13 +1631,23 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
         mass = result.get("total_mass")
         verifier = "mass-not-below-12"
         verified_path = None
+        verification_started = time.monotonic()
         if mass is not None and Fraction(mass) < 12 and candidate.exists():
             verifier, verified_path = verify_candidate(
                 Path(generated["directory"]), candidate, side
             )
         elif mass is not None and Fraction(mass) < 12:
             verifier = "candidate-missing"
+        generated["verification_seconds"] = time.monotonic() - verification_started
         generated["verifier"] = verifier
+        if verifier.startswith("verification-error"):
+            try:
+                code = int(verifier.rsplit("-", 1)[-1])
+            except ValueError:
+                code = frontier_runtime.INFRASTRUCTURE
+            record_job_failure(root, state, cycle, generated, code)
+            return
+        state["consecutive_job_errors"] = 0
         if verified_path is not None:
             decision, reason = "VERIFIED", "full exact retention gate accepted frozen candidate"
             cycle["verifier"] = "full-retainable"
@@ -1436,6 +1680,8 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                     reason += f"; verifier={verifier}"
                     if decision == "SEARCH_FAILED":
                         decision = "UNRESOLVED"
+        if decision == "ESCALATE" and cycle_stalled(cycle, result):
+            decision, reason = "UNRESOLVED", "objective plateau; abandon this instrument stage and schedule another strategy"
         generated.update(
             {
                 "status": "complete",
@@ -1444,276 +1690,546 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                 "finished_at": stamp(),
             }
         )
+        record_notable_search(state, cycle, generated)
         cycle["column_rounds_requested"] = sum(
             stage["budget"] for stage in cycle["stages"] if stage["status"] == "complete"
         )
         cycle["column_rounds_completed"] = sum(
-            len(stage.get("result", {}).get("rounds") or [])
+            int(stage.get("result", {}).get("column_rounds_executed",
+                len(stage.get("result", {}).get("rounds") or [])))
             for stage in cycle["stages"]
             if stage["status"] == "complete"
         )
         generated["cumulative_column_rounds"] = cycle["column_rounds_completed"]
         atomic_json(Path(generated["directory"]) / "metadata.json", generated)
         save_state(root, state)
+        poll_stop()
         emit(
             root,
             f"[stage] L={display(side)} rounds={generated['budget']} "
             f"scale={stage_scale(generated)} objective={result.get('objective')} "
             f"total={result.get('total_mass')} "
-            f"time={float(result.get('seconds') or 0):.0f}s -> {decision}",
+            f"time={float(result.get('seconds') or 0):.0f}s "
+            f"verify_s={generated['verification_seconds']:.3f} "
+            f"stage_wall_s={max(0, time.time() - generated.get('started_epoch', time.time())):.3f} -> {decision}",
             significant=significant_result(decision, result),
         )
         if decision in ("ESCALATE", "REFINE_SCALE"):
             continue
+        if result.get("converged") is not True and not cycle.get("row_retry_done"):
+            old_rows = int(cycle.get("row_rounds", state["config"]["row_rounds"]))
+            maximum_rows = int(state["config"].get("max_row_rounds", old_rows))
+            if old_rows < maximum_rows:
+                cycle["row_rounds"] = min(old_rows * 2, maximum_rows)
+                cycle["row_retry_done"] = True
+                generated["decision"] = "RETRY_ROWS"
+                save_state(root, state)
+                emit(root, f"[plan] inner row budget {old_rows} -> {cycle['row_rounds']}; no failure inference")
+                continue
         cycle.update({"status": decision, "reason": reason, "finished_at": stamp()})
         apply_result(state, cycle)
         save_state(root, state)
         write_views(root, state)
+        publish_findings(root, state)
         emit(
             root,
             f"[result] L={display(side)} exact={side} {decision} reason={reason}",
             significant=significant_result(decision, result),
         )
-        emit(
-            root,
-            f"[frontier] verified={display(state['verified_low'])} "
-            f"soft-high={display(soft_high(state))} "
-            f"search-high={display(state['search_high'])}",
-        )
+        emit(root, frontier_status(state))
         return
 
 
+def tail_text(path: Path, count: int = 32768) -> str:
+    with path.open("rb") as handle:
+        handle.seek(max(0, path.stat().st_size - count))
+        return handle.read().decode("utf-8", errors="replace")
+
+
+def poll_stop() -> None:
+    if _ACTIVE_STOP is not None:
+        _ACTIVE_STOP.poll()
+
+
+def controlled_env(state: dict[str, Any]) -> dict[str, str]:
+    return {**os.environ, "PACK_JOBS": str(state["config"]["workers"]),
+            "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"}
+
+
+def raw_source_for(state: dict[str, Any], cycle: dict[str, Any], side: Fraction,
+                   target_scale: int) -> tuple[dict[str, Any], Path] | None:
+    completed = [s for s in cycle["stages"] if s.get("status") == "complete"]
+    if completed and completed[-1].get("decision") != "REFINE_SCALE":
+        return None
+    for previous_cycle in reversed(state["cycles"]):
+        if (Fraction(previous_cycle["side"]) != side
+                or previous_cycle.get("strategy", "baseline") != cycle.get("strategy", "baseline")
+                or previous_cycle.get("search_revision", 0) != cycle.get("search_revision", 0)):
+            continue
+        for stage in reversed(previous_cycle.get("stages", [])):
+            result = stage.get("result") or {}
+            path_text = result.get("raw_weights")
+            used = stage_scale(stage)
+            if (path_text and used and used < target_scale and scale_limited_result(result)
+                    and Path(path_text).is_file()
+                    and result.get("raw_weights_sha256") == digest(Path(path_text))
+                    and (Path(stage["directory"]) / "result.json").exists()):
+                return stage, Path(path_text)
+    return None
+
+
+def cycle_stalled(cycle: dict[str, Any], result: dict[str, Any]) -> bool:
+    if result.get("converged") is not True or result.get("work_kind") == "rerationalisation":
+        return False
+    completed = [s for s in cycle["stages"] if s.get("status") == "complete"
+                 and s.get("result", {}).get("work_kind") != "rerationalisation"]
+    if not completed:
+        return False
+    old = completed[-1].get("result", {}).get("objective")
+    new = result.get("objective")
+    return (isinstance(old, (int, float)) and isinstance(new, (int, float))
+            and math.isfinite(old) and math.isfinite(new) and abs(old - new) <= 1e-7)
+
+
+def record_job_failure(root: Path, state: dict[str, Any], cycle: dict[str, Any],
+                       stage: dict[str, Any], code: int) -> None:
+    reason = f"operational job failure {code}; not search-failure evidence"
+    stage.update(status="error", decision="ERROR", reason=reason, finished_at=stamp())
+    cycle.update(status="ERROR", reason=reason, finished_at=stamp(),
+                 error_epoch=state.get("error_epoch", 0))
+    state.setdefault("operational_errors", []).append({
+        "at": stamp(), "side": cycle["side"], "code": code, "stage": stage["directory"],
+        "strategy": cycle.get("strategy", "baseline"),
+    })
+    state["active"] = None
+    state["consecutive_job_errors"] = int(state.get("consecutive_job_errors", 0)) + 1
+    if code == frontier_runtime.PERMANENT_ERROR or state["consecutive_job_errors"] >= 3:
+        state["mode"] = "BLOCKED"
+    save_state(root, state)
+    write_views(root, state)
+    emit(root, f"[ERROR] L={display(cycle['side'])} {reason}; logs={stage['directory']}", significant=True)
+
+
+def promote_verified(state: dict[str, Any], side: Fraction, candidate: Path, mechanism: str) -> None:
+    previous = Fraction(state["verified_low"])
+    if side <= previous:
+        return
+    record = read_json(candidate, 8 * 1024 * 1024)
+    if record.get("n") != 12 or Fraction(record["outer_side"]) != side:
+        raise ValueError("verified artifact does not match the proposed bound")
+    mass = sum((Fraction(atom[2]) for atom in record["atoms"]), Fraction(0))
+    if mass != Fraction(record["total_mass"]) or not 0 < mass < 12:
+        raise ValueError("verified artifact has inconsistent or inadmissible mass")
+    proof_sha = digest(candidate)
+    proof_receipt = candidate.parent / "verification.json"
+    if not proof_receipt.exists():
+        raise ValueError("verified artifact is missing its full exact gate receipt")
+    verdict = read_json(proof_receipt)
+    if (verdict.get("status") != "VERIFIED" or verdict.get("category") != "full-retainable"
+            or verdict.get("finished") is not True
+            or verdict.get("verified_sha256") != proof_sha
+            or Fraction(verdict.get("side", "0")) != side):
+        raise ValueError("verified artifact does not match its full gate receipt")
+    state["verified_low"] = str(side)
+    state["verified_certificate"] = str(candidate)
+    state["verified_sha256"] = proof_sha
+    state["mode"] = "FRONTIER"
+    state["consecutive_job_errors"] = 0
+    frontier_policy.reconcile(state)
+    event = {"id": proof_sha, "at": stamp(), "side": str(side), "previous": str(previous),
+             "improvement": str(side - previous), "mass": str(mass),
+             "candidate": str(candidate), "sha256": proof_sha, "mechanism": mechanism,
+             "float64_distinct": float(side) != float(previous),
+             "gate_receipt": str(proof_receipt)}
+    if not any(e["id"] == proof_sha for e in state.setdefault("discoveries", [])):
+        state["discoveries"].append(event)
+
+
+def publish_findings(root: Path, state: dict[str, Any]) -> None:
+    discoveries = state.get("discoveries", [])
+    search_findings = state.get("search_findings", [])
+    atomic_json(root / "findings.json", {
+        "schema": 2,
+        "verified_improvements": discoveries,
+        "notable_search_improvements": search_findings,
+        "current_verified": {"side": state["verified_low"], "candidate": state["verified_certificate"],
+                             "sha256": state.get("verified_sha256")},
+    })
+    lines = ["# Verified lower-bound improvements", "",
+             "Only full two-route gate successes appear here. Search opportunities are not proofs.", ""]
+    for event in discoveries:
+        distinct = event.get(
+            "float64_distinct",
+            float(Fraction(event["side"])) != float(Fraction(event["previous"])),
+        )
+        classification = "backend-distinct improvement" if distinct else "exact-only refinement"
+        lines.extend([f"## s(12) >= {event['side']} ({display(event['side'])})",
+                      f"Classification: **{classification}**.",
+                      f"Improvement: `{event['improvement']}`; mass: `{event['mass']}`.",
+                      f"Certificate: `{event['candidate']}`", f"SHA-256: `{event['sha256']}`", ""])
+    if search_findings:
+        lines.extend(["# Notable search improvements", "",
+                      "These are search-instrument results, **not proofs**.", ""])
+        for event in search_findings:
+            lines.extend([
+                f"## {event['strategy']} / {event['stage']} at L={event['side']}",
+                f"Objective: `{event['previous_best_objective']:.12g}` → "
+                f"`{event['objective']:.12g}` (gain `{event['gain']:.6g}`).",
+                f"Previous best strategy: `{event['previous_best_strategy']}`.",
+                "",
+            ])
+    atomic_text(root / "findings.md", "\n".join(lines) + "\n")
+    for event in discoveries:
+        if event.get("announced"):
+            continue
+        distinct = event.get(
+            "float64_distinct",
+            float(Fraction(event["side"])) != float(Fraction(event["previous"])),
+        )
+        heading = (
+            "VERIFIED LOWER BOUND IMPROVEMENT"
+            if distinct
+            else "VERIFIED EXACT REFINEMENT"
+        )
+        note = (
+            ""
+            if distinct
+            else "exactly stronger, but unchanged at float64 search resolution\n"
+        )
+        emit(root, "\n" + "=" * 72 + f"\n{heading}\n"
+             f"s(12) >= {event['side']} = {display(event['side'])}\n"
+             f"previous={display(event['previous'])}  improvement={event['improvement']}\n"
+             f"{note}"
+             f"full exact gate: PASS   mass={event['mass']}\n"
+             f"certificate: {event['candidate']}\nsha256: {event['sha256']}\n" + "=" * 72,
+             significant=distinct)
+        event["announced"] = True
+        save_state(root, state)
+    for event in search_findings:
+        if event.get("announced"):
+            continue
+        emit(
+            root,
+            "\n" + "-" * 72 + "\nNOTABLE SEARCH IMPROVEMENT (NOT A PROOF)\n"
+            f"L={display(event['side'])} strategy={event['strategy']} stage={event['stage']}\n"
+            f"objective {event['previous_best_objective']:.12g} -> "
+            f"{event['objective']:.12g}  gain={event['gain']:.6g}\n"
+            f"previous-best-strategy={event['previous_best_strategy']}\n"
+            + "-" * 72,
+            significant=True,
+        )
+        event["announced"] = True
+        save_state(root, state)
+
+
+def generation_parallelism(state: dict[str, Any], work: dict[str, Any]) -> bool:
+    if state.get("active_generation"):
+        return True
+    if work["kind"] != "search" or state.get("active") is not None:
+        return False
+    if state["config"].get("generation_trials", 3) <= 1 or state["config"]["workers"] <= 1:
+        return False
+    from devtools.frontier_generation_campaign import select_plans
+    return len(select_plans(state, work)) > 1
+
+
+def choose_work(state: dict[str, Any]) -> dict[str, Any]:
+    if state.get("active_generation"):
+        return {"kind": "resume-generation", "reason": "finish the durable strategy cohort"}
+    target = next_side(state)
+    ceiling = soft_high(state)
+    pending = target == ceiling and any(
+        Fraction(c['side']) == ceiling and scale_limited_unresolved(c, int(state['config']['max_scale']))
+        for c in state['cycles'][-1:]
+    )
+    # Find the latest record for this side, not merely the last campaign cycle.
+    for cycle in reversed(state['cycles']):
+        if Fraction(cycle['side']) == ceiling:
+            pending = target == ceiling and scale_limited_unresolved(cycle, int(state['config']['max_scale']))
+            break
+    return frontier_policy.plan(
+        state, next_side=target, soft_high=ceiling, scale_pending=pending,
+        repair_available=select_repair_candidate(state) is not None,
+        saturated=numeric_search_saturated(state),
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
+    global _ACTIVE_STOP, _RUNTIME_LIMITS
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--resume", action="store_true")
-    parser.add_argument("--verified-low", type=Fraction, default=Fraction(99, 25))
-    parser.add_argument("--search-high", type=Fraction, default=Fraction(397, 100))
-    parser.add_argument("--seed-certificate", type=Path, default=DEFAULT_SEED)
-    parser.add_argument("--workers", type=int, default=int(os.environ.get("PACK_JOBS", "1")))
-    parser.add_argument("--screen-rounds", type=int, default=8)
-    parser.add_argument("--normal-rounds", type=int, default=20)
-    parser.add_argument("--deep-rounds", type=int, default=40)
-    parser.add_argument("--max-rounds", type=int, default=60)
-    parser.add_argument(
-        "--row-rounds",
-        type=int,
-        default=60,
-        help="maximum inner row-generation rounds per column round",
-    )
-    parser.add_argument(
-        "--scale",
-        type=int,
-        default=DEFAULT_RATIONALISATION_SCALE,
-        help=(
-            "initial weight rationalisation denominator; default 1600000 is an "
-            "exact 8x refinement of the historical 200000 grid"
-        ),
-    )
-    parser.add_argument(
-        "--max-scale",
-        type=int,
-        default=DEFAULT_MAX_RATIONALISATION_SCALE,
-        help=(
-            "largest automatic rationalisation denominator; scale doubles only "
-            "when LP objective < 12 but rationalised mass is still >= 12"
-        ),
-    )
-    parser.add_argument("--target-width", type=Fraction)
-    parser.add_argument("--max-cycles", type=int)
+    parser.add_argument("--status", action="store_true", help="print saved progress without starting work")
+    for name in ("verified-low", "search-high", "target-width", "strategy-width"):
+        parser.add_argument(f"--{name}", type=Fraction)
+    parser.add_argument("--seed-certificate", type=Path)
+    for name in ("workers", "screen-rounds", "normal-rounds", "deep-rounds", "max-rounds",
+                 "row-rounds", "max-row-rounds", "scale", "max-scale", "max-cycles", "generation-trials"):
+        parser.add_argument(f"--{name}", type=int)
+    parser.add_argument("--strategies", help="comma-separated portfolio (default: baseline,centre,pricing,windows,dense,fine-net)")
+    parser.add_argument("--max-hours", type=float, help="request a graceful stop after this session budget")
+    parser.add_argument("--stop-when-exhausted", action="store_true",
+                        help="exit instead of staying idle when the configured portfolio is exhausted")
     parser.add_argument("--import-result", type=Path)
+    for name in ("stage-seconds", "verify-seconds", "no-progress-seconds", "heartbeat-seconds", "backoff-seconds"):
+        parser.add_argument(f"--{name}", type=float)
+    for name in ("retries", "max-rss-mib", "min-free-mib"):
+        parser.add_argument(f"--{name}", type=int)
     args = parser.parse_args(argv)
-    budgets = [args.screen_rounds, args.normal_rounds, args.deep_rounds, args.max_rounds]
-    if (
-        args.workers < 1
-        or args.row_rounds < 1
-        or args.scale < 1
-        or args.max_scale < args.scale
-        or sorted(set(budgets)) != budgets
-        or budgets[0] < 1
-        or (args.max_cycles is not None and args.max_cycles < 1)
-        or (args.target_width is not None and args.target_width <= 0)
-    ):
-        parser.error(
-            "workers and budgets must be positive, budgets strictly increasing, "
-            "and finite stops positive"
-        )
     root = args.root.resolve()
-    seed = args.seed_certificate.resolve()
-    config: dict[str, Any] = {
-        "verified_low": str(args.verified_low),
-        "search_high": str(args.search_high),
-        "seed_certificate": str(seed),
-        "workers": args.workers,
-        "budgets": budgets,
-        "row_rounds": args.row_rounds,
-        "scale": args.scale,
-        "max_scale": args.max_scale,
-        "target_width": str(args.target_width) if args.target_width is not None else None,
-        "max_cycles": args.max_cycles,
-    }
     started = time.monotonic()
+    if args.status:
+        state = read_json(root / "state.json")
+        print(timestamped(summary(root, state, started)))
+        return 0
+    previous_handlers = {}
+    previous_workers_env = os.environ.get("PACK_JOBS")
+    previous_stop, previous_limits = _ACTIVE_STOP, _RUNTIME_LIMITS
+    state = None
+    exit_code = 0
     try:
         with locked(root):
+            stop = StopFlag(root)
+            _ACTIVE_STOP = stop
+            for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+                previous_handlers[signum] = signal.signal(signum, stop.handle)
             if args.resume:
-                state = load_state(root, config)
+                state = load_state(root)
+                config = dict(state["config"])
             else:
                 if (root / "state.json").exists():
-                    parser.error("state already exists; use --resume")
+                    raise ValueError("state already exists; use --resume")
                 if any(path.name != ".runner.lock" for path in root.iterdir()):
-                    parser.error("root contains files without state; choose a fresh root")
-                state = initial_state({**config, "root": root}, seed)
-                (root / "README.md").write_text(README, encoding="utf-8")
-                save_state(root, state)
-                if args.import_result is not None:
-                    import_result(root, state, args.import_result)
-                    save_state(root, state)
-            state["session_limits"] = {
-                "target_width": config["target_width"],
-                "max_cycles": config["max_cycles"],
+                    raise ValueError("root contains files without state; preserve them and choose a fresh root")
+                config = {}
+            defaults = {
+                "verified_low": "99/25", "search_high": "397/100", "seed_certificate": str(DEFAULT_SEED),
+                "workers": int(os.environ.get("PACK_JOBS", "16")), "budgets": [8, 20, 40, 60],
+                "row_rounds": 60, "max_row_rounds": 120, "scale": DEFAULT_RATIONALISATION_SCALE,
+                "max_scale": DEFAULT_MAX_RATIONALISATION_SCALE,
+                "strategies": [p["name"] for p in frontier_policy.PROFILES],
+                "strategy_width": "1/100000", "target_width": None, "max_cycles": None,
+                "generation_trials": 3,
             }
+            config = {**defaults, **config}
+            for key in ("verified_low", "search_high", "seed_certificate"):
+                value = getattr(args, key)
+                if value is not None:
+                    value = str(value.resolve()) if isinstance(value, Path) else str(value)
+                    if args.resume and value != config[key]:
+                        raise ValueError(f"cannot change initial {key} while resuming this campaign")
+                    config[key] = value
+            for key in ("workers", "row_rounds", "max_row_rounds", "scale", "max_scale", "generation_trials"):
+                if getattr(args, key) is not None:
+                    config[key] = getattr(args, key)
+            budgets = list(config["budgets"])
+            for index, key in enumerate(("screen_rounds", "normal_rounds", "deep_rounds", "max_rounds")):
+                if getattr(args, key) is not None:
+                    budgets[index] = getattr(args, key)
+            config["budgets"] = budgets
+            if args.strategies is not None:
+                config["strategies"] = list(dict.fromkeys(args.strategies.split(",")))
+            for strategy in config["strategies"]:
+                frontier_policy.profile(strategy)
+            if args.strategy_width is not None:
+                config["strategy_width"] = str(args.strategy_width)
+            # Finite session limits are not inherited accidentally on resume.
+            config["target_width"] = str(args.target_width) if args.target_width is not None else None
+            config["max_cycles"] = args.max_cycles
+            runtime = {**frontier_runtime.DEFAULTS, **config.get("runtime", {})}
+            for key in frontier_runtime.DEFAULTS:
+                value = getattr(args, key, None)
+                if value is not None:
+                    runtime[key] = value
+            if any(not math.isfinite(float(value)) for value in runtime.values()):
+                raise ValueError("runtime budgets must be finite")
+            if args.max_hours is not None and (not math.isfinite(args.max_hours) or args.max_hours <= 0):
+                raise ValueError("max-hours must be positive and finite")
+            if not config["strategies"]:
+                raise ValueError("at least one strategy is required")
+            if runtime["max_rss_mib"] == 0:
+                memory = Path("/proc/meminfo").read_text().splitlines()
+                total_mib = int(next(line.split()[1] for line in memory if line.startswith("MemTotal:"))) // 1024
+                runtime["max_rss_mib"] = max(256, min(24576, total_mib * 3 // 4))
+            if (not 1 <= config["generation_trials"] <= 6
+                    or config["workers"] < 1 or config["row_rounds"] < 1
+                    or config["max_row_rounds"] < config["row_rounds"]
+                    or config["scale"] < 1 or config["max_scale"] < config["scale"]
+                    or sorted(set(budgets)) != budgets or budgets[0] < 1
+                    or not config["strategies"] or Fraction(config["strategy_width"]) <= 0
+                    or (args.max_cycles is not None and args.max_cycles < 1)
+                    or (args.target_width is not None and args.target_width <= 0)
+                    or (args.max_hours is not None and args.max_hours <= 0)
+                    or any(float(runtime[k]) < 0 for k in runtime)
+                    or runtime["stage_seconds"] <= 0 or runtime["verify_seconds"] <= 0
+                    or runtime["heartbeat_seconds"] <= 0):
+                raise ValueError("invalid positive budget, scale, strategy, or runtime limit")
+            config["runtime"] = runtime
+            _RUNTIME_LIMITS = runtime
+            os.environ["PACK_JOBS"] = str(config["workers"])
+            if state is None:
+                state = initial_state({**config, "root": root}, Path(config["seed_certificate"]))
+            else:
+                if config != state["config"]:
+                    state.setdefault("configuration_history", []).append({"at": stamp(), "previous": state["config"]})
+                    if any(config[k] != state["config"].get(k) for k in ("budgets", "row_rounds", "max_row_rounds")):
+                        state["search_revision"] = int(state.get("search_revision", 0)) + 1
+                state["config"] = config
+            if args.resume:
+                # Explicit resume permits fresh bounded attempts for operational
+                # failures, including repairs; it does not erase mathematical refusals.
+                state["error_epoch"] = int(state.get("error_epoch", 0)) + 1
+                if state.get("mode") == "BLOCKED":
+                    state.setdefault("recoveries", []).append({"at": stamp(), "reason": "operator resumed blocked campaign"})
+                    state["mode"] = "FRONTIER"
+                    state["consecutive_job_errors"] = 0
+            save_state(root, state)
+            if args.import_result is not None:
+                if args.resume:
+                    raise ValueError("import-result is an initialization operation, not a resume override")
+                import_result(root, state, args.import_result)
+                save_state(root, state)
+            atomic_text(root / "README.md", README)
+            write_views(root, state)
+            publish_findings(root, state)
+            emit(root, f"[start] n=12 workers={config['workers']} scale={config['scale']} max-scale={config['max_scale']} "
+                 f"verified={display(state['verified_low'])} search-high={display(state['search_high'])} "
+                 f"strategies={','.join(config['strategies'])} generation-trials={config['generation_trials']}")
+            if state.pop("anchor_needs_verification", False):
+                seed = Path(state["verified_certificate"])
+                anchor_dir = root / f"anchor-{digest(seed)[:16]}"
+                anchor_dir.mkdir(exist_ok=True)
+                emit(root, "[verify] checking the legacy best certificate before new work")
+                status, proof = verify_candidate(anchor_dir, seed, Fraction(state["verified_low"]))
+                if proof is None:
+                    state["anchor_needs_verification"] = True
+                    raise ValueError(f"legacy anchor did not pass the full exact gate: {status}")
+                state["verified_certificate"] = proof
+                state["verified_sha256"] = digest(Path(proof))
+                save_state(root, state)
+            idle_since = None
+            idle_message_at = 0.0
+            while (not stop.requested or state.get("active") is not None or state.get("active_generation")
+                   or any(a.get("status") in ("RUNNING", "INTERRUPTED") for a in state.get("repair_attempts", []))):
+                poll_stop()
+                active_repair = any(a.get("status") in ("RUNNING", "INTERRUPTED")
+                                    for a in state.get("repair_attempts", []))
+                if stop.requested and state.get("active") is None and not state.get("active_generation") and not active_repair:
+                    break
+                if state.get("active") is None and not state.get("active_generation") and not active_repair:
+                    completed = sum(c["status"] in ("VERIFIED", "SEARCH_FAILED", "UNRESOLVED", "ERROR") for c in state["cycles"])
+                    if args.max_cycles is not None and completed >= args.max_cycles:
+                        break
+                    if args.max_hours is not None and time.monotonic() - started >= args.max_hours * 3600:
+                        break
+                    if args.target_width is not None and soft_high(state) - Fraction(state["verified_low"]) <= args.target_width:
+                        break
+                    if state.get("mode") == "BLOCKED":
+                        emit(root, "[BLOCKED] repeated infrastructure/environment errors; evidence saved. Fix the environment and resume.", significant=True)
+                        exit_code = 1
+                        break
+                work = choose_work(state)
+                if work["kind"] == "idle":
+                    if idle_since is None:
+                        idle_since = time.monotonic()
+                        state["mode"] = "IDLE_EXHAUSTED"
+                        state["idle_reason"] = work["reason"]
+                        save_state(root, state)
+                        write_views(root, state)
+                        emit(root, f"[IDLE] {work['reason']}; Ctrl-C prints the summary", significant=True)
+                    if args.stop_when_exhausted:
+                        break
+                    if time.monotonic() - idle_message_at >= runtime["heartbeat_seconds"]:
+                        emit(root, f"[idle] verified={display(state['verified_low'])}; no duplicate work submitted")
+                        idle_message_at = time.monotonic()
+                    time.sleep(1)
+                    continue
+                idle_since = None
+                if work["kind"] == "search":
+                    state["scheduled_work"] = work
+                    state["mode"] = "FRONTIER"
+                    save_state(root, state)
+                    emit(root, f"[plan] L={display(work['side'])} strategy={work['strategy']} reason={work['reason']}")
+                try:
+                    if work["kind"] == "repair":
+                        run_repair(root, state)
+                    elif generation_parallelism(state, work):
+                        from devtools.frontier_generation_campaign import run_portfolio
+                        run_portfolio(root, state, sys.modules[__name__])
+                    else:
+                        run_cycle(root, state)
+                except frontier_runtime.LiveJob as error:
+                    # Only legacy children lack an adoptable supervisor. Waiting
+                    # is safe; starting another computation would not be.
+                    emit(root, f"[recover] {error}")
+                    for _ in range(max(1, int(runtime["heartbeat_seconds"]))):
+                        poll_stop()
+                        if stop.requested:
+                            break
+                        time.sleep(1)
+                    if stop.requested:
+                        break
+                poll_stop()
+                if stop.requested and state.get("active") is None and not state.get("active_generation"):
+                    break
             save_state(root, state)
             write_views(root, state)
-            stop = StopFlag(root)
-            signal.signal(signal.SIGINT, stop.handle)
-            signal.signal(signal.SIGTERM, stop.handle)
-            if hasattr(signal, "SIGHUP"):
-                signal.signal(signal.SIGHUP, stop.handle)
-            os.environ["PACK_JOBS"] = str(args.workers)
-            emit(
-                root,
-                f"[start] n=12 workers={args.workers} scale={state['config']['scale']} "
-                f"max-scale={state['config']['max_scale']} "
-                f"verified={display(state['verified_low'])} "
-                f"search-high={display(state['search_high'])}",
-            )
+            publish_findings(root, state)
+            emit(root, summary(root, state, started))
+    except (ValueError, RuntimeError, OSError, KeyError, TypeError, OverflowError) as error:
+        exit_code = 1
+        if state is not None:
             try:
-                while not stop.requested or state["active"] is not None:
-                    if state["active"] is None:
-                        if (
-                            args.max_cycles is not None
-                            and sum(
-                                c["status"] in ("VERIFIED", "SEARCH_FAILED", "UNRESOLVED")
-                                for c in state["cycles"]
-                            )
-                            >= args.max_cycles
-                        ):
-                            break
-                        if (
-                            args.target_width is not None
-                            and soft_high(state) - Fraction(state["verified_low"])
-                            <= args.target_width
-                        ):
-                            break
-                        if numeric_search_saturated(state):
-                            if state.get("mode") != "REPAIR":
-                                state["mode"] = "REPAIR"
-                                save_state(root, state)
-                                emit(
-                                    root,
-                                    "[frontier] float64 search saturated; switching to "
-                                    "automatic candidate diagnosis/repair",
-                                    significant=True,
-                                )
-                            if not run_repair(root, state):
-                                break
-                            continue
-                        if next_side(state) is None:
-                            break
-                    run_cycle(root, state)
-            finally:
-                save_state(root, state)
-                write_views(root, state)
-                emit(root, summary(root, state, started))
-    except (ValueError, RuntimeError, FileNotFoundError) as error:
-        print(f"frontier runner: {error}", file=sys.stderr)
-        return 1
-    return 0
+                with locked(root):
+                    save_state(root, state)
+                    write_views(root, state)
+                    emit(root, summary(root, state, started))
+            except (OSError, RuntimeError):
+                pass  # Never race another writer; the last atomic state survives.
+        print(timestamped(f"frontier runner stopped safely: {error}"), file=sys.stderr)
+    finally:
+        for signum, handler in previous_handlers.items():
+            signal.signal(signum, handler)
+        _ACTIVE_STOP, _RUNTIME_LIMITS = previous_stop, previous_limits
+        if previous_workers_env is None:
+            os.environ.pop("PACK_JOBS", None)
+        else:
+            os.environ["PACK_JOBS"] = previous_workers_env
+    return exit_code
 
 
-README = """# n=12 frontier search record
+README = """# Persistent autonomous n=12 search
 
-From `packing/`:
+Run from packing/:
 
-```bash
-PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier \\
-  --root ../Experiments/n12-frontier-search
-PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier \\
-  --root ../Experiments/n12-frontier-search --resume
-```
+    PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search
+    PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search --resume
 
-`state.json` is authoritative. Each side has stable rational naming; each cycle
-and stage has its own directory. `summary.csv` and `report.md` are views of state.
-Use `--resume` after interruption. The lock prevents concurrent writers.
-Each subprocess records its PID and Linux process start identity beside its log.
-If a parent crash leaves a child alive, resume refuses to launch a duplicate
-until that child exits. SIGINT, SIGTERM, and SIGHUP request a graceful stop;
-long subprocesses emit a heartbeat every five minutes, including the latest
-flushed column round, LP round, and objective when available.
+Ctrl-C finishes the active bounded cycle/repair, saves state and prints a summary.
+Use --status to inspect a saved campaign without starting jobs. A stopped VM must
+still be restarted externally; run in tmux for ordinary SSH sessions.
 
-A cycle is one side from screening through its final VERIFIED, SEARCH_FAILED, or
-UNRESOLVED decision. The first Ctrl-C finishes that cycle. Stage budgets rerun
-the generator with sites from the preceding frozen candidate; that candidate is
-only a search seed. Budgets are additional restart budgets: the default
-8/20/40/60 schedule can request up to 128 column rounds across four runs,
-plus repeated inner row generation. State and report record the cumulative
-column rounds actually completed. No stage resumes solver internals.
+State schema 3 migrates schema-2 history with a backup. Live supervised jobs are
+reattached on resume, not duplicated. Child jobs have wall/progress/resource limits
+and bounded retries; ERROR is never mathematical SEARCH_FAILED. Repeated execution
+errors enter BLOCKED. Explicit resume permits recovery after fixing the environment.
 
-The runner uses `--scale 1600000` initially and an automatic nested scale
-ladder up to `--max-scale 25600000`. If a converged stage has LP objective
-below 12 but upward rationalisation still leaves total mass at or above 12,
-the runner first repeats the same column budget on the same side at twice the
-scale, seeded from the preceding candidate's sites. It keeps doubling only
-while rationalisation is the blocker. A point whose LP objective is itself at
-or above 12 spends effort on the column search instead.
+The default portfolio is baseline,centre,pricing,windows,dense,fine-net. Stagnation
+changes the instrument instead of indefinitely increasing one round budget. Scale
+refinement uses raw-lp.json without re-solving LP; legacy stages without raw
+snapshots require an initial fresh solve. Search failures are only heuristic
+frontier points. The full existing exact two-route gate alone permits VERIFIED.
 
-A schema-2 state written before these options existed is migrated in place on
-`--resume`; old stages remain auditable at their original scale. An unresolved
-point is revisited only when a finer scale remains untried there. Merely
-improving the VERIFIED low no longer causes the deterministic unresolved
-ceiling to be recomputed over and over.
+Verified improvements have prominent terminal banners and their own findings.json
+and findings.md ledger with certificate SHA-256. Full logs remain in stage/job files.
+No retained certificate is overwritten. A successful repair beyond the heuristic
+high expands the exploration interval instead of invalidating state.
 
-VERIFIED results, scale-refinement opportunities, and final scale-limited
-UNRESOLVED results are printed in blue on an interactive terminal so they stand
-out during occasional checks. `NO_COLOR` disables this; persistent logs never
-contain ANSI colour codes.
-
-`--row-rounds` limits inner row generation per column round; a stage that does
-not converge there is UNRESOLVED regardless of its floating-point objective.
-An incomplete stage with
-a valid result JSON is finalized on resume; otherwise its files remain in place
-and a new stage attempt is made.
-
-The next side is the exact midpoint between the best VERIFIED low and the
-nearest UNRESOLVED point above it, or the SEARCH_FAILED/configured high if no
-such point exists. When a verified low improves and the gap to the nearest
-UNRESOLVED point is at most one sixteenth of the initial width, that point is
-retried once with the new seed. There is no silent precision stop. When exact midpoint bisection collapses onto
-one of its endpoints in the float64 search backend, the runner switches from
-FRONTIER mode to automatic REPAIR mode instead of burning CPU on numerically
-identical searches.
-
-REPAIR mode scans the persisted state for the strongest untried side above the
-current VERIFIED bound whose rational mass is already below 12 but whose quick
-or full exact gate rejected it. The runner re-runs the quick gate with
-`--dump-stalls`, stores a structured diagnosis under `repair/`, then tries
-sound uniform weight boosts using progressively more of the remaining strict
-mass slack. Uniform scaling preserves the site set and D4 symmetry and can only
-increase covered mass; every repaired artifact still has total mass strictly
-below 12 and must pass declaration, quick interval verification, and the full
-two-route exact retention gate before it can update VERIFIED. Failed repairs
-are retained and the next candidate is selected automatically. If all persisted
-repairable candidates are exhausted, the runner stops explicitly in
-REPAIR_EXHAUSTED rather than repeating identical floating searches.
-
-The search policy escalates when the result is close to mass/objective 12, is
-improving with useful columns or priced depth, or has priced depth near the
-frontier. A stalled distant run is SEARCH_FAILED; a close or improving run at
-maximum budget is UNRESOLVED. These are instrument judgments, never proofs.
-Only a frozen below-12 candidate accepted by the full exact two-route gate is
-VERIFIED. The original retained certificate is never changed.
+On configured portfolio exhaustion the runner idles visibly without busy-looping.
+--stop-when-exhausted exits instead. Neither state means mathematical impossibility.
+Detailed strategy, watchdog, migration, and testing documentation is in
+packing/devtools/n12-frontier.md in the repository.
 """
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

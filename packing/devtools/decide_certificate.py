@@ -86,6 +86,7 @@ from sqpack.fractional.corner_clip import (
 from sqpack.fractional.interval import (
     MAX_INTERVAL_ATOMS,
     IntervalInputError,
+    interval_worker_count,
     scaled_atom_masses,
     verify_by_intervals,
 )
@@ -448,6 +449,10 @@ def decide(
 
     start = time.time()
     interval = None
+    print(
+        f"  interval workers={interval_worker_count(2 * len(certificate.half_tangents) - 1)}",
+        flush=True,
+    )
     stall_log: dict[str, list[list[float]]] = {}
     # An unconditional decision calls both routes exactly as it did before the clip
     # existed, with no extra argument: same call, same bytes, same verdict.

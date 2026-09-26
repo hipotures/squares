@@ -80,10 +80,17 @@ certificates, and the full-net searches report no stalled box.
 from __future__ import annotations
 
 import math
+import multiprocessing as mp
+import os
+import sys
+import threading
 from collections.abc import Iterator
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from fractions import Fraction
 from itertools import pairwise
+from multiprocessing.context import BaseContext
+from pathlib import Path
 from typing import Literal
 
 import numpy as np
@@ -91,6 +98,7 @@ from numpy.typing import NDArray
 
 from sqpack.fractional.certificate import Certificate
 from sqpack.fractional.corner_clip import CornerClip
+from sqpack.workers import worker_count
 
 Floats = NDArray[np.float64]
 Ints = NDArray[np.int64]
@@ -147,6 +155,69 @@ MAX_INTERVAL_ATOMS = 4096
 # millions of retained coordinate enclosures. At this cap four float arrays use
 # 256 KiB; the per-batch mask still obeys its original 16 MiB ceiling.
 MAX_BATCH_SITES = 2 * MAX_INTERVAL_ATOMS
+
+# Full certificate decisions have hundreds of independent directions. Repair
+# used to run them serially, leaving a 16-vCPU search host at roughly one busy
+# core. PACK_JOBS remains the operator CPU cap, while this conservative memory
+# allowance keeps parallel branch-and-bound from multiplying transient arrays
+# without bound.
+_INTERVAL_PARALLEL_MIN_DIRECTIONS = 24
+_INTERVAL_MAX_PARALLEL_WORKERS = 32
+_INTERVAL_WORKER_ESTIMATE_BYTES = 128 * 1024 * 1024
+_INTERVAL_PARALLEL_BUDGET_BYTES = 2 * 1024 * 1024 * 1024
+
+
+def _available_memory_bytes() -> int | None:
+    """Linux MemAvailable, used only to lower the parallelism budget safely."""
+
+    try:
+        for line in Path("/proc/meminfo").read_text(encoding="utf-8").splitlines():
+            if line.startswith("MemAvailable:"):
+                return int(line.split()[1]) * 1024
+    except (OSError, ValueError, IndexError):
+        return None
+    return None
+
+
+def interval_worker_count(units: int, requested: int | None = None) -> int:
+    """Workers for independent interval directions under CPU and memory caps."""
+
+    if units < 1:
+        return 1
+    available = os.process_cpu_count() or 1
+    pack_cap = worker_count(available)
+    desired = pack_cap if requested is None else min(max(1, requested), pack_cap)
+    memory = _available_memory_bytes()
+    budget = _INTERVAL_PARALLEL_BUDGET_BYTES
+    if memory is not None:
+        budget = min(
+            budget,
+            max(_INTERVAL_WORKER_ESTIMATE_BYTES, memory // 4),
+        )
+    by_memory = max(1, budget // _INTERVAL_WORKER_ESTIMATE_BYTES)
+    return min(units, desired, _INTERVAL_MAX_PARALLEL_WORKERS, by_memory)
+
+
+def _main_is_importable() -> bool:
+    main = sys.modules.get("__main__")
+    main_file = getattr(main, "__file__", None) if main is not None else None
+    return (
+        isinstance(main_file, str)
+        and not main_file.startswith("<")
+        and Path(main_file).is_file()
+    )
+
+
+def _interval_pool_context() -> BaseContext | None:
+    """Match the exact verifier's safe Linux process-start policy."""
+
+    if not sys.platform.startswith("linux"):
+        return mp.get_context()
+    if threading.active_count() == 1:
+        return mp.get_context("fork")
+    if _main_is_importable():
+        return mp.get_context()
+    return None
 
 
 def interval_batch_size(batch_size: int) -> int:
@@ -907,6 +978,64 @@ def searches(
         yield search
 
 
+_WORKER_ATOMS: AtomData | None = None
+_WORKER_OUTER: Interval | None = None
+_WORKER_SQUARE: Interval | None = None
+_WORKER_CLIP: CornerClip | None = None
+_WORKER_ENCLOSE = False
+_WORKER_STALLS = False
+
+
+def _search_rotation(
+    atoms: AtomData,
+    rotation: Rotation,
+    outer: Interval,
+    square: Interval,
+    clip: CornerClip | None,
+    *,
+    enclose: bool,
+    collect_stalls: bool,
+) -> tuple[DirectionOutcome, list[list[float]]]:
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        search = DirectionSearch(atoms, rotation, outer, square, clip)
+        boxes: list[list[float]] = []
+        outcome = search.search(
+            prune_at=None if enclose else atoms.scale,
+            stall_boxes=boxes if collect_stalls else None,
+        )
+    return outcome, boxes
+
+
+def _init_interval_worker(
+    certificate: Certificate,
+    enclose: bool,
+    clip: CornerClip | None,
+    collect_stalls: bool,
+) -> None:
+    global _WORKER_ATOMS, _WORKER_OUTER, _WORKER_SQUARE
+    global _WORKER_CLIP, _WORKER_ENCLOSE, _WORKER_STALLS
+    _WORKER_ATOMS = AtomData.of(certificate)
+    _WORKER_OUTER = Interval.of(certificate.outer_side)
+    _WORKER_SQUARE = Interval.of(certificate.square_side)
+    _WORKER_CLIP = clip
+    _WORKER_ENCLOSE = enclose
+    _WORKER_STALLS = collect_stalls
+
+
+def _search_rotation_worker(rotation: Rotation) -> tuple[DirectionOutcome, list[list[float]]]:
+    if _WORKER_ATOMS is None or _WORKER_OUTER is None or _WORKER_SQUARE is None:
+        raise RuntimeError("interval worker was not initialised")
+    return _search_rotation(
+        _WORKER_ATOMS,
+        rotation,
+        _WORKER_OUTER,
+        _WORKER_SQUARE,
+        _WORKER_CLIP,
+        enclose=_WORKER_ENCLOSE,
+        collect_stalls=_WORKER_STALLS,
+    )
+
+
 def verify_by_intervals(
     certificate: Certificate,
     *,
@@ -914,6 +1043,7 @@ def verify_by_intervals(
     directions: tuple[str, ...] | None = None,
     stall_log: dict[str, list[list[float]]] | None = None,
     clip: CornerClip | None = None,
+    workers: int | None = None,
 ) -> IntervalVerdict:
     """Decide the certificate; ``enclose`` also pins the least covered mass.
 
@@ -938,20 +1068,51 @@ def verify_by_intervals(
         _condition_containment(certificate),
     ]
     outcomes: list[DirectionOutcome] = []
-    for search in searches(certificate, atoms, clip=clip):
-        if directions is not None and search.label not in directions:
-            continue
-        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
-            boxes: list[list[float]] = []
-            outcome = search.search(
-                prune_at=None if enclose else atoms.scale,
-                stall_boxes=boxes if stall_log is not None else None,
-            )
+    outer = Interval.of(certificate.outer_side)
+    square = Interval.of(certificate.square_side)
+    requested_labels = None if directions is None else set(directions)
+    rotations = tuple(
+        rotation
+        for rotation in doubled_net(certificate.half_tangents)
+        if requested_labels is None or rotation.label in requested_labels
+    )
+    count = interval_worker_count(len(rotations), workers)
+    context = (
+        _interval_pool_context()
+        if len(rotations) >= _INTERVAL_PARALLEL_MIN_DIRECTIONS and count > 1
+        else None
+    )
+    def record(outcome: DirectionOutcome, boxes: list[list[float]]) -> bool:
         if stall_log is not None:
-            stall_log[search.label] = boxes
+            stall_log[outcome.label] = boxes
         outcomes.append(outcome)
-        if outcomes[-1].status == "refuted":
-            break
+        return outcome.status == "refuted"
+
+    if context is None:
+        for rotation in rotations:
+            outcome, boxes = _search_rotation(
+                atoms,
+                rotation,
+                outer,
+                square,
+                clip,
+                enclose=enclose,
+                collect_stalls=stall_log is not None,
+            )
+            if record(outcome, boxes):
+                break
+    else:
+        # executor.map preserves net order, so the observable verdict and
+        # the first refuting direction stay identical to the serial algorithm.
+        with ProcessPoolExecutor(
+            max_workers=count,
+            mp_context=context,
+            initializer=_init_interval_worker,
+            initargs=(certificate, enclose, clip, stall_log is not None),
+        ) as pool:
+            for outcome, boxes in pool.map(_search_rotation_worker, rotations, chunksize=1):
+                if record(outcome, boxes):
+                    break
     statuses = {o.status for o in outcomes}
     # Certified means only that the search resolved every box against the
     # threshold it was run with, and under ``enclose`` that threshold is the
