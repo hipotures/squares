@@ -359,3 +359,22 @@ def test_grid_proposals_stay_inside_own_bracket_and_keep_meaningful_gaps(offset)
         target = Fraction(work["side"])
         assert low + RESOLUTION <= target <= high - RESOLUTION
         assert (target / RESOLUTION).denominator == 1
+
+
+
+def test_status_labels_legacy_globals_and_shows_strategy_local_frontiers():
+    state = campaign()
+    state["config"]["strategies"] = ["windows", "centre"]
+    prove_fixture(state, LOG_LOW)
+    outcome(state, LOG_LOW + 4 * RESOLUTION, "centre", "UNRESOLVED")
+
+    text = frontier.frontier_status(state)
+
+    assert "[frontier] verified=" in text
+    assert "legacy-soft-high=" in text
+    assert "legacy-search-high=" in text
+    assert "[strategy-frontiers]" in text
+    assert "windows:next=" in text
+    assert "windows:" in text and "own-high=" in text
+    assert "centre:" in text and "(observed)" in text
+    assert "soft-high=" not in text.replace("legacy-soft-high=", "")
