@@ -213,7 +213,7 @@ def _batch(root: str, items: list[dict]) -> tuple[int, float]:
 
 
 def replay_session(args) -> int:
-    from devtools.native_ab import emit, finish_report, session_manifest
+    from devtools.native_ab import emit, finish_report, session_manifest, terminal_bell
 
     if not 1 <= args.workers <= 64 or args.minutes < 0 or args.rounds < 0:
         raise ValueError("invalid replay budget")
@@ -328,6 +328,7 @@ def replay_session(args) -> int:
         runtime.atomic_json(
             directory / "error.json", {"type": type(exc).__name__, "message": str(exc)}
         )
+        terminal_bell(f"ERROR during replay: {type(exc).__name__}: {exc}", error=True)
         for future in futures:
             future.cancel()
         pool.terminate_workers()
@@ -343,12 +344,25 @@ def replay_session(args) -> int:
     session["completed_replays"] = completed
     session["matched_output_checks"] = completed
     session["fully_completed_epochs"] = completed // len(manifest["items"])
-    finish_report(
-        directory,
-        session,
-        time.monotonic() - started,
-        exit_code=code,
-        drain=0.0 if requested is None else time.monotonic() - requested,
-        first_window=first_window,
+    try:
+        finish_report(
+            directory,
+            session,
+            time.monotonic() - started,
+            exit_code=code,
+            drain=0.0 if requested is None else time.monotonic() - requested,
+            first_window=first_window,
+        )
+    except Exception as exc:
+        terminal_bell(
+            f"ERROR while writing final replay report: {type(exc).__name__}: {exc}",
+            error=True,
+        )
+        raise
+    terminal_bell(
+        "replay finished; final throughput report is ready"
+        if code == 0
+        else f"replay finished with exit={code}; inspect error/report artifacts",
+        error=code != 0,
     )
     return code
