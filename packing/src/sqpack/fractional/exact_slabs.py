@@ -13,12 +13,12 @@ and exact-intersection construction remain the caller's responsibility.
 
 from __future__ import annotations
 
-from sqpack.fractional.native_ab_hooks import exact_at, exact_cost
-
 from collections.abc import Iterable
 from fractions import Fraction
 from math import gcd, lcm
 from typing import Protocol
+
+from sqpack.fractional.native_ab_hooks import exact_at, exact_cost
 
 type IntegerSlab = tuple[int, int, int, int]
 type HomogeneousPoint = tuple[int, int, int]
