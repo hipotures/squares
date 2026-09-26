@@ -133,8 +133,12 @@ uv run --frozen python -m devtools.native_ab campaign \
 ```
 
 The ordinary timestamped frontier output remains visible. After 60 minutes the
-wrapper requests the same graceful stop as Ctrl-C. It **finishes bounded
-already-admitted work**, so the final elapsed time can exceed 60 minutes.
+wrapper requests the same graceful stop as Ctrl-C. It finishes **only the
+already-running bounded stage/wave**, adopts and interprets that completed result,
+and leaves any later normal/deep/maximum escalation resumable for the next
+session. It does not start a fresh escalation merely to "finish the cycle".
+The final elapsed time can therefore exceed 60 minutes by the remaining time of
+one already-running stage/wave, but not by the whole escalation ladder.
 `--minutes 0` disables the timer for entirely manual control. A stop during
 startup is deferred until the controller has installed its signal handlers.
 Repeated Ctrl-C does not silently escalate to destructive termination.
@@ -168,7 +172,13 @@ same root; the existing campaign lock remains authoritative.
 
 ## Throughput, not just duration
 
-Each session prints and saves a final table with:
+Each session prints and saves a final table with rates computed over the
+**measurement window ending when the timed/interactive stop was requested**, not
+over the later drain. The final session and drain durations and final cumulative
+counts remain in JSON separately. This prevents a long drain from diluting an
+otherwise valid one-hour baseline.
+
+The table includes:
 
 - completed calls per wall second;
 - logical units per wall second;
