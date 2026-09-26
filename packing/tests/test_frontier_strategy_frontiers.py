@@ -15,7 +15,12 @@ import pytest
 
 from devtools import frontier_policy as policy
 from devtools import run_n12_frontier as frontier
-from devtools.frontier_generation_campaign import retire_superseded, run_portfolio, select_plans
+from devtools.frontier_generation_campaign import (
+    refill_resumed_cohort,
+    retire_superseded,
+    run_portfolio,
+    select_plans,
+)
 from devtools.frontier_io import read_json
 
 LOG_LOW = Fraction(43562304060209, 10995116277760)
@@ -380,6 +385,82 @@ def test_status_labels_legacy_globals_and_shows_strategy_local_frontiers():
     assert "centre:" in text and "(observed)" in text
     assert "soft-high=" not in text.replace("legacy-soft-high=", "")
 
+
+
+def test_resume_refills_partial_generation_cohort(tmp_path):
+    state = campaign()
+    state["config"]["strategies"] = ["pricing", "windows", "centre"]
+    side = LOG_LOW + 10 * RESOLUTION
+    original = outcome(
+        state,
+        side,
+        "pricing",
+        "INTERRUPTED",
+        plan_reason="strategy-local exploration",
+        stages=[
+            {
+                "status": "complete",
+                "decision": "ESCALATE",
+                "name": "deep",
+                "budget": 40,
+            }
+        ],
+    )
+    state["active_generation"] = [0]
+    emitted = []
+    stub = SimpleNamespace(
+        stamp=lambda: "fixture",
+        save_state=lambda *_: None,
+        emit=lambda *args: emitted.append(args),
+    )
+
+    added = refill_resumed_cohort(tmp_path, state, stub)
+
+    assert len(added) == 2
+    assert state["active_generation"][0] == 0
+    assert state["cycles"][0] is original
+    assert len(state["active_generation"]) == 3
+    assert {state["cycles"][i]["strategy"] for i in state["active_generation"]} == {
+        "pricing", "windows", "centre"
+    }
+    assert all(state["cycles"][i]["status"] == "RUNNING" for i in added)
+    assert any("resumed-refill=2" in args[1] for args in emitted)
+
+
+def test_resume_refill_preserves_singleton_precision_repair(tmp_path):
+    state = campaign()
+    cycle = outcome(
+        state,
+        LOG_LOW + RESOLUTION,
+        "pricing",
+        "INTERRUPTED",
+        plan_reason="untried same-side rationalisation before geometric saturation",
+        stages=[{"status": "complete", "decision": "REFINE_SCALE"}],
+    )
+    state["active_generation"] = [0]
+    stub = SimpleNamespace(stamp=lambda: "fixture", save_state=lambda *_: None, emit=lambda *_: None)
+
+    assert refill_resumed_cohort(tmp_path, state, stub) == []
+    assert state["active_generation"] == [0]
+    assert state["cycles"] == [cycle]
+
+
+def test_resume_refill_waits_for_uninterpreted_generated_result(tmp_path):
+    state = campaign()
+    cycle = outcome(
+        state,
+        LOG_LOW + RESOLUTION,
+        "pricing",
+        "INTERRUPTED",
+        plan_reason="strategy-local exploration",
+        stages=[{"status": "generated"}],
+    )
+    state["active_generation"] = [0]
+    stub = SimpleNamespace(stamp=lambda: "fixture", save_state=lambda *_: None, emit=lambda *_: None)
+
+    assert refill_resumed_cohort(tmp_path, state, stub) == []
+    assert state["active_generation"] == [0]
+    assert state["cycles"] == [cycle]
 
 
 def test_stop_between_generation_stages_preserves_resumable_cohort(tmp_path):
