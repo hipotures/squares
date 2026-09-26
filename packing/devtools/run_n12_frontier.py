@@ -242,6 +242,50 @@ def soft_high(state: dict[str, Any]) -> Fraction:
     return min(active_unresolved(state), default=Fraction(state["search_high"]))
 
 
+def strategy_frontier_lines(state: dict[str, Any]) -> list[str]:
+    """Readable strategy-local search state; legacy globals are diagnostics only."""
+
+    active: dict[str, Fraction] = {}
+    for cycle in state.get("cycles", []):
+        if cycle.get("status") not in ("RUNNING", "INTERRUPTED"):
+            continue
+        strategy = cycle.get("strategy", "baseline")
+        side = Fraction(cycle["side"])
+        active[strategy] = max(side, active.get(strategy, side))
+
+    lines: list[str] = []
+    for strategy in state.get("config", {}).get(
+        "strategies", [profile["name"] for profile in frontier_policy.PROFILES]
+    ):
+        bounds = frontier_policy.strategy_frontier(state, strategy)
+        kind = "observed" if bounds["observed_ceiling"] else "horizon"
+        if strategy in active:
+            cursor = f"active={display(active[strategy])}"
+        else:
+            proposal = frontier_policy.strategy_proposal(state, strategy)
+            cursor = (
+                f"next={display(proposal['side'])}"
+                if proposal is not None
+                else "next=none"
+            )
+        lines.append(
+            f"{strategy}:{cursor},own-high={display(bounds['ceiling'])}({kind})"
+        )
+    return lines
+
+
+def frontier_status(state: dict[str, Any]) -> str:
+    """Current proof endpoint plus the strategy-local frontiers that drive work."""
+
+    legacy = (
+        f"[frontier] verified={display(state['verified_low'])} "
+        f"legacy-soft-high={display(soft_high(state))} "
+        f"legacy-search-high={display(state['search_high'])}"
+    )
+    strategies = "[strategy-frontiers] " + "; ".join(strategy_frontier_lines(state))
+    return legacy + "\n" + strategies
+
+
 def stage_scale(stage: dict[str, Any]) -> int | None:
     """Rationalisation scale used by a stage, including legacy stage records."""
 
@@ -1172,10 +1216,14 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
             f"(certificate `{state['verified_certificate']}`)."
         ),
         (
-            f"Search high: `{state['search_high']}` "
-            f"({state['search_high_kind']}; search evidence only)."
+            f"Legacy search high: `{state['search_high']}` "
+            f"({state['search_high_kind']}; historical diagnostic only)."
         ),
-        f"UNRESOLVED sides: {unresolved}.",
+        f"Legacy UNRESOLVED sides: {unresolved}.",
+        "Strategy-local frontiers:",
+        "",
+        *[f"- {line}" for line in strategy_frontier_lines(state)],
+        "",
         f"Next policy action: `{choose_work(state)}`.",
         "",
         (
@@ -1230,12 +1278,20 @@ def summary(root: Path, state: dict[str, Any], started: float) -> str:
             f"cycles completed: {sum(c['status'] in ('VERIFIED', 'SEARCH_FAILED', 'UNRESOLVED') for c in state['cycles'])}",  # noqa: E501
             f"session wall time: {time.monotonic() - started:.0f}s",
             f"best VERIFIED: {low} = {display(low)}",
-            f"current search high ({state['search_high_kind']}): {high} = {display(high)}",
             (
-                "nearest active UNRESOLVED: "
+                f"legacy search high ({state['search_high_kind']}): "
+                f"{high} = {display(high)}"
+            ),
+            (
+                "legacy nearest active UNRESOLVED: "
                 f"{display(soft_high(state)) if active_unresolved(state) else 'none'}"
             ),
-            f"heuristic frontier width (not a mathematical upper bound): {high - low} = {display(high - low)}",
+            (
+                "legacy heuristic width (diagnostic, not a mathematical upper bound): "
+                f"{high - low} = {display(high - low)}"
+            ),
+            "strategy-local frontiers:",
+            *[f"  {line}" for line in strategy_frontier_lines(state)],
             f"exact verifications attempted: {attempts}",
             f"automatic repair attempts: {len(state.get('repair_attempts') or [])}",
             f"mode: {state.get('mode', 'FRONTIER')}",
@@ -1680,12 +1736,7 @@ def run_cycle(root: Path, state: dict[str, Any], *, defer_generation: bool = Fal
             f"[result] L={display(side)} exact={side} {decision} reason={reason}",
             significant=significant_result(decision, result),
         )
-        emit(
-            root,
-            f"[frontier] verified={display(state['verified_low'])} "
-            f"soft-high={display(soft_high(state))} "
-            f"search-high={display(state['search_high'])}",
-        )
+        emit(root, frontier_status(state))
         return
 
 
