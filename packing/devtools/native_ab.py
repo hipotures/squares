@@ -65,6 +65,42 @@ def _completed(state: dict) -> set[str]:
     }
 
 
+def _campaign_delta(before: dict, after: dict) -> dict:
+    delta = {
+        "completed_stages": len(_completed(after) - _completed(before)),
+        "bound_improvements": len(
+            {e["id"] for e in after.get("discoveries", [])}
+            - {e["id"] for e in before.get("discoveries", [])}
+        ),
+        "initial_verified": before.get("verified_low"),
+        "final_verified": after.get("verified_low"),
+    }
+    if before.get("verified_low") and after.get("verified_low"):
+        delta["exact_bound_gain"] = str(
+            Fraction(after["verified_low"]) - Fraction(before["verified_low"])
+        )
+    return delta
+
+
+def _rate_rows(counts: dict, wall: float) -> dict:
+    rows = {}
+    for key, values in counts.items():
+        name = key.split("/", 1)[0]
+        rows[key] = {
+            **values,
+            "unit": UNITS.get(name, "items"),
+            "calls_per_wall_second": values["calls"] / wall if wall else 0.0,
+            "units_per_wall_second": values["units"] / wall if wall else 0.0,
+            "units_per_kernel_cpu_second": values["units"] / values["cpu_s"]
+            if values["cpu_s"]
+            else None,
+            "units_per_kernel_worker_second": values["units"] / values["wall_s"]
+            if values["wall_s"]
+            else None,
+        }
+    return rows
+
+
 def session_manifest(kind: str, native: str, workers: int, label: str) -> dict:
     os.environ["PACK_NATIVE_KERNELS"] = native
     checked = runtime.preflight()
@@ -106,21 +142,23 @@ def finish_report(
     first_window: dict | None = None,
 ) -> dict:
     counts = metrics.aggregate(directory / "processes")
-    rows = {}
-    for key, values in counts.items():
-        name = key.split("/", 1)[0]
-        rows[key] = {
-            **values,
-            "unit": UNITS.get(name, "items"),
-            "calls_per_wall_second": values["calls"] / wall if wall else 0.0,
-            "units_per_wall_second": values["units"] / wall if wall else 0.0,
-            "units_per_kernel_cpu_second": values["units"] / values["cpu_s"]
-            if values["cpu_s"]
-            else None,
-            "units_per_kernel_worker_second": values["units"] / values["wall_s"]
-            if values["wall_s"]
-            else None,
-        }
+    rows = _rate_rows(counts, wall)
+    measurement_wall = (
+        float(first_window["wall_seconds"])
+        if first_window is not None
+        else wall
+    )
+    measurement_counts = (
+        first_window.get("metrics", {})
+        if first_window is not None
+        else counts
+    )
+    measurement_rows = _rate_rows(measurement_counts, measurement_wall)
+    measurement_delta = (
+        first_window.get("campaign_delta")
+        if first_window is not None
+        else campaign_delta
+    )
     expected = {
         "prefix": ("prefix/c",),
         "topk": ("topk/c",),
@@ -132,10 +170,14 @@ def finish_report(
     not_exercised = [
         name
         for name in manifest["native"]["kernels"]
-        if not any(rows.get(key, {}).get("calls", 0) for key in expected[name])
+        if not any(measurement_rows.get(key, {}).get("calls", 0) for key in expected[name])
     ]
     desired = "+".join(manifest["native"]["kernels"]) or "none"
-    observed = sorted(key.split("/", 1)[1] for key in rows if key.startswith("direction/"))
+    observed = sorted(
+        key.split("/", 1)[1]
+        for key in measurement_rows
+        if key.startswith("direction/")
+    )
     mixed = bool(observed and observed != [desired])
     report = {
         "schema": 1,
@@ -145,6 +187,9 @@ def finish_report(
         "exit_code": exit_code,
         "completed": exit_code == 0,
         "metrics": rows,
+        "measurement_window_seconds": measurement_wall,
+        "measurement_metrics": measurement_rows,
+        "measurement_campaign_delta": measurement_delta,
         "not_exercised": not_exercised,
         "mixed_direction_profiles": mixed,
         "observed_direction_profiles": observed,
@@ -159,10 +204,11 @@ def finish_report(
         "NATIVE A/B THROUGHPUT SUMMARY",
         f"kind={manifest['kind']} label={manifest['label']}",
         f"enabled={','.join(manifest['native']['kernels']) or 'none'} workers={manifest['workers']}",
-        f"session={wall:.3f}s drain={drain:.3f}s exit={exit_code}",
+        f"measurement={measurement_wall:.3f}s session={wall:.3f}s "
+        f"drain={drain:.3f}s exit={exit_code}",
         "kernel/backend                      calls/s       units/s          units/CPU-s",
     ]
-    for key, row in sorted(rows.items()):
+    for key, row in sorted(measurement_rows.items()):
         cpu_rate = row["units_per_kernel_cpu_second"]
         cpu_text = "n/a" if cpu_rate is None else f"{cpu_rate:.3f}"
         lines.append(
@@ -175,12 +221,19 @@ def finish_report(
         lines.append(
             "MIXED PROFILE: recovered work retained an older profile; use sealed replay for a clean comparison"
         )
-    if campaign_delta:
+    if measurement_delta:
         lines.append(
-            f"new completed stages/hour={campaign_delta['completed_stages'] * 3600 / max(wall, 1e-9):.3f}"
+            "measurement completed stages/hour="
+            f"{measurement_delta['completed_stages'] * 3600 / max(measurement_wall, 1e-9):.3f}"
         )
         lines.append(
-            f"new verified bound improvements/hour={campaign_delta['bound_improvements'] * 3600 / max(wall, 1e-9):.3f}"
+            "measurement verified bound improvements/hour="
+            f"{measurement_delta['bound_improvements'] * 3600 / max(measurement_wall, 1e-9):.3f}"
+        )
+    if first_window is not None and campaign_delta:
+        lines.append(
+            f"final incl-drain completed stages={campaign_delta['completed_stages']} "
+            f"verified improvements={campaign_delta['bound_improvements']}"
         )
     lines.extend(
         [
@@ -268,9 +321,11 @@ def campaign(args: argparse.Namespace, extra: list[str]) -> int:
                 and (directory / "controller-ready.json").exists()
             ):
                 requested = now
+                window_state = _state(root)
                 first_window = {
                     "wall_seconds": now - started,
                     "metrics": metrics.aggregate(directory / "processes"),
+                    "campaign_delta": _campaign_delta(before, window_state),
                     "snapshot_lag_seconds_approximately": 1.0,
                 }
                 runtime.atomic_json(directory / "stop-window.json", first_window)
@@ -307,19 +362,7 @@ def campaign(args: argparse.Namespace, extra: list[str]) -> int:
             signal.signal(signum, handler)
     wall = time.monotonic() - started
     after = _state(root)
-    delta = {
-        "completed_stages": len(_completed(after) - _completed(before)),
-        "bound_improvements": len(
-            {e["id"] for e in after.get("discoveries", [])}
-            - {e["id"] for e in before.get("discoveries", [])}
-        ),
-        "initial_verified": before.get("verified_low"),
-        "final_verified": after.get("verified_low"),
-    }
-    if before.get("verified_low") and after.get("verified_low"):
-        delta["exact_bound_gain"] = str(
-            Fraction(after["verified_low"]) - Fraction(before["verified_low"])
-        )
+    delta = _campaign_delta(before, after)
     try:
         finish_report(
             directory,
