@@ -289,7 +289,6 @@ def test_real_campaign_graceful_budget_and_resume(tmp_path):
     assert {tuple(r["session"]["native"]["kernels"]) for r in reports} == {(), ("compact",)}
 
 
-
 def test_terminal_bell_marks_success_and_error(capsys):
     terminal_bell("finished")
     success = capsys.readouterr()
