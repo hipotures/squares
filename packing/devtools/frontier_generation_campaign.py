@@ -38,6 +38,82 @@ def select_plans(state: dict[str, Any], first: dict[str, Any]) -> list[dict[str,
     return plans
 
 
+def refill_resumed_cohort(root: Path, state: dict[str, Any], frontier) -> list[int]:
+    """Restore generation parallelism after a graceful stop left a partial cohort."""
+    active = [
+        index for index in state.get("active_generation", [])
+        if state["cycles"][index].get("status") in ("RUNNING", "INTERRUPTED")
+    ]
+    if not active:
+        return []
+    cycles = [state["cycles"][index] for index in active]
+    # Interpret already-generated results before speculating on fresh work: one
+    # of them may move the verified bound and make a new sibling redundant.
+    if any(
+        stage.get("status") == "generated"
+        for cycle in cycles
+        for stage in cycle.get("stages", [])
+    ):
+        return []
+    # Same-side precision repair deliberately owns the cohort by itself.
+    if any(
+        cycle.get("plan_reason", "").startswith("untried same-side rationalisation")
+        for cycle in cycles
+    ):
+        return []
+
+    maximum = min(
+        int(state["config"].get("generation_trials", 3)),
+        int(state["config"]["workers"]),
+    )
+    room = maximum - len(active)
+    limit = state["config"].get("max_cycles")
+    if limit is not None:
+        room = min(room, max(0, int(limit) - len(state["cycles"])))
+    if room <= 0:
+        return []
+
+    occupied = {cycle.get("strategy", "baseline") for cycle in cycles}
+    plans = []
+    for name in state["config"]["strategies"]:
+        if len(plans) >= room:
+            break
+        if name in occupied:
+            continue
+        choice = frontier_policy.strategy_proposal(state, name)
+        if choice is None:
+            continue
+        plans.append(choice)
+        occupied.add(name)
+    if not plans:
+        return []
+
+    added = []
+    for plan in plans:
+        cycle = {
+            "side": plan["side"],
+            "strategy": plan["strategy"],
+            "search_revision": state.get("search_revision", 0),
+            "plan_reason": plan["reason"],
+            "status": "RUNNING",
+            "started_at": frontier.stamp(),
+            "seed_verified_low": state["verified_low"],
+            "stages": [],
+        }
+        index = len(state["cycles"])
+        state["cycles"].append(cycle)
+        state["active_generation"].append(index)
+        added.append(index)
+    frontier.save_state(root, state)
+    frontier.emit(
+        root,
+        f"[portfolio] resumed-refill={len(added)} "
+        f"active={len(state['active_generation'])}/{maximum} "
+        f"strategies={','.join(state['cycles'][i].get('strategy', 'baseline') for i in state['active_generation'])}",
+    )
+    return added
+
+
 def _finish_wave(root: Path, state: dict[str, Any], frontier) -> None:
     wave = state["generation_wave"]
     directory = Path(wave["directory"])
@@ -122,6 +198,7 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
         from devtools import run_n12_frontier as frontier
 
     stop_requested = getattr(frontier, "stop_requested", lambda: False)
+    resumed_generation = bool(state.get("active_generation"))
 
     if not state.get("active_generation"):
         if state.get("active") is not None:
@@ -145,6 +222,8 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
                           f"targets={','.join(p['strategy'] + '@' + frontier.display(p['side']) for p in plans)}")
         state["active"] = None
         frontier.save_state(root, state)
+    if resumed_generation and not stop_requested():
+        refill_resumed_cohort(root, state, frontier)
     while state.get("active_generation"):
         if state.get("generation_wave"):
             _finish_wave(root, state, frontier)
