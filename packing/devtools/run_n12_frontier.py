@@ -29,6 +29,7 @@ from typing import Any
 from devtools import frontier_policy, frontier_runtime
 from devtools.frontier_phase import timestamped
 from devtools.frontier_io import atomic_json as durable_json, atomic_text, digest, read_json
+from sqpack.fractional import native_ab_runtime
 
 REPO = Path(__file__).resolve().parents[2]
 DEFAULT_SEED = REPO / "packing/cases/n12_fractional_certificate/certificate.json"
@@ -2022,6 +2023,7 @@ def main(argv: list[str] | None = None) -> int:
         state = read_json(root / "state.json")
         print(timestamped(summary(root, state, started)))
         return 0
+    native_profile = native_ab_runtime.preflight()
     previous_handlers = {}
     previous_workers_env = os.environ.get("PACK_JOBS")
     previous_stop, previous_limits = _ACTIVE_STOP, _RUNTIME_LIMITS
@@ -2137,7 +2139,8 @@ def main(argv: list[str] | None = None) -> int:
             publish_findings(root, state)
             emit(root, f"[start] n=12 workers={config['workers']} scale={config['scale']} max-scale={config['max_scale']} "
                  f"verified={display(state['verified_low'])} search-high={display(state['search_high'])} "
-                 f"strategies={','.join(config['strategies'])} generation-trials={config['generation_trials']}")
+                 f"strategies={','.join(config['strategies'])} generation-trials={config['generation_trials']} "
+                 f"native={'+'.join(native_profile['kernels']) or 'reference-none'}")
             if state.pop("anchor_needs_verification", False):
                 seed = Path(state["verified_certificate"])
                 anchor_dir = root / f"anchor-{digest(seed)[:16]}"
@@ -2243,10 +2246,14 @@ def main(argv: list[str] | None = None) -> int:
 
 README = """# Persistent autonomous n=12 search
 
-Run from packing/:
+Run from packing/. The accepted prefix+topk+scatter+compact native core is
+the default production path and is built by `uv sync --frozen`:
 
     PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search
     PACK_JOBS=16 uv run --frozen python -m devtools.run_n12_frontier --root ../Experiments/n12-frontier-search --resume
+
+`PACK_NATIVE_KERNELS=none` is retained only as a differential/reference mode,
+not as a production workflow.
 
 Ctrl-C finishes only the already-running bounded stage/wave (and interprets its
 completed result), defers any later escalation for --resume, saves state and prints
