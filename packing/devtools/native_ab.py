@@ -39,6 +39,13 @@ def emit(message: str) -> None:
     print(f"[{int(time.time())}] [native-ab] {message}", flush=True)
 
 
+def terminal_bell(message: str, *, error: bool = False) -> None:
+    """Emit a console BEL plus a visible reason; errors use a double bell."""
+
+    bells = "\a\a" if error else "\a"
+    print(f"{bells}[native-ab] {message}", file=sys.stderr, flush=True)
+
+
 def _state(root: Path) -> dict:
     path = root / "state.json"
     return json.loads(path.read_text()) if path.is_file() else {}
@@ -283,6 +290,10 @@ def campaign(args: argparse.Namespace, extra: list[str]) -> int:
         runtime.atomic_json(
             directory / "error.json", {"type": type(exc).__name__, "message": str(exc)}
         )
+        terminal_bell(
+            f"ERROR {type(exc).__name__}: {exc}; draining owned campaign work",
+            error=True,
+        )
         if child is not None and child.poll() is None:
             child.send_signal(signal.SIGINT)
             child.wait()
@@ -304,14 +315,27 @@ def campaign(args: argparse.Namespace, extra: list[str]) -> int:
         delta["exact_bound_gain"] = str(
             Fraction(after["verified_low"]) - Fraction(before["verified_low"])
         )
-    finish_report(
-        directory,
-        manifest,
-        wall,
-        exit_code=code,
-        drain=0.0 if requested is None else time.monotonic() - requested,
-        campaign_delta=delta,
-        first_window=first_window,
+    try:
+        finish_report(
+            directory,
+            manifest,
+            wall,
+            exit_code=code,
+            drain=0.0 if requested is None else time.monotonic() - requested,
+            campaign_delta=delta,
+            first_window=first_window,
+        )
+    except Exception as exc:
+        terminal_bell(
+            f"ERROR while writing final campaign report: {type(exc).__name__}: {exc}",
+            error=True,
+        )
+        raise
+    terminal_bell(
+        "campaign finished; final throughput report is ready"
+        if code == 0
+        else f"campaign finished with exit={code}; inspect error/report artifacts",
+        error=code != 0,
     )
     return code
 
@@ -397,4 +421,9 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        status = main()
+    except BaseException as exc:
+        terminal_bell(f"ERROR {type(exc).__name__}: {exc}", error=True)
+        raise
+    raise SystemExit(status)
