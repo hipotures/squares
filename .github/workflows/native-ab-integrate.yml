@@ -1,0 +1,80 @@
+name: Native A/B integration
+on:
+  push:
+    branches: [work/frontier-native-ab]
+    paths: ['.github/native-ab-integrate*.py', '.github/workflows/native-ab-integrate.yml']
+permissions:
+  contents: write
+concurrency:
+  group: native-ab-integration
+  cancel-in-progress: true
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PACK_JOBS: '2'
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          submodules: recursive
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          python-version: '3.14'
+          enable-cache: false
+      - name: Integrate only the reviewed experimental boundaries
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/work/frontier-native-ab
+          uv run --no-project --python 3.14 .github/native-ab-integrate.py
+          uv run --no-project --python 3.14 .github/native-ab-integrate-fixes.py
+          uv run --no-project --python 3.14 .github/native-ab-integrate-cache.py
+      - name: Build explicit native libraries and check syntax
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          if ! test -f /usr/include/boost/multiprecision/cpp_int.hpp; then
+            sudo apt-get update -qq
+            sudo apt-get install -y libboost-dev
+          fi
+          mkdir -p ../native-ab-artifacts
+          uv sync --frozen
+          uv run --frozen python -m devtools.native_ab build > ../native-ab-artifacts/build.json
+          uv run --frozen python -m compileall -q src/sqpack/fractional devtools/native_ab.py devtools/native_ab_replay.py
+          uv run --frozen ruff check --select F,E9 src/sqpack/fractional/native_ab_*.py devtools/native_ab*.py tests/test_native_ab*.py
+      - name: Differential kernels, real replay, accounting, signals and resume
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen pytest tests/test_native_ab_kernels.py tests/test_native_ab_sessions.py -q --junitxml=../native-ab-artifacts/native.xml 2>&1 | tee ../native-ab-artifacts/native.log
+      - name: Existing frontier and generator regressions
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py tests/test_exact_slabs.py tests/test_run_fractional_colgen.py tests/test_colgen_parallel_directions.py tests/test_colgen_persistent_lp.py tests/test_fractional_generate.py tests/test_declare_least_cell_mass.py -q --junitxml=../native-ab-artifacts/regression.xml 2>&1 | tee ../native-ab-artifacts/regression.log
+      - name: Publish integrated source only after tests pass
+        run: |
+          set -euo pipefail
+          git fetch origin work/frontier-native-ab
+          test "$(git rev-parse FETCH_HEAD)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packing/src/sqpack/fractional/generate.py packing/src/sqpack/fractional/colgen.py packing/src/sqpack/fractional/exact_slabs.py packing/src/sqpack/fractional/native_ab_*.py packing/devtools/run_n12_frontier.py packing/devtools/frontier_runtime.py packing/devtools/run_fractional_colgen.py packing/devtools/native_ab*.py
+          git commit -m 'feat: integrate validated native A/B switches and throughput accounting' -m 'Refs #5. Only work/frontier-native-ab is advanced. No proof gate or scheduler budget is relaxed.'
+          git push origin HEAD:work/frontier-native-ab
+      - name: Preserve test evidence
+        if: always()
+        run: |
+          mkdir -p native-ab-artifacts
+          git rev-parse HEAD > native-ab-artifacts/tested-commit.txt
+          git diff > native-ab-artifacts/integration.patch
+          git status --short > native-ab-artifacts/working-tree.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-ab-integration-${{ github.sha }}
+          path: native-ab-artifacts/
+          retention-days: 30
