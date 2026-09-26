@@ -216,7 +216,9 @@ def preflight() -> dict:
     resolved = {}
     if any(k != "exact-depth" for k in selected):
         packaged = packaged_core_path()
-        resolved["core"] = str(packaged if packaged.is_file() else build_directory() / "core.so")
+        resolved["core"] = str(
+            packaged if packaged.is_file() else build_directory() / "core.so"
+        )
     if "exact-depth" in selected:
         resolved["exact"] = str(build_directory() / "exact.so")
     if resolved:

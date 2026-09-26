@@ -10,6 +10,7 @@ from math import atan2
 
 import numpy as np
 
+from sqpack.fractional import depth_parallel
 from sqpack.fractional import native_ab_metrics as metrics
 from sqpack.fractional import native_ab_runtime as runtime
 
@@ -229,11 +230,8 @@ def observe_vertices(function):
 def observe_depths(function):
     @wraps(function)
     def wrapped(query, axes, offsets, weights, half, *, slack):
-        return metrics.timed(
-            "depth-survey",
-            "numpy",
-            len(query) * len(weights),
-            lambda: function(query, axes, offsets, weights, half, slack=slack),
+        return depth_parallel.evaluate(
+            function, query, axes, offsets, weights, half, slack=slack
         )
 
     return wrapped
