@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from devtools.native_ab import PACKING, finish_report
+from devtools.native_ab import PACKING, finish_report, terminal_bell
 from devtools.native_ab_replay import seal_corpus, validate_corpus
 from sqpack.fractional import native_ab_metrics as metrics
 from sqpack.fractional import native_ab_runtime as runtime
@@ -243,3 +243,14 @@ def test_real_campaign_graceful_budget_and_resume(tmp_path):
     assert len(sessions) == 2
     reports = [json.loads(p.read_text()) for p in sessions]
     assert {tuple(r["session"]["native"]["kernels"]) for r in reports} == {(), ("compact",)}
+
+
+
+def test_terminal_bell_marks_success_and_error(capsys):
+    terminal_bell("finished")
+    success = capsys.readouterr()
+    assert success.err == "\a[native-ab] finished\n"
+
+    terminal_bell("failed", error=True)
+    failure = capsys.readouterr()
+    assert failure.err == "\a\a[native-ab] failed\n"
