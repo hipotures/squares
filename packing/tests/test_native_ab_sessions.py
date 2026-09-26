@@ -160,6 +160,50 @@ def test_report_has_throughput_and_separate_drain(tmp_path, monkeypatch):
     assert report["drain_seconds"] == 2
 
 
+def test_report_uses_stop_window_for_primary_throughput(tmp_path, monkeypatch):
+    monkeypatch.setenv("PACK_NATIVE_STATS", str(tmp_path / "processes"))
+    metrics.record("direction", "none", 100, 2, 1)
+    metrics.flush(force=True)
+    first_counts = metrics.aggregate(tmp_path / "processes")
+    metrics.record("direction", "none", 300, 3, 2)
+    metrics.flush(force=True)
+    manifest = {"kind": "test", "label": "window", "workers": 2, "native": {"kernels": []}}
+    first_window = {
+        "wall_seconds": 5.0,
+        "metrics": first_counts,
+        "campaign_delta": {
+            "completed_stages": 4,
+            "bound_improvements": 1,
+            "initial_verified": "1",
+            "final_verified": "2",
+        },
+    }
+
+    report = finish_report(
+        tmp_path,
+        manifest,
+        10.0,
+        exit_code=0,
+        drain=5.0,
+        campaign_delta={
+            "completed_stages": 9,
+            "bound_improvements": 2,
+            "initial_verified": "1",
+            "final_verified": "3",
+        },
+        first_window=first_window,
+    )
+
+    assert report["measurement_window_seconds"] == 5.0
+    assert report["measurement_metrics"]["direction/none"]["calls_per_wall_second"] == 0.2
+    assert report["measurement_metrics"]["direction/none"]["units_per_wall_second"] == 20
+    assert report["metrics"]["direction/none"]["calls_per_wall_second"] == 0.2
+    text = (tmp_path / "performance.txt").read_text()
+    assert "measurement=5.000s session=10.000s drain=5.000s" in text
+    assert "measurement completed stages/hour=2880.000" in text
+    assert "final incl-drain completed stages=9 verified improvements=2" in text
+
+
 def test_real_generator_preserves_mathematical_output(monkeypatch, tmp_path):
     from devtools.run_fractional_colgen import RunSettings, run
 
