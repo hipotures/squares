@@ -48,19 +48,27 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ../frontier-artifacts
-          uv run --frozen python -m compileall -q devtools/run_n12_frontier.py devtools/frontier_*.py devtools/bench_frontier_dispatch.py devtools/bench_frontier_generation.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py
+          uv run --frozen python -m compileall -q devtools/run_n12_frontier.py devtools/frontier_*.py devtools/bench_frontier_dispatch.py devtools/bench_frontier_generation.py devtools/bench_exact_pricing.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py src/sqpack/fractional/exact_slabs.py
           uv run --frozen ruff check --select F,E9 devtools/run_n12_frontier.py devtools/frontier_*.py devtools/bench_frontier_dispatch.py devtools/bench_frontier_generation.py devtools/run_fractional_colgen.py src/sqpack/fractional/colgen.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py | tee ../frontier-artifacts/lint.log
-      - name: Autonomy, shared generation, recovery, repair and exact-gate smoke tests
+          uv run --frozen ruff format --check src/sqpack/fractional/exact_slabs.py devtools/bench_exact_pricing.py tests/test_exact_slabs.py
+          uv run --frozen ruff check src/sqpack/fractional/exact_slabs.py devtools/bench_exact_pricing.py tests/test_exact_slabs.py
+          uv run --frozen basedpyright src/sqpack/fractional/exact_slabs.py devtools/bench_exact_pricing.py tests/test_exact_slabs.py
+      - name: Autonomy, shared generation, recovery, repair and exact-equivalence tests
         working-directory: packing
         run: |
           set -euo pipefail
-          uv run --frozen pytest tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py -q --junitxml=../frontier-artifacts/autonomy.xml 2>&1 | tee ../frontier-artifacts/autonomy.log
+          uv run --frozen pytest tests/test_exact_slabs.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py -q --junitxml=../frontier-artifacts/autonomy.xml 2>&1 | tee ../frontier-artifacts/autonomy.log
           uv run --frozen python -m devtools.run_n12_frontier --help > ../frontier-artifacts/help.txt
       - name: Generator, persistent LP and separation regression
         working-directory: packing
         run: |
           set -euo pipefail
           uv run --frozen pytest tests/test_run_fractional_colgen.py tests/test_colgen_parallel_directions.py tests/test_colgen_persistent_lp.py tests/test_fractional_generate.py tests/test_declare_least_cell_mass.py -q --junitxml=../frontier-artifacts/generator.xml 2>&1 | tee ../frontier-artifacts/generator.log
+      - name: Paired full-generator exact-pricing control
+        working-directory: packing
+        run: |
+          set -euo pipefail
+          uv run --frozen python -m devtools.bench_exact_pricing --root ../frontier-artifacts/exact-pricing-paired --workers 2 --samples 1 | tee ../frontier-artifacts/exact-pricing-benchmark.log
       - name: Real generator shared-versus-sequential control
         working-directory: packing
         run: |
