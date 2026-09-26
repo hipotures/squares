@@ -158,11 +158,32 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
             retire_superseded(root, state, frontier)
             if index not in state["active_generation"]:
                 continue
+            has_generated = any(
+                stage.get("status") == "generated" for stage in cycle.get("stages", [])
+            )
+            if frontier.stop_requested() and not has_generated:
+                if cycle["status"] == "RUNNING":
+                    cycle.update(
+                        status="INTERRUPTED",
+                        reason="operator stop between stages; continuation deferred for resume",
+                        interrupted_at=frontier.stamp(),
+                    )
+                    frontier.save_state(root, state)
+                continue
             state["active"] = index
             stage = frontier.run_cycle(root, state, defer_generation=True)
             state["active"] = None
             if stage is None:
-                state["active_generation"].remove(index)
+                if cycle["status"] not in ("RUNNING", "INTERRUPTED"):
+                    state["active_generation"].remove(index)
+            elif frontier.stop_requested():
+                cycle.update(
+                    status="INTERRUPTED",
+                    reason="operator stop before queued continuation; stage preserved for resume",
+                    interrupted_at=frontier.stamp(),
+                )
+                frontier.save_state(root, state)
+                continue
             elif stage.get("work_kind") == "rerationalisation":
                 # Cheap snapshot work does not require a generation pool.
                 code = frontier.run_child(stage["command"], Path(stage["directory"]) / "stdout.log",
@@ -176,6 +197,24 @@ def run_portfolio(root: Path, state: dict[str, Any], frontier=None) -> None:
             frontier.save_state(root, state)
         retire_superseded(root, state, frontier)
         queued = [entry for entry in queued if entry[0] in state["active_generation"]]
+        if frontier.stop_requested():
+            for index in state.get("active_generation", []):
+                cycle = state["cycles"][index]
+                if cycle["status"] == "RUNNING":
+                    cycle.update(
+                        status="INTERRUPTED",
+                        reason="operator stop after current generation wave; continuation deferred for resume",
+                        interrupted_at=frontier.stamp(),
+                    )
+            state["active"] = None
+            frontier.save_state(root, state)
+            frontier.write_views(root, state)
+            frontier.emit(
+                root,
+                "[stop] current generation wave adopted; no later stage was started; "
+                "remaining cohort is resumable",
+            )
+            return
         if not queued:
             continue
         number = int(state.get("generation_wave_count", 0)) + 1
