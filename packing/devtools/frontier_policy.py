@@ -85,17 +85,9 @@ def tried(state: dict[str, Any], side: Fraction, strategy: str) -> bool:
 
 
 def search_resolution(state: dict[str, Any]) -> Fraction:
-    """Smallest useful new-L experiment, not a proof or rounding tolerance.
-
-    Reuse the operator's strategy-width setting (default 1e-5). The numerical
-    floor also excludes a new ULP staircase when an unusually small width is
-    configured. Same-side weight refinement is exempt from this admission rule.
-    """
-    requested = Fraction(state.get("config", {}).get("strategy_width", "1/100000"))
-    if requested <= 0:
-        raise ValueError("strategy-width must be positive")
-    low = Fraction(state["verified_low"])
-    return max(requested, 32 * Fraction.from_float(math.ulp(float(low))))
+    """Effective persisted search grid; never the verifier's precision."""
+    from devtools.frontier_resolution import effective_resolution
+    return effective_resolution(state)
 
 
 def _enabled(state: dict[str, Any]) -> list[str]:

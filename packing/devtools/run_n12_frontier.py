@@ -26,7 +26,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
-from devtools import frontier_policy, frontier_runtime
+from devtools import frontier_policy, frontier_runtime, frontier_resolution
 from devtools.frontier_phase import timestamped
 from devtools.frontier_io import atomic_json as durable_json, atomic_text, digest, read_json
 from sqpack.fractional import native_ab_runtime
@@ -1295,6 +1295,9 @@ def summary(root: Path, state: dict[str, Any], started: float) -> str:
             *[f"  {line}" for line in strategy_frontier_lines(state)],
             f"exact verifications attempted: {attempts}",
             f"automatic repair attempts: {len(state.get('repair_attempts') or [])}",
+            f"search grid: {frontier_policy.search_resolution(state)} "
+            f"(requested start: {frontier_resolution.requested_width(state)}; "
+            f"numeric floor: {frontier_resolution.numerical_floor(state)})",
             f"mode: {state.get('mode', 'FRONTIER')}",
             f"next suggested L: {choose_work(state).get('side', 'none')}",
             f"next action: {choose_work(state)['kind']}",
@@ -1988,11 +1991,18 @@ def choose_work(state: dict[str, Any]) -> dict[str, Any]:
         if Fraction(cycle['side']) == ceiling:
             pending = target == ceiling and scale_limited_unresolved(cycle, int(state['config']['max_scale']))
             break
-    return frontier_policy.plan(
+    work = frontier_policy.plan(
         state, next_side=target, soft_high=ceiling, scale_pending=pending,
         repair_available=select_repair_candidate(state) is not None,
         saturated=numeric_search_saturated(state),
     )
+    if work["kind"] == "idle":
+        refinement = frontier_resolution.refinement_proposal(state)
+        if refinement is not None:
+            return refinement
+        if frontier_policy.search_resolution(state) == frontier_resolution.numerical_floor(state):
+            work = {**work, "reason": work["reason"] + "; 32-ULP search-grid floor reached"}
+    return work
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -2140,7 +2150,8 @@ def main(argv: list[str] | None = None) -> int:
             emit(root, f"[start] n=12 workers={config['workers']} scale={config['scale']} max-scale={config['max_scale']} "
                  f"verified={display(state['verified_low'])} search-high={display(state['search_high'])} "
                  f"strategies={','.join(config['strategies'])} generation-trials={config['generation_trials']} "
-                 f"native={'+'.join(native_profile['kernels']) or 'reference-none'}")
+                 f"native={'+'.join(native_profile['kernels']) or 'reference-none'} "
+                 f"resolution={frontier_policy.search_resolution(state)}")
             if state.pop("anchor_needs_verification", False):
                 seed = Path(state["verified_certificate"])
                 anchor_dir = root / f"anchor-{digest(seed)[:16]}"
@@ -2175,6 +2186,13 @@ def main(argv: list[str] | None = None) -> int:
                         exit_code = 1
                         break
                 work = choose_work(state)
+                if work["kind"] == "refine-resolution":
+                    poll_stop()
+                    if not frontier_resolution.apply_refinement(root, state, work, sys.modules[__name__]):
+                        break
+                    idle_since = None
+                    idle_message_at = 0.0
+                    continue
                 if work["kind"] == "idle":
                     if idle_since is None:
                         idle_since = time.monotonic()
@@ -2277,8 +2295,13 @@ and findings.md ledger with certificate SHA-256. Full logs remain in stage/job f
 No retained certificate is overwritten. A successful repair beyond the heuristic
 high expands the exploration interval instead of invalidating state.
 
-On configured portfolio exhaustion the runner idles visibly without busy-looping.
---stop-when-exhausted exits instead. Neither state means mathematical impossibility.
+When observed strategy brackets exhaust the current search grid, the runner
+reduces the effective strategy-width by a decade automatically, checkpoints the
+change and replans in the same session. The configured width remains the initial
+setting; resume preserves the effective width. The lower limit is 32 ULPs of the
+float64 lower endpoint, not a verifier tolerance. --status is read-only.
+Only exhaustion with no remaining refinement enters IDLE; --stop-when-exhausted
+exits instead. Neither state means mathematical impossibility.
 Detailed strategy, watchdog, migration, and testing documentation is in
 packing/devtools/n12-frontier.md in the repository.
 """
