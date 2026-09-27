@@ -13,6 +13,7 @@ import pytest
 from devtools import frontier_policy as policy
 from devtools import frontier_resolution as resolution
 from devtools import run_n12_frontier as frontier
+from devtools.frontier_generation_campaign import select_plans
 from devtools.frontier_io import atomic_json, read_json
 
 
@@ -59,6 +60,12 @@ def exhausted(low=LOW, high=HIGH, width=WIDTH):
     }
 
 
+def stale_ceiling(state, seed):
+    for cycle in state["cycles"]:
+        cycle["seed_verified_low"] = str(seed)
+    return state
+
+
 def controller(events=None, stopped=lambda: False):
     def save(root, state):
         atomic_json(root / "state.json", state)
@@ -69,6 +76,38 @@ def controller(events=None, stopped=lambda: False):
         stop_requested=stopped,
         emit=lambda *args: events.append(args[1]) if events is not None else None,
     )
+
+
+def test_exhausted_old_ceiling_is_reprobed_before_more_decimal_chasing():
+    state = stale_ceiling(exhausted(), LOW - WIDTH)
+    work = frontier.choose_work(state)
+    assert work["kind"] == "search"
+    assert Fraction(work["side"]) == HIGH
+    assert work["frontier_mode"] == "heuristic-ceiling-reprobe"
+    assert "stronger verified seed" in work["reason"]
+    assert resolution.refinement_proposal(state) is None
+    plans = select_plans(state, work)
+    assert len(plans) == 3
+    assert all(Fraction(plan["side"]) == HIGH for plan in plans)
+    assert all(plan["frontier_mode"] == "heuristic-ceiling-reprobe" for plan in plans)
+
+
+def test_current_seed_ceiling_failure_can_refine_grid_instead_of_retrying_forever():
+    state = exhausted()
+    for cycle in state["cycles"]:
+        cycle["seed_verified_low"] = str(LOW)
+    work = frontier.choose_work(state)
+    assert work["kind"] == "refine-resolution"
+
+
+def test_verified_ceiling_reopens_search_above_old_heuristic_high():
+    state = stale_ceiling(exhausted(), LOW - WIDTH)
+    assert Fraction(frontier.choose_work(state)["side"]) == HIGH
+    state["verified_low"] = str(HIGH)
+    policy.reconcile(state)
+    work = frontier.choose_work(state)
+    assert work["kind"] == "search"
+    assert Fraction(work["side"]) > HIGH
 
 
 @pytest.mark.parametrize(
