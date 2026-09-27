@@ -17,7 +17,8 @@ numerical proof tolerances, or discard earlier search failures.
 The existing fixed-grid planner is unchanged except that search_resolution
 reads the persisted effective grid. The controller's read-only choose_work
 preview first asks for normal generation, same-side rationalisation and repair.
-Only an otherwise exhausted plan may return refine-resolution.
+Only an otherwise exhausted plan may return refine-resolution. Before doing so,
+an exhausted observed ceiling is eligible for one stronger-seed re-probe.
 
 An eligible observed strategy bracket must be too narrow for two current grid
 steps, or have no aligned interior grid point after rounding. An unobserved
@@ -34,9 +35,16 @@ there is no further transition, no reset and no repeated refinement heartbeat.
 If the fixed-grid planner still has no work, IDLE remains legitimate and names
 the 32-ULP floor. This is not a mathematical impossibility proof.
 
-The current legacy case therefore changes 1e-6 to 1e-7 without a restart and
-can propose 3.9646995. That value is only a search target until the unchanged
-full certificate gate accepts a frozen candidate.
+When a verified bound has approached an observed heuristic ceiling until the
+current grid has no interior point, the controller first re-probes that ceiling
+with the stronger verified seed. This prevents an asymptotic decimal chase that
+can never cross the old heuristic observation. A failed re-probe is not repeated
+again until the verified seed advances; only then may the grid refine further.
+
+For the observed 3.964699999999 versus 3.964700000000 state, the next useful
+target is therefore 3.964700000000 itself, not another midpoint below it. If the
+unchanged full exact gate verifies that target, its old UNRESOLVED/SEARCH_FAILED
+records cease to bound the strategy and normal exploration continues above it.
 
 ## Persistence, stop and resume
 
