@@ -112,11 +112,11 @@ def publish():
         raise RuntimeError("unexpected repository")
     if os.environ.get("GITHUB_REF") != "refs/heads/work/frontier-resolution-build-20260927":
         raise RuntimeError("unexpected preparation branch")
-    # Only reviewed source/test/doc paths enter a candidate based on the user's
-    # original branch. The preparation script and write-enabled workflow do not.
-    def post(endpoint, payload):
+    # Export blobs only. The authorized connector creates the final tree and
+    # commit, including workflow changes, after reviewing these identities.
+    def post_blob(payload):
         request = urllib.request.Request(
-            "https://api.github.com/repos/hipotures/squares/git/" + endpoint,
+            "https://api.github.com/repos/hipotures/squares/git/blobs",
             data=json.dumps(payload).encode(), method="POST", headers={
                 "Authorization": "Bearer " + os.environ["GITHUB_TOKEN"],
                 "Accept": "application/vnd.github+json", "Content-Type": "application/json",
@@ -125,13 +125,11 @@ def publish():
             return json.load(response)
     entries = []
     for name in FILES:
-        blob = post("blobs", {"content": (ROOT / name).read_text(), "encoding": "utf-8"})
+        blob = post_blob({"content": (ROOT / name).read_text(), "encoding": "utf-8"})
         entries.append({"path": name, "mode": "100644", "type": "blob", "sha": blob["sha"]})
-    tree = post("trees", {"base_tree": BASE_TREE, "tree": entries})
-    commit = post("commits", {"tree": tree["sha"], "parents": [BASE],
-        "message": "fix: refine exhausted frontier search grids automatically\n\nPersist exact effective resolution, retain configured start and history, and stop at the existing 32-ULP floor. Preserve live work, stop semantics, negative observations and exact certificate gates. Add controller, resume and numeric-floor regressions."})
-    print("TESTED_CANDIDATE_SHA=" + commit["sha"], flush=True)
-    (ROOT / "resolution-artifacts/candidate-sha.txt").write_text(commit["sha"] + "\n")
+    record = {"base_commit": BASE, "base_tree": BASE_TREE, "tree": entries}
+    print("TESTED_TREE_ENTRIES=" + json.dumps(record), flush=True)
+    (ROOT / "resolution-artifacts/candidate-sha.txt").write_text(json.dumps(record, indent=2) + "\n")
 
 
 if __name__ == "__main__":
