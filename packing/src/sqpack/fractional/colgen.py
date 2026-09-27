@@ -50,6 +50,8 @@ from itertools import combinations
 from pathlib import Path
 from typing import TextIO
 
+from sqpack.fractional.native_ab_hooks import observe_lp, observe_vertices, observe_depths, flush_after
+
 import highspy
 import numpy as np
 from scipy.optimize import linprog
@@ -498,6 +500,7 @@ class _PersistentLp:
         self.columns = columns
         self.held = 0
 
+    @observe_lp
     def solve(self, rows: Rows) -> tuple[np.ndarray, np.ndarray, float] | None:
         matrix = rows.stacked()
         if matrix.shape[1] != self.columns or len(rows) < self.held:
@@ -567,6 +570,7 @@ def _direction_task(
 _DIRECTIONS_PER_TASK = 4
 
 
+@flush_after
 def _direction_chunk_task(
     args: tuple[
         np.ndarray, np.ndarray, tuple[Direction, ...], float, float, int, CornerClip | None
@@ -974,6 +978,7 @@ def _float_squares(
     return axes, offsets, weights, half
 
 
+@observe_depths
 def _depths(
     query: np.ndarray,
     axes: np.ndarray,
@@ -1029,6 +1034,7 @@ def _arrangement_lines(
     return lines
 
 
+@observe_vertices
 def _vertices(
     lines: list[tuple[Fraction, Fraction, Fraction]], outer_side: Fraction
 ) -> tuple[np.ndarray, list[tuple[int, int]]]:

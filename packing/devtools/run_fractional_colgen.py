@@ -16,6 +16,7 @@ frozen candidate into a retained one.
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import math
 import sys
@@ -376,6 +377,11 @@ def run(
     family_frozen = freeze_priced_family(settings, log, freeze_family)
     result = summary(settings, log, candidate, seconds, frozen)
     result["work_kind"] = "generation"
+    if os.environ.get("PACK_NATIVE_SESSION"):
+        from sqpack.fractional import native_ab_runtime, native_ab_metrics
+        result["native_runtime"] = native_ab_runtime.preflight()
+        result["native_session"] = os.environ["PACK_NATIVE_SESSION"]
+        native_ab_metrics.flush(force=True)
     result["phase_timings"] = phases.summary()
     result["column_rounds_executed"] = len(log.rounds)
     result["raw_weights"] = str(raw_weights) if raw_weights is not None and raw_weights.exists() else None

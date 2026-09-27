@@ -18,6 +18,8 @@ from fractions import Fraction
 from math import gcd, lcm
 from typing import Protocol
 
+from sqpack.fractional.native_ab_hooks import exact_at, exact_cost
+
 type IntegerSlab = tuple[int, int, int, int]
 type HomogeneousPoint = tuple[int, int, int]
 type Point = tuple[Fraction, Fraction]
@@ -82,6 +84,7 @@ class PreparedDepth:
             for square, weight in weighted
         )
 
+    @exact_at
     def at(self, x: Fraction, y: Fraction) -> Fraction:
         point = _point(x, y)
         return sum(
@@ -93,6 +96,7 @@ class PreparedDepth:
             start=Fraction(0),
         )
 
+    @exact_cost
     def reduced_cost(self, orbit: tuple[Point, ...], outer_side: Fraction) -> Fraction:
         half = outer_side / 2
         centred = tuple(_point(x - half, y - half) for x, y in orbit)

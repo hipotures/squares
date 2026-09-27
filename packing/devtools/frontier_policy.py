@@ -85,17 +85,9 @@ def tried(state: dict[str, Any], side: Fraction, strategy: str) -> bool:
 
 
 def search_resolution(state: dict[str, Any]) -> Fraction:
-    """Smallest useful new-L experiment, not a proof or rounding tolerance.
-
-    Reuse the operator's strategy-width setting (default 1e-5). The numerical
-    floor also excludes a new ULP staircase when an unusually small width is
-    configured. Same-side weight refinement is exempt from this admission rule.
-    """
-    requested = Fraction(state.get("config", {}).get("strategy_width", "1/100000"))
-    if requested <= 0:
-        raise ValueError("strategy-width must be positive")
-    low = Fraction(state["verified_low"])
-    return max(requested, 32 * Fraction.from_float(math.ulp(float(low))))
+    """Effective persisted search grid; never the verifier's precision."""
+    from devtools.frontier_resolution import effective_resolution
+    return effective_resolution(state)
 
 
 def _enabled(state: dict[str, Any]) -> list[str]:
@@ -195,6 +187,66 @@ def strategy_proposal(state: dict[str, Any], strategy: str) -> dict[str, Any] | 
                        f"step={target - low} resolution={resolution}; "
                        "other instruments' unresolved points do not bound this strategy"),
             "frontier_mode": mode}
+
+
+def ceiling_reprobe_proposal(state: dict[str, Any], strategy: str) -> dict[str, Any] | None:
+    """Retry an exhausted heuristic ceiling once a stronger verified seed exists.
+
+    UNRESOLVED/SEARCH_FAILED is evidence about one invocation, not an upper bound.
+    Once a local bracket has no admissible current-grid interior point, retry its
+    ceiling if the verified seed advanced since the latest negative result.
+    """
+    if strategy not in _enabled(state):
+        return None
+    bounds = strategy_frontier(state, strategy)
+    if not bounds["observed_ceiling"]:
+        return None
+    low, ceiling, resolution = bounds["low"], bounds["ceiling"], bounds["resolution"]
+    if ceiling <= low or not useful_for_side(strategy, ceiling):
+        return None
+    lower_units = (low + resolution) / resolution
+    lower = -(-lower_units.numerator // lower_units.denominator)
+    upper_units = (ceiling - resolution) / resolution
+    upper = upper_units.numerator // upper_units.denominator
+    if ceiling - low >= 2 * resolution and lower <= upper:
+        return None
+    latest = next(
+        (
+            cycle
+            for cycle in reversed(_records(state, strategy))
+            if Fraction(cycle["side"]) == ceiling
+            and cycle.get("status") in ("UNRESOLVED", "SEARCH_FAILED")
+            and not cycle.get("superseded_by")
+        ),
+        None,
+    )
+    if latest is None or latest.get("seed_verified_low") is None:
+        return None
+    try:
+        previous_seed = Fraction(latest["seed_verified_low"])
+    except (TypeError, ValueError, ZeroDivisionError):
+        return None
+    if previous_seed >= low:
+        return None
+    return {
+        "kind": "search",
+        "side": str(ceiling),
+        "strategy": strategy,
+        "reason": (
+            "reprobe heuristic ceiling with stronger verified seed; "
+            f"previous-seed={previous_seed} current-seed={low} ceiling={ceiling}; "
+            "prior unresolved/search-failed result is not an impossibility proof"
+        ),
+        "frontier_mode": "heuristic-ceiling-reprobe",
+    }
+
+
+def ceiling_reprobe(state: dict[str, Any]) -> dict[str, Any] | None:
+    for strategy in _priority(state):
+        choice = ceiling_reprobe_proposal(state, strategy)
+        if choice is not None:
+            return choice
+    return None
 
 
 def _priority(state: dict[str, Any]) -> list[str]:
@@ -336,6 +388,9 @@ def plan(
     choice = alternative(state, Fraction(state["verified_low"]))
     if choice is not None:
         return choice
+    reprobe = ceiling_reprobe(state)
+    if reprobe is not None:
+        return reprobe
     if repair_available and _material_repair(state):
         return {"kind": "repair", "reason": "remaining repair evidence above the meaningful step floor"}
     return {"kind": "idle", "reason": "configured strategy frontiers exhausted at this search resolution; not a mathematical impossibility proof"}

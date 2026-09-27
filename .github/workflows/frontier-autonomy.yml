@@ -57,7 +57,7 @@ jobs:
         working-directory: packing
         run: |
           set -euo pipefail
-          uv run --frozen pytest tests/test_exact_slabs.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py -q --junitxml=../frontier-artifacts/autonomy.xml 2>&1 | tee ../frontier-artifacts/autonomy.log
+          uv run --frozen pytest tests/test_frontier_resolution.py tests/test_exact_slabs.py tests/test_run_n12_frontier.py tests/test_frontier_autonomy.py tests/test_frontier_hardening.py tests/test_frontier_runtime_hardening.py tests/test_frontier_boost_queue.py tests/test_frontier_repair_batch.py tests/test_frontier_generation_queue.py tests/test_frontier_generation_recovery.py tests/test_frontier_strategy_frontiers.py -q --junitxml=../frontier-artifacts/autonomy.xml 2>&1 | tee ../frontier-artifacts/autonomy.log
           uv run --frozen python -m devtools.run_n12_frontier --help > ../frontier-artifacts/help.txt
       - name: Generator, persistent LP and separation regression
         working-directory: packing

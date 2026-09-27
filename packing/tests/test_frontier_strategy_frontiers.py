@@ -15,7 +15,12 @@ import pytest
 
 from devtools import frontier_policy as policy
 from devtools import run_n12_frontier as frontier
-from devtools.frontier_generation_campaign import retire_superseded, run_portfolio, select_plans
+from devtools.frontier_generation_campaign import (
+    refill_resumed_cohort,
+    retire_superseded,
+    run_portfolio,
+    select_plans,
+)
 from devtools.frontier_io import read_json
 
 LOG_LOW = Fraction(43562304060209, 10995116277760)
@@ -364,6 +369,7 @@ def test_grid_proposals_stay_inside_own_bracket_and_keep_meaningful_gaps(offset)
 
 def test_status_labels_legacy_globals_and_shows_strategy_local_frontiers():
     state = campaign()
+    state["unresolved"] = []
     state["config"]["strategies"] = ["windows", "centre"]
     prove_fixture(state, LOG_LOW)
     outcome(state, LOG_LOW + 4 * RESOLUTION, "centre", "UNRESOLVED")
@@ -378,3 +384,124 @@ def test_status_labels_legacy_globals_and_shows_strategy_local_frontiers():
     assert "windows:" in text and "own-high=" in text
     assert "centre:" in text and "(observed)" in text
     assert "soft-high=" not in text.replace("legacy-soft-high=", "")
+
+
+
+def test_resume_refills_partial_generation_cohort(tmp_path):
+    state = campaign()
+    state["config"]["strategies"] = ["pricing", "windows", "centre"]
+    side = LOG_LOW + 10 * RESOLUTION
+    original = outcome(
+        state,
+        side,
+        "pricing",
+        "INTERRUPTED",
+        plan_reason="strategy-local exploration",
+        stages=[
+            {
+                "status": "complete",
+                "decision": "ESCALATE",
+                "name": "deep",
+                "budget": 40,
+            }
+        ],
+    )
+    state["active_generation"] = [0]
+    emitted = []
+    stub = SimpleNamespace(
+        stamp=lambda: "fixture",
+        save_state=lambda *_: None,
+        emit=lambda *args: emitted.append(args),
+    )
+
+    added = refill_resumed_cohort(tmp_path, state, stub)
+
+    assert len(added) == 2
+    assert state["active_generation"][0] == 0
+    assert state["cycles"][0] is original
+    assert len(state["active_generation"]) == 3
+    assert {state["cycles"][i]["strategy"] for i in state["active_generation"]} == {
+        "pricing", "windows", "centre"
+    }
+    assert all(state["cycles"][i]["status"] == "RUNNING" for i in added)
+    assert any("resumed-refill=2" in args[1] for args in emitted)
+
+
+def test_resume_refill_preserves_singleton_precision_repair(tmp_path):
+    state = campaign()
+    cycle = outcome(
+        state,
+        LOG_LOW + RESOLUTION,
+        "pricing",
+        "INTERRUPTED",
+        plan_reason="untried same-side rationalisation before geometric saturation",
+        stages=[{"status": "complete", "decision": "REFINE_SCALE"}],
+    )
+    state["active_generation"] = [0]
+    stub = SimpleNamespace(stamp=lambda: "fixture", save_state=lambda *_: None, emit=lambda *_: None)
+
+    assert refill_resumed_cohort(tmp_path, state, stub) == []
+    assert state["active_generation"] == [0]
+    assert state["cycles"] == [cycle]
+
+
+def test_resume_refill_waits_for_uninterpreted_generated_result(tmp_path):
+    state = campaign()
+    cycle = outcome(
+        state,
+        LOG_LOW + RESOLUTION,
+        "pricing",
+        "INTERRUPTED",
+        plan_reason="strategy-local exploration",
+        stages=[{"status": "generated"}],
+    )
+    state["active_generation"] = [0]
+    stub = SimpleNamespace(stamp=lambda: "fixture", save_state=lambda *_: None, emit=lambda *_: None)
+
+    assert refill_resumed_cohort(tmp_path, state, stub) == []
+    assert state["active_generation"] == [0]
+    assert state["cycles"] == [cycle]
+
+
+def test_stop_between_generation_stages_preserves_resumable_cohort(tmp_path):
+    state = campaign()
+    side = LOG_LOW + 10 * RESOLUTION
+    cycles = []
+    for name in ("fine-net", "baseline", "centre"):
+        cycles.append(
+            outcome(
+                state,
+                side,
+                name,
+                "RUNNING",
+                stages=[
+                    {
+                        "status": "complete",
+                        "decision": "ESCALATE",
+                        "reason": "fixture needs a later budget",
+                        "name": "screen",
+                        "budget": 8,
+                    }
+                ],
+            )
+        )
+    state["active_generation"] = [0, 1, 2]
+    state["generation_wave"] = None
+    calls = []
+    stub = SimpleNamespace(
+        stamp=lambda: "fixture",
+        display=str,
+        save_state=lambda *_: None,
+        write_views=lambda *_: None,
+        emit=lambda *args: calls.append(args),
+        stop_requested=lambda: True,
+        run_cycle=lambda *_args, **_kwargs: pytest.fail("stop must not admit another stage"),
+    )
+
+    run_portfolio(tmp_path, state, frontier=stub)
+
+    assert state["active_generation"] == [0, 1, 2]
+    assert state["generation_wave"] is None
+    assert all(cycle["status"] == "INTERRUPTED" for cycle in cycles)
+    assert all(len(cycle["stages"]) == 1 for cycle in cycles)
+    assert any("no later stage was started" in args[1] for args in calls)

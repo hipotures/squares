@@ -27,8 +27,10 @@ from fractions import Fraction
 import numpy as np
 from scipy.optimize import linprog
 
-from sqpack.fractional._prefix_rows import accumulate_axis0
-from sqpack.fractional._top13_selector import select_lowest_finite
+from sqpack.fractional.native_ab_hooks import (
+    accumulate_axis0, select_lowest_finite, scatter, compact,
+    observe_direction, observe_event_grid, observe_topk,
+)
 from sqpack.fractional.certificate import Certificate
 from sqpack.fractional.corner_clip import CornerClip
 from sqpack.fractional.model import Atom, Direction, rotation_from_half_tangent
@@ -276,6 +278,7 @@ class EventGrid:
     domain: _CentreDomain
 
 
+@observe_event_grid
 def event_grid(
     points: np.ndarray,
     weights: np.ndarray,
@@ -328,10 +331,7 @@ def event_grid(
     right = np.searchsorted(u_events, live_u + half)
     bottom = np.searchsorted(v_events, live_v - half)
     top = np.searchsorted(v_events, live_v + half)
-    np.add.at(grid, (left, bottom), live_w)
-    np.add.at(grid, (right, bottom), -live_w)
-    np.add.at(grid, (left, top), -live_w)
-    np.add.at(grid, (right, top), live_w)
+    scatter(grid, left, right, bottom, top, live_w)
     # No caller uses the difference grid after its prefix sums. Both passes
     # support exact in-place accumulation and avoid two grid-sized temporaries.
     np.add.accumulate(grid, axis=1, out=grid)
@@ -383,11 +383,11 @@ def _reachable_values(
         offsets[0] = 0
         np.cumsum(widths[:-1], out=offsets[1:])
     values = np.empty(int(widths.sum()), dtype=np.float64)
-    for row, first, width, offset in zip(row_ids, firsts, widths, offsets, strict=True):
-        values[offset:offset + width] = cells.mass[row, first:first + width]
+    compact(cells.mass, row_ids, firsts, widths, offsets, values)
     return values, row_ids, firsts, offsets
 
 
+@observe_topk
 def _least_finite_indices(
     flat: np.ndarray, count: int, *, zero_weight_grid: bool = False
 ) -> np.ndarray:
@@ -439,6 +439,7 @@ def _least_finite_indices(
     return selected[np.lexsort((selected, flat[selected]))]
 
 
+@observe_direction
 def placement_cells(
     points: np.ndarray,
     weights: np.ndarray,
