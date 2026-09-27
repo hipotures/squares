@@ -49,7 +49,7 @@ jobs:
         working-directory: packing
         run: |
           set -euo pipefail
-          uv run --frozen pytest tests/test_frontier_utilization.py -q -s --junitxml=../utilization-artifacts/utilization.xml 2>&1 | tee ../utilization-artifacts/utilization.log
+          uv run --frozen pytest tests/test_frontier_resolution.py tests/test_frontier_utilization.py -q -s --junitxml=../utilization-artifacts/utilization.xml 2>&1 | tee ../utilization-artifacts/utilization.log
       - name: Existing stop, recovery, full gate and policy regressions
         working-directory: packing
         run: |

@@ -4,6 +4,7 @@ Planning is read-only. Only the controller, after checking stop and resource
 limits, commits a resolution change. Historical search outcomes, budgets,
 seeds, and proof gates are never rewritten by this policy.
 """
+
 from __future__ import annotations
 
 import math
@@ -51,7 +52,10 @@ def _busy(state: dict[str, Any]) -> bool:
         or state.get("active_generation")
         or state.get("generation_wave")
         or any(c.get("status") in ("RUNNING", "INTERRUPTED") for c in state.get("cycles", []))
-        or any(a.get("status") in ("RUNNING", "INTERRUPTED") for a in state.get("repair_attempts", []))
+        or any(
+            a.get("status") in ("RUNNING", "INTERRUPTED")
+            for a in state.get("repair_attempts", [])
+        )
     )
 
 
@@ -73,7 +77,10 @@ def refinement_proposal(state: dict[str, Any]) -> dict[str, Any] | None:
     if current <= floor:
         return None
     low = Fraction(state["verified_low"])
-    if policy.precision_proposal(state) is not None or policy.alternative(state, low) is not None:
+    if (
+        policy.precision_proposal(state) is not None
+        or policy.alternative(state, low) is not None
+    ):
         return None
     brackets = []
     for name in state.get("config", {}).get("strategies", [p["name"] for p in policy.PROFILES]):
@@ -86,11 +93,13 @@ def refinement_proposal(state: dict[str, Any]) -> dict[str, Any] | None:
         upper_units = (ceiling - current) / current
         upper = upper_units.numerator // upper_units.denominator
         if ceiling - low < 2 * current or lower > upper:
-            brackets.append({"strategy": name, "ceiling": str(ceiling), "gap": str(ceiling - low)})
+            brackets.append(
+                {"strategy": name, "ceiling": str(ceiling), "gap": str(ceiling - low)}
+            )
     if not brackets:
         return None
     refined = max(current / 10, floor)
-    result = {
+    result: dict[str, Any] = {
         "kind": "refine-resolution",
         "from": str(current),
         "to": str(refined),
@@ -101,9 +110,13 @@ def refinement_proposal(state: dict[str, Any]) -> dict[str, Any] | None:
         "brackets": brackets,
         "reason": "observed strategy brackets exhausted at the current search grid; refine automatically, not a proof of impossibility",
     }
-    preview = {**state, "adaptive_resolution": {
-        "requested_width": result["requested_width"], "effective_width": str(refined),
-    }}
+    preview = {
+        **state,
+        "adaptive_resolution": {
+            "requested_width": result["requested_width"],
+            "effective_width": str(refined),
+        },
+    }
     next_work = policy.alternative(preview, low)
     if next_work is not None:
         result["side"] = next_work["side"]
@@ -111,7 +124,9 @@ def refinement_proposal(state: dict[str, Any]) -> dict[str, Any] | None:
     return result
 
 
-def apply_refinement(root: Path, state: dict[str, Any], proposal: dict[str, Any], frontier) -> bool:
+def apply_refinement(
+    root: Path, state: dict[str, Any], proposal: dict[str, Any], frontier
+) -> bool:
     """Checkpoint before admitting work; return False when stopping takes priority."""
     stopped = getattr(frontier, "stop_requested", lambda: False)
     if stopped():
