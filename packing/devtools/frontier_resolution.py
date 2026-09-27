@@ -80,6 +80,7 @@ def refinement_proposal(state: dict[str, Any]) -> dict[str, Any] | None:
     if (
         policy.precision_proposal(state) is not None
         or policy.alternative(state, low) is not None
+        or policy.ceiling_reprobe(state) is not None
     ):
         return None
     brackets = []
