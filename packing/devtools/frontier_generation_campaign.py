@@ -34,6 +34,8 @@ def select_plans(state: dict[str, Any], first: dict[str, Any]) -> list[dict[str,
         if name == first["strategy"]:
             continue
         choice = frontier_policy.strategy_proposal(state, name)
+        if first.get("frontier_mode") == "heuristic-ceiling-reprobe":
+            choice = frontier_policy.ceiling_reprobe_proposal(state, name)
         if choice is not None:
             plans.append(choice)
     return plans
