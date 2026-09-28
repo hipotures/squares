@@ -1,0 +1,43 @@
+name: Hybrid experiment tests
+"on":
+  push:
+    branches:
+      - work/frontier-native-ab-a
+      - work/frontier-native-ab-b
+      - work/frontier-native-ab-c
+      - work/frontier-native-a-d
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: hybrid-tests-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  hybrid-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PACK_JOBS: "2"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          submodules: true
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          enable-cache: false
+      - name: Install the locked environment
+        working-directory: packing
+        run: uv sync --frozen --all-extras --group dev
+      - name: Run hybrid tests and unchanged generator regressions
+        working-directory: packing
+        run: >-
+          uv run --frozen pytest tests/test_hybrid_*.py
+          tests/test_colgen_persistent_lp.py
+          tests/test_colgen_parallel_directions.py
+          tests/test_run_fractional_colgen.py -q
