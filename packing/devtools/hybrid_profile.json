@@ -1,0 +1,20 @@
+{
+  "variant": "A",
+  "mode": "control",
+  "targets": ["15680/3951"],
+  "workers": 16,
+  "stage_seconds": 3600,
+  "verify_seconds": 7200,
+  "max_rss_mib": 24576,
+  "grid_counts": [26, 35, 43],
+  "angle_limit": "207107/500000",
+  "direction_steps": 180,
+  "shrink": "9977/10000",
+  "scale": 1600000,
+  "seed_map": "scale",
+  "row_rounds": 120,
+  "column_rounds": 60,
+  "columns_per_round": 1,
+  "rows_per_direction": 3,
+  "support_cap": 32
+}
