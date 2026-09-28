@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import json
+import math
 import os
 import signal
 import sys
@@ -21,6 +22,8 @@ PROFILE = Path(__file__).with_name("hybrid_profile.json")
 
 class Stop:
     def __init__(self, minutes: float):
+        if not math.isfinite(minutes) or minutes < 0:
+            raise ValueError("session minutes must be finite and nonnegative")
         self.requested = False
         self.deadline = time.monotonic() + minutes * 60 if minutes > 0 else float("inf")
 
@@ -33,7 +36,9 @@ class Stop:
 
 def configuration(args: argparse.Namespace) -> dict[str, Any]:
     config = json.loads(PROFILE.read_text(encoding="utf-8"))
-    for key in ("workers", "stage_seconds", "verify_seconds", "column_rounds", "row_rounds", "columns_per_round", "seed_map", "direction_steps", "shrink"):
+    if config.get("mode") not in ("control", "batched", "interleaved", "bins"):
+        raise ValueError("unknown hybrid profile mode")
+    for key in ("workers", "stage_seconds", "verify_seconds", "column_rounds", "row_rounds", "columns_per_round", "seed_map", "direction_steps", "shrink", "bin_net"):
         value = getattr(args, key, None)
         if value is not None:
             config[key] = value
@@ -42,10 +47,17 @@ def configuration(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("worker, round and net budgets must be positive")
     if not 0 < Fraction(config["shrink"]) < 1:
         raise ValueError("shrink must be strictly between zero and one")
-    gap = Fraction(config["angle_limit"]) / config["direction_steps"]
-    if Fraction(config["shrink"]) * (1 + gap) >= 1:
-        raise ValueError("the fixed-B net does not satisfy strict containment")
-    if min(config["stage_seconds"], config["verify_seconds"]) <= 0:
+    if config["mode"] == "bins":
+        from sqpack.fractional.hybrid_bins import bin_count
+        bin_count(config["bin_net"])
+        if getattr(args, "shrink", None) is not None or getattr(args, "direction_steps", None) is not None:
+            raise ValueError("bin mode uses --bin-net, not fixed-B shrink or direction steps")
+    else:
+        gap = Fraction(config["angle_limit"]) / config["direction_steps"]
+        if Fraction(config["shrink"]) * (1 + gap) >= 1:
+            raise ValueError("the fixed-B net does not satisfy strict containment")
+    if any(not math.isfinite(config[k]) or config[k] <= 0
+           for k in ("stage_seconds", "verify_seconds")):
         raise ValueError("wall budgets must be positive")
     return config
 
@@ -63,8 +75,15 @@ def campaign(args: argparse.Namespace) -> int:
     root = args.root.resolve()
     if (root / "state.json").exists():
         raise ValueError("this is a production frontier root; choose a new hybrid experiment directory")
-    paths = args.seed or [EXTERNAL / "s12/certificates/s12_lower_3.9686.txt"]
-    sources = [{"path": str(path.resolve()), "sha256": load_measure(path, pinned_record=(not args.seed)).sha256} for path in paths]
+    external_record = EXTERNAL / "s12/certificates/s12_lower_3.9686.txt"
+    paths = list(args.seed or [external_record])
+    if not args.seed and config.get("use_retained_seed", False):
+        paths.append(PACKING / "cases/n12_fractional_certificate/certificate.json")
+    if args.own_seed is not None:
+        paths.append(args.own_seed)
+    sources = [{"path": str(path.resolve()), "sha256": load_measure(
+        path, pinned_record=(path.resolve() == external_record.resolve())).sha256}
+        for path in paths]
     sides = [str(Fraction(side)) for side in (args.target or config["targets"])]
     if len(set(sides)) != len(sides) or any(not 1 < Fraction(side) < 4 for side in sides):
         raise ValueError("targets must be distinct rational sides between 1 and 4")
@@ -102,7 +121,8 @@ def campaign(args: argparse.Namespace) -> int:
                 raise ValueError("archived source measure changed")
         stop = Stop(args.minutes)
         old_handlers = {sig: signal.signal(sig, stop.signal) for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)}
-        environment = dict(os.environ, PACK_JOBS=str(config["workers"]), OMP_NUM_THREADS="1",
+        environment = dict(os.environ, PACK_JOBS=str(config["workers"]),
+                           PACK_GENERATION_MANAGED="1", OMP_NUM_THREADS="1",
                            OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
         try:
             for index, task in enumerate(state["tasks"]):
@@ -116,7 +136,16 @@ def campaign(args: argparse.Namespace) -> int:
                 directory = root / f"target-{index:03d}"
                 directory.mkdir(exist_ok=True)
                 manifest = directory / "manifest.json"
-                body = {"config": config, "sources": state["sources"], "side": task["side"]}
+                if "job_sources" not in task:
+                    task["job_sources"] = list(state["sources"])
+                    if config.get("carry_support", False):
+                        prior = next((t.get("search_support") for t in reversed(state["tasks"][:index])
+                                      if t.get("search_support")), None)
+                        if prior is not None:
+                            if digest(Path(prior["path"])) != prior["sha256"]:
+                                raise ValueError("carried support changed after the previous target")
+                            task["job_sources"].append(prior)
+                body = {"config": config, "sources": task["job_sources"], "side": task["side"]}
                 if not manifest.exists():
                     atomic_json(manifest, body)
                 elif read_json(manifest) != body:
@@ -143,9 +172,15 @@ def campaign(args: argparse.Namespace) -> int:
                         if digest(candidate) != result["candidate_sha256"]:
                             raise ValueError("candidate differs from the generation receipt")
                         gate = directory / "gate/verification.json"
+                        gate_module = ("devtools.frontier_hybrid_bin_gate" if config["mode"] == "bins"
+                                       else "devtools.frontier_verify")
+                        gate_args = [sys.executable, "-m", gate_module, "--input", str(candidate),
+                                     "--side", task["side"], "--report", str(gate)]
+                        if config["mode"] == "bins":
+                            gate_args += ["--workers", str(config["workers"]),
+                                          "--seconds", str(config["verify_seconds"] * 0.95)]
                         code = runtime.run(
-                            [sys.executable, "-m", "devtools.frontier_verify", "--input", str(candidate),
-                             "--side", task["side"], "--report", str(gate)], directory / "gate.log",
+                            gate_args, directory / "gate.log",
                             cwd=PACKING, env=environment,
                             limits={"verify_seconds": config["verify_seconds"], "max_rss_mib": config["max_rss_mib"],
                                     "heartbeat_seconds": 60}, on_poll=stop.poll,
@@ -153,8 +188,11 @@ def campaign(args: argparse.Namespace) -> int:
                         if code:
                             task.update(status="ERROR", returncode=code)
                         else:
-                            from devtools.frontier_verify import checked_receipt
-                            report = checked_receipt(gate, candidate, Fraction(task["side"]))
+                            if config["mode"] == "bins":
+                                from devtools.frontier_hybrid_bin_gate import checked_receipt as read_gate
+                            else:
+                                from devtools.frontier_verify import checked_receipt as read_gate
+                            report = read_gate(gate, candidate, Fraction(task["side"]))
                             if report is None:
                                 raise ValueError("missing or unbound full-gate receipt")
                             task["status"] = report["status"]
@@ -162,6 +200,12 @@ def campaign(args: argparse.Namespace) -> int:
                             if report["status"] == "VERIFIED":
                                 task.update(verified_candidate=report["verified_candidate"], verified_sha256=report["verified_sha256"])
                                 emit(f"VERIFIED s(12) >= {task['side']} sha256={report['verified_sha256']}")
+                support = directory / "search-support.json"
+                if support.is_file() and task["status"] != "ERROR":
+                    source = load_measure(support)
+                    if source.side != Fraction(task["side"]):
+                        raise ValueError("saved support belongs to another target")
+                    task["search_support"] = {"path": str(support), "sha256": source.sha256}
                 atomic_json(state_path, state)
                 emit(f"completed side={task['side']} status={task['status']}")
                 if task["status"] == "ERROR":
@@ -182,10 +226,11 @@ def main(argv: list[str] | None = None) -> int:
     run = commands.add_parser("run")
     run.add_argument("--root", type=Path, required=True)
     run.add_argument("--seed", type=Path, action="append")
+    run.add_argument("--own-seed", type=Path, help="append an exact local support to the defaults")
     run.add_argument("--target", action="append")
     run.add_argument("--resume", action="store_true")
     run.add_argument("--minutes", type=float, default=60)
-    for flag in ("workers", "column-rounds", "row-rounds", "columns-per-round", "direction-steps"):
+    for flag in ("workers", "column-rounds", "row-rounds", "columns-per-round", "direction-steps", "bin-net"):
         run.add_argument(f"--{flag}", type=int)
     for flag in ("stage-seconds", "verify-seconds"):
         run.add_argument(f"--{flag}", type=float)

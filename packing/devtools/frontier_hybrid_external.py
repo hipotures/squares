@@ -52,15 +52,35 @@ def run_logged(command: list[str], path: Path, seconds: float, *, cwd: Path | No
     path.parent.mkdir(parents=True, exist_ok=True)
     environment = {k: v for k, v in os.environ.items() if not k.startswith(("VERIFY_", "TIGHT_"))}
     environment.pop("PYTHONOPTIMIZE", None)
+    managed = bool(environment.get("SQUARES_FRONTIER_JOB_TOKEN"))
     with path.open("w", encoding="utf-8") as log:
         process = subprocess.Popen(command, cwd=cwd, env=environment, stdout=log,
                                    stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                                   start_new_session=True)
+                                   start_new_session=not managed)
         try:
             code = process.wait(timeout=seconds)
         except BaseException:
             if process.poll() is None:
-                os.killpg(process.pid, signal.SIGKILL)
+                if managed:
+                    from devtools.frontier_runtime import owned_members, process_info
+                    members = owned_members(None, environment["SQUARES_FRONTIER_JOB_TOKEN"])
+                    descendants = {process.pid}
+                    while True:
+                        expanded = descendants | {m["pid"] for m in members if m["ppid"] in descendants}
+                        if expanded == descendants:
+                            break
+                        descendants = expanded
+                    for member in reversed(members):
+                        current = process_info(member["pid"])
+                        if member["pid"] in descendants and current and current["ticks"] == member["ticks"]:
+                            try:
+                                os.kill(member["pid"], signal.SIGKILL)
+                            except ProcessLookupError:
+                                pass
+                    if process.poll() is None:
+                        process.kill()
+                else:
+                    os.killpg(process.pid, signal.SIGKILL)
             process.wait()
             raise
     return code, path.read_text(encoding="utf-8")

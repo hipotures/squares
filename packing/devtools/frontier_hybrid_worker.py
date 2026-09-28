@@ -33,6 +33,21 @@ def generate(manifest: dict[str, Any], directory: Path) -> dict[str, Any]:
     started = time.perf_counter()
     deadline = started + config["stage_seconds"] * 0.95
 
+    if config["mode"] == "bins":
+        from sqpack.fractional.hybrid_bin_engine import generate_bins
+        candidate_record, details = generate_bins(side, config, seeds, directory, deadline, phases)
+        if candidate_record is not None:
+            atomic_json(directory / "candidate.json", candidate_record)
+        return {
+            "schema": "hybrid-generation/v1",
+            "status": "CANDIDATE" if candidate_record is not None else "UNRESOLVED",
+            "side": str(side),
+            "mass": candidate_record["total_mass"] if candidate_record is not None else None,
+            "candidate_sha256": digest(directory / "candidate.json") if candidate_record is not None else None,
+            "seconds": time.perf_counter() - started, "phase_timings": phases.summary(),
+            "seed_points": len(seeds), **details,
+        }
+
     def capture(sites: Any, weights: Any) -> None:
         save_snapshot(directory / "raw-lp.json", sites, weights, n=12,
                       square_side=Fraction(config["shrink"]),
@@ -57,8 +72,9 @@ def generate(manifest: dict[str, Any], directory: Path) -> dict[str, Any]:
         details = {"objective": log.objective, "converged": log.stopped.startswith("converged"),
                    "stopped": log.stopped, "rounds": len(log.rounds)}
     else:
-        from sqpack.fractional.hybrid_engine import generate_hybrid
-        candidate, details = generate_hybrid(side, config, seeds, directory, deadline, phases, capture)
+        from importlib import import_module
+        engine = import_module("sqpack.fractional.hybrid_engine")
+        candidate, details = engine.generate_hybrid(side, config, seeds, directory, deadline, phases, capture)
     if candidate is not None:
         (directory / "candidate.json").write_text(certificate_json(candidate, None), encoding="utf-8")
     result = {

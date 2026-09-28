@@ -53,10 +53,16 @@ class SourceMeasure:
 
 
 def load_measure(path: Path, *, pinned_record: bool = False) -> SourceMeasure:
-    """Read external integer text or own JSON without inventing fixed-B metadata."""
+    """Read exact support data. Import never transfers a proof claim."""
     if path.stat().st_size > MAX_BYTES:
         raise ValueError("source measure is too large")
-    raw = path.read_bytes()
+    return parse_measure(path.read_bytes(), str(path.resolve()), pinned_record=pinned_record)
+
+
+def parse_measure(raw: bytes, source: str = "<memory>", *, pinned_record: bool = False) -> SourceMeasure:
+    """Parse bounded exact source data independently of filesystem access."""
+    if len(raw) > MAX_BYTES:
+        raise ValueError("source measure is too large")
     if pinned_record:
         blob = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
         if blob != RECORD_BLOB:
@@ -74,7 +80,7 @@ def load_measure(path: Path, *, pinned_record: bool = False) -> SourceMeasure:
         for row in entries:
             if not isinstance(row, list) or len(row) != 3:
                 raise ValueError("each atom must have exactly x, y, and weight")
-            atoms.append(tuple(rational(value) for value in row))
+            atoms.append((rational(row[0]), rational(row[1]), rational(row[2])))
     else:
         tokens = text.split()
         if len(tokens) < 5 or any(len(token) > 512 for token in tokens):
@@ -103,7 +109,7 @@ def load_measure(path: Path, *, pinned_record: bool = False) -> SourceMeasure:
             raise ValueError("negative weight or point outside the container")
         combined[x, y] += weight
     merged = tuple((x, y, weight) for (x, y), weight in sorted(combined.items()))
-    return SourceMeasure(side, merged, hashlib.sha256(raw).hexdigest(), str(path.resolve()))
+    return SourceMeasure(side, merged, hashlib.sha256(raw).hexdigest(), source)
 
 
 def mapped_points(measures: list[SourceMeasure], side: Fraction, mapping: str) -> set[tuple[Fraction, Fraction]]:
@@ -113,11 +119,11 @@ def mapped_points(measures: list[SourceMeasure], side: Fraction, mapping: str) -
     for measure in measures:
         for x, y, _ in measure.atoms:
             if mapping == "scale":
-                x, y = x * side / measure.side, y * side / measure.side
+                mx, my = x * side / measure.side, y * side / measure.side
             else:
                 shift = (side - measure.side) / 2
-                x, y = x + shift, y + shift
-            if not (0 <= x <= side and 0 <= y <= side):
+                mx, my = x + shift, y + shift
+            if not (0 <= mx <= side and 0 <= my <= side):
                 raise ValueError("the requested mapping moves a source point outside the target")
-            result.add((x, y))
+            result.add((mx, my))
     return result

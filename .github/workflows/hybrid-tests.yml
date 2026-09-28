@@ -18,9 +18,11 @@ jobs:
     timeout-minutes: 12
     env:
       PACK_JOBS: "2"
+      PACK_GENERATION_MANAGED: "1"
       OMP_NUM_THREADS: "1"
       OPENBLAS_NUM_THREADS: "1"
       MKL_NUM_THREADS: "1"
+      HYBRID_EXTERNAL_TESTS: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -34,6 +36,11 @@ jobs:
       - name: Install the locked environment
         working-directory: packing
         run: uv sync --frozen --all-extras --group dev
+      - name: Build the pinned external checker for tiny integration fixtures
+        working-directory: packing
+        run: >-
+          uv run --frozen python -m devtools.frontier_hybrid prepare-external
+          --root ../Experiments/hybrid-ci/external-build
       - name: Run hybrid tests and unchanged generator regressions
         working-directory: packing
         run: >-

@@ -16,5 +16,7 @@
   "column_rounds": 60,
   "columns_per_round": 1,
   "rows_per_direction": 3,
-  "support_cap": 32
+  "support_cap": 32,
+  "use_retained_seed": false,
+  "carry_support": false
 }
