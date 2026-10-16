@@ -23,6 +23,7 @@ struct SearchOptions {
     double wall_seconds{0.0};
     Shard shard{};
     bool retain_keys{false};
+    bool profile_canonical{false};
 };
 
 struct SearchStats {
@@ -35,12 +36,19 @@ struct SearchStats {
     std::uint64_t total_candidate_contacts{};
     std::uint64_t total_incidence_vertices{};
     std::uint64_t total_incidence_edges{};
+    std::uint64_t canonical_profiled_calls{};
     double wall_seconds{};
     double generation_seconds{};
     double validation_seconds{};
     double graph_conversion_seconds{};
     double canonicalization_seconds{};
     double dedup_seconds{};
+    double canonical_dense_build_seconds{};
+    double canonical_partition_seconds{};
+    double canonical_nauty_seconds{};
+    double canonical_extraction_seconds{};
+    double canonical_encoding_seconds{};
+    double canonical_hash_seconds{};
 };
 
 struct SearchResult {

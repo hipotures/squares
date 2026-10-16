@@ -32,8 +32,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-unique", type=int, default=200_000)
     parser.add_argument("--max-depth", type=int, default=3)
     parser.add_argument("--max-additions", type=int, default=256)
+    parser.add_argument(
+        "--profile-canonical",
+        action="store_true",
+        help="microprofile the internal canonicalization stages in native workers",
+    )
     parser.add_argument("--json-report", type=Path)
     return parser.parse_args()
+
+
+def summed(summaries: list[dict[str, object]], key: str) -> float:
+    return sum(float(item.get(key, 0.0)) for item in summaries)
 
 
 def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
@@ -59,6 +68,9 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
             f"{shard}/{workers}",
             "--json",
         ]
+        if args.profile_canonical:
+            command.append("--profile-canonical")
+
         processes.append(
             subprocess.Popen(
                 command,
@@ -93,8 +105,59 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
         "duplicates": duplicates,
         "local_unique_sum": local_unique_sum,
         "candidates_per_second": raw / external_wall if external_wall else 0.0,
+        "canonical_profiled_calls": sum(
+            int(item.get("canonical_profiled_calls", 0)) for item in summaries
+        ),
+        "canonicalization_seconds": summed(summaries, "canonicalization_seconds"),
+        "canonical_dense_build_seconds": summed(
+            summaries, "canonical_dense_build_seconds"
+        ),
+        "canonical_partition_seconds": summed(
+            summaries, "canonical_partition_seconds"
+        ),
+        "canonical_nauty_seconds": summed(summaries, "canonical_nauty_seconds"),
+        "canonical_extraction_seconds": summed(
+            summaries, "canonical_extraction_seconds"
+        ),
+        "canonical_encoding_seconds": summed(
+            summaries, "canonical_encoding_seconds"
+        ),
+        "canonical_hash_seconds": summed(summaries, "canonical_hash_seconds"),
+        "canonical_profile_other_seconds": summed(
+            summaries, "canonical_profile_other_seconds"
+        ),
         "worker_summaries": summaries,
     }
+
+
+def print_canonical_profile(rows: list[dict[str, object]]) -> None:
+    print()
+    print("canonical microprofile (microseconds per profiled canonicalization)")
+    print(
+        f"{'workers':>7} {'dense':>9} {'partition':>10} {'nauty':>9} "
+        f"{'extract':>9} {'encoding':>10} {'hash':>8} {'other':>8} {'total':>9}"
+    )
+
+    for row in rows:
+        calls = int(row["canonical_profiled_calls"])
+        if calls == 0:
+            continue
+
+        scale = 1_000_000.0 / calls
+        dense = float(row["canonical_dense_build_seconds"]) * scale
+        partition = float(row["canonical_partition_seconds"]) * scale
+        nauty = float(row["canonical_nauty_seconds"]) * scale
+        extraction = float(row["canonical_extraction_seconds"]) * scale
+        encoding = float(row["canonical_encoding_seconds"]) * scale
+        hash_time = float(row["canonical_hash_seconds"]) * scale
+        other = float(row["canonical_profile_other_seconds"]) * scale
+        total = float(row["canonicalization_seconds"]) * scale
+
+        print(
+            f"{int(row['workers']):7d} {dense:9.2f} {partition:10.2f} {nauty:9.2f} "
+            f"{extraction:9.2f} {encoding:10.2f} {hash_time:8.2f} "
+            f"{other:8.2f} {total:9.2f}"
+        )
 
 
 def main() -> int:
@@ -126,14 +189,18 @@ def main() -> int:
             f"{int(row['local_unique_sum']):13d}"
         )
 
+    if args.profile_canonical:
+        print_canonical_profile(rows)
+
     if args.json_report is not None:
         args.json_report.parent.mkdir(parents=True, exist_ok=True)
         args.json_report.write_text(
             json.dumps(
                 {
-                    "schema": "sqtopology.scaling-report.v1",
+                    "schema": "sqtopology.scaling-report.v2",
                     "fixture": args.fixture,
                     "seconds": args.seconds,
+                    "profile_canonical": args.profile_canonical,
                     "rows": rows,
                 },
                 indent=2,

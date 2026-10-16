@@ -229,6 +229,43 @@ the semantic representation unchanged while removing avoidable work:
 The checked public incidence builder remains available for external callers. The native
 tests assert that the checked and validated fast paths produce the same canonical encoding.
 
+## Canonicalization microprofiling
+
+The phase-1.2 instrumentation can split the canonicalization block without changing the
+search semantics. It is opt-in so ordinary search throughput is not charged for several
+extra high-resolution clock reads per candidate.
+
+Use:
+
+~~~bash
+python3 tools/bench_scaling.py \
+  --binary ./build/sqtopology \
+  --fixture grid-4x4-minus-one \
+  --workers 1,2,4,8,16 \
+  --seconds 30 \
+  --max-candidates 0 \
+  --max-unique 200000 \
+  --max-depth 3 \
+  --max-additions 256 \
+  --profile-canonical \
+  --json-report /tmp/sqtopology-canonical-profile.json
+~~~
+
+The harness prints a second table in microseconds per profiled canonicalization. The
+instrumented block is split into:
+
+- dense nauty graph allocation/construction;
+- initial colored partition/labelling setup;
+- the `densenauty()` call itself;
+- canonical graph extraction;
+- deterministic full-key encoding;
+- FNV-1a display/index hash;
+- residual canonical-block time not covered by the six measured regions.
+
+The unprofiled command remains the correct throughput benchmark. A run with
+`--profile-canonical` is diagnostic and should not be compared directly with the
+unprofiled throughput baseline.
+
 ## Measurement fields
 
 Native search summaries separately report:
@@ -247,7 +284,10 @@ Native search summaries separately report:
 - deduplication time;
 - unattributed wall time;
 - total candidate-contact count;
-- total incidence vertices and edges.
+- total incidence vertices and edges;
+- number of profiled canonicalizations;
+- dense-build, partition, `densenauty`, extraction, encoding, hash, and residual
+  canonicalization times when canonical profiling is enabled.
 
 The purpose is to locate the actual bottleneck before optimizing it.
 

@@ -73,6 +73,7 @@ void usage() {
         << "  --max-additions N\n"
         << "  --shard INDEX/COUNT\n"
         << "  --json\n"
+        << "  --profile-canonical\n"
         << "  --emit-keys FILE\n";
 }
 
@@ -181,6 +182,10 @@ int search_command(int argc, char** argv) {
         const std::string_view arg = argv[i];
         if (arg == "--json") {
             json = true;
+            continue;
+        }
+        if (arg == "--profile-canonical") {
+            options.profile_canonical = true;
             continue;
         }
         if (i + 1 >= argc) {

@@ -240,6 +240,65 @@ void test_validated_incidence_fast_path_matches_checked_path() {
     );
 }
 
+void test_canonical_microprofile_preserves_semantics() {
+    using namespace sqtopology;
+
+    const auto topology = make_fixture("grid-4x4-minus-one").normalized();
+    const auto incidence = to_incidence_graph_validated(topology);
+    const auto baseline = canonicalize_colored_graph(incidence);
+
+    CanonicalProfile profile;
+    const auto profiled = canonicalize_colored_graph(incidence, &profile);
+
+    expect(
+        baseline.encoding == profiled.encoding,
+        "canonical microprofiling must not change the canonical encoding"
+    );
+    expect(
+        baseline.fingerprint == profiled.fingerprint,
+        "canonical microprofiling must not change the canonical fingerprint"
+    );
+    expect(profile.calls == 1, "canonical profile must count the profiled call");
+    expect(profile.dense_build_seconds >= 0.0, "dense-build timing must be non-negative");
+    expect(profile.partition_seconds >= 0.0, "partition timing must be non-negative");
+    expect(profile.nauty_seconds >= 0.0, "nauty timing must be non-negative");
+    expect(profile.extraction_seconds >= 0.0, "extraction timing must be non-negative");
+    expect(profile.encoding_seconds >= 0.0, "encoding timing must be non-negative");
+    expect(profile.hash_seconds >= 0.0, "hash timing must be non-negative");
+}
+
+void test_search_canonical_microprofile() {
+    using namespace sqtopology;
+
+    const SearchOptions options{
+        .max_candidates = 24,
+        .max_unique = 24,
+        .max_depth = 1,
+        .max_additions_per_parent = 16,
+        .wall_seconds = 0.0,
+        .shard = Shard{.index = 0, .count = 1},
+        .retain_keys = false,
+        .profile_canonical = true,
+    };
+
+    const auto result = run_search(make_fixture("grid-3x3"), options);
+    expect(result.stats.valid_candidates > 0, "profiled search must process candidates");
+    expect(
+        result.stats.canonical_profiled_calls == result.stats.valid_candidates,
+        "every valid search candidate must receive one canonical microprofile"
+    );
+
+    const auto json = search_stats_to_json(result.stats, options.shard);
+    expect(
+        json.find("\"canonical_profile_enabled\":true") != std::string::npos,
+        "search JSON must report enabled canonical profiling"
+    );
+    expect(
+        json.find("\"canonical_nauty_seconds\":") != std::string::npos,
+        "search JSON must expose nauty microprofile timing"
+    );
+}
+
 void test_canonical_equality_uses_encoding() {
     using namespace sqtopology;
 
@@ -270,6 +329,8 @@ int main() {
         test_shard_reproducibility();
         test_export_smoke();
         test_validated_incidence_fast_path_matches_checked_path();
+        test_canonical_microprofile_preserves_semantics();
+        test_search_canonical_microprofile();
         test_canonical_equality_uses_encoding();
         std::cout << "sqtopology_tests: all tests passed\n";
         return 0;

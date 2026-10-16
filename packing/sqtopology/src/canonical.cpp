@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
@@ -13,6 +14,12 @@ extern "C" {
 
 namespace sqtopology {
 namespace {
+
+using Clock = std::chrono::steady_clock;
+
+double seconds_between(Clock::time_point start, Clock::time_point end) {
+    return std::chrono::duration<double>(end - start).count();
+}
 
 std::uint32_t add_vertex(ColoredGraph& graph, VertexColor color) {
     const auto id = static_cast<std::uint32_t>(graph.colors.size());
@@ -142,9 +149,20 @@ ColoredGraph to_incidence_graph_validated(const Topology& topology) {
     return build_incidence_graph(topology);
 }
 
-CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph) {
+CanonicalForm canonicalize_colored_graph(
+    const ColoredGraph& graph,
+    CanonicalProfile* profile
+) {
     if (graph.colors.empty()) {
         throw std::invalid_argument("cannot canonicalize an empty graph");
+    }
+    if (profile != nullptr) {
+        ++profile->calls;
+    }
+
+    Clock::time_point stage_started{};
+    if (profile != nullptr) {
+        stage_started = Clock::now();
     }
 
     const int n = static_cast<int>(graph.vertex_count());
@@ -172,6 +190,11 @@ CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph) {
         );
     }
 
+    if (profile != nullptr) {
+        profile->dense_build_seconds += seconds_between(stage_started, Clock::now());
+        stage_started = Clock::now();
+    }
+
     std::vector<int> lab(static_cast<std::size_t>(n));
     std::vector<int> ptn(static_cast<std::size_t>(n), 0);
     std::vector<int> orbits(static_cast<std::size_t>(n), 0);
@@ -197,6 +220,11 @@ CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph) {
     }
     ptn.back() = 0;
 
+    if (profile != nullptr) {
+        profile->partition_seconds += seconds_between(stage_started, Clock::now());
+        stage_started = Clock::now();
+    }
+
     DEFAULTOPTIONS_GRAPH(options);
     options.getcanon = TRUE;
     options.defaultptn = FALSE;
@@ -213,6 +241,11 @@ CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph) {
         n,
         canonical_dense.data()
     );
+
+    if (profile != nullptr) {
+        profile->nauty_seconds += seconds_between(stage_started, Clock::now());
+        stage_started = Clock::now();
+    }
 
     if (stats.errstatus != 0) {
         throw std::runtime_error(
@@ -240,6 +273,11 @@ CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph) {
         }
     }
 
+    if (profile != nullptr) {
+        profile->extraction_seconds += seconds_between(stage_started, Clock::now());
+        stage_started = Clock::now();
+    }
+
     std::ostringstream encoding;
     encoding << "SQT1|n:" << n << "|c:";
     for (std::size_t i = 0; i < result.canonical_colors.size(); ++i) {
@@ -257,14 +295,27 @@ CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph) {
                  << '-'
                  << result.canonical_edges[i].second;
     }
-
     result.encoding = encoding.str();
+
+    if (profile != nullptr) {
+        profile->encoding_seconds += seconds_between(stage_started, Clock::now());
+        stage_started = Clock::now();
+    }
+
     result.fingerprint = stable_fingerprint(result.encoding);
+
+    if (profile != nullptr) {
+        profile->hash_seconds += seconds_between(stage_started, Clock::now());
+    }
+
     return result;
 }
 
-CanonicalForm canonicalize(const Topology& topology) {
-    return canonicalize_colored_graph(to_incidence_graph(topology));
+CanonicalForm canonicalize(
+    const Topology& topology,
+    CanonicalProfile* profile
+) {
+    return canonicalize_colored_graph(to_incidence_graph(topology), profile);
 }
 
 std::uint64_t stable_fingerprint(std::string_view bytes) {

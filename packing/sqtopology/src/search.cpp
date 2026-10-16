@@ -20,6 +20,19 @@ double seconds_between(Clock::time_point start, Clock::time_point end) {
     return std::chrono::duration<double>(end - start).count();
 }
 
+void accumulate_canonical_profile(
+    SearchStats& stats,
+    const CanonicalProfile& profile
+) {
+    stats.canonical_profiled_calls += profile.calls;
+    stats.canonical_dense_build_seconds += profile.dense_build_seconds;
+    stats.canonical_partition_seconds += profile.partition_seconds;
+    stats.canonical_nauty_seconds += profile.nauty_seconds;
+    stats.canonical_extraction_seconds += profile.extraction_seconds;
+    stats.canonical_encoding_seconds += profile.encoding_seconds;
+    stats.canonical_hash_seconds += profile.hash_seconds;
+}
+
 struct QueueItem {
     Topology topology;
     std::size_t depth{};
@@ -100,11 +113,18 @@ SearchResult run_search(
         result.stats.total_incidence_vertices += incidence.vertex_count();
         result.stats.total_incidence_edges += incidence.edges.size();
 
+        CanonicalProfile canonical_profile;
         t0 = Clock::now();
-        const auto form = canonicalize_colored_graph(incidence);
+        const auto form = canonicalize_colored_graph(
+            incidence,
+            options.profile_canonical ? &canonical_profile : nullptr
+        );
         t1 = Clock::now();
         result.stats.canonicalization_seconds += seconds_between(t0, t1);
         ++result.stats.canonicalizations;
+        if (options.profile_canonical) {
+            accumulate_canonical_profile(result.stats, canonical_profile);
+        }
 
         t0 = Clock::now();
         const bool inserted = seen.insert(form.encoding).second;
@@ -197,10 +217,22 @@ std::string search_stats_to_json(
     const double unattributed_seconds =
         std::max(0.0, stats.wall_seconds - attributed_seconds);
 
+    const double canonical_profile_sum =
+        stats.canonical_dense_build_seconds
+        + stats.canonical_partition_seconds
+        + stats.canonical_nauty_seconds
+        + stats.canonical_extraction_seconds
+        + stats.canonical_encoding_seconds
+        + stats.canonical_hash_seconds;
+    const double canonical_profile_other_seconds =
+        stats.canonical_profiled_calls > 0
+            ? std::max(0.0, stats.canonicalization_seconds - canonical_profile_sum)
+            : 0.0;
+
     std::ostringstream out;
     out << std::setprecision(17)
         << '{'
-        << "\"schema\":\"sqtopology.search-summary.v2\","
+        << "\"schema\":\"sqtopology.search-summary.v3\","
         << "\"shard\":{\"index\":" << shard.index
         << ",\"count\":" << shard.count << "},"
         << "\"raw_candidates\":" << stats.raw_candidates << ','
@@ -212,13 +244,23 @@ std::string search_stats_to_json(
         << "\"total_candidate_contacts\":" << stats.total_candidate_contacts << ','
         << "\"total_incidence_vertices\":" << stats.total_incidence_vertices << ','
         << "\"total_incidence_edges\":" << stats.total_incidence_edges << ','
+        << "\"canonical_profile_enabled\":"
+        << (stats.canonical_profiled_calls > 0 ? "true" : "false") << ','
+        << "\"canonical_profiled_calls\":" << stats.canonical_profiled_calls << ','
         << "\"wall_seconds\":" << stats.wall_seconds << ','
         << "\"generation_seconds\":" << stats.generation_seconds << ','
         << "\"validation_seconds\":" << stats.validation_seconds << ','
         << "\"graph_conversion_seconds\":" << stats.graph_conversion_seconds << ','
         << "\"canonicalization_seconds\":" << stats.canonicalization_seconds << ','
         << "\"dedup_seconds\":" << stats.dedup_seconds << ','
-        << "\"unattributed_seconds\":" << unattributed_seconds
+        << "\"unattributed_seconds\":" << unattributed_seconds << ','
+        << "\"canonical_dense_build_seconds\":" << stats.canonical_dense_build_seconds << ','
+        << "\"canonical_partition_seconds\":" << stats.canonical_partition_seconds << ','
+        << "\"canonical_nauty_seconds\":" << stats.canonical_nauty_seconds << ','
+        << "\"canonical_extraction_seconds\":" << stats.canonical_extraction_seconds << ','
+        << "\"canonical_encoding_seconds\":" << stats.canonical_encoding_seconds << ','
+        << "\"canonical_hash_seconds\":" << stats.canonical_hash_seconds << ','
+        << "\"canonical_profile_other_seconds\":" << canonical_profile_other_seconds
         << "}\n";
     return out.str();
 }

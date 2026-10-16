@@ -65,4 +65,5 @@ jobs:
             --seconds 1 \
             --max-unique 2000 \
             --max-depth 2 \
-            --max-additions 32
+            --max-additions 32 \
+            --profile-canonical
