@@ -47,7 +47,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--backends",
         type=parse_backends,
-        default=parse_backends("dense-nauty"),
+        default=parse_backends("traces"),
         help="comma-separated canonical backends: dense-nauty,sparse-nauty,traces",
     )
     parser.add_argument("--seconds", type=float, default=10.0)

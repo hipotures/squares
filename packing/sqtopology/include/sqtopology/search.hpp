@@ -25,11 +25,11 @@ struct SearchOptions {
     Shard shard{};
     bool retain_keys{false};
     bool profile_canonical{false};
-    CanonicalBackend canonical_backend{CanonicalBackend::DenseNauty};
+    CanonicalBackend canonical_backend{CanonicalBackend::Traces};
 };
 
 struct SearchStats {
-    CanonicalBackend canonical_backend{CanonicalBackend::DenseNauty};
+    CanonicalBackend canonical_backend{CanonicalBackend::Traces};
     std::uint64_t raw_candidates{};
     std::uint64_t valid_candidates{};
     std::uint64_t canonicalizations{};

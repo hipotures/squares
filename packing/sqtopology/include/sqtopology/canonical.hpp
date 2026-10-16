@@ -86,7 +86,7 @@ struct CanonicalProfile {
 // exact backend-local canonical keys.
 [[nodiscard]] CanonicalKey canonical_key_colored_graph(
     const ColoredGraph& graph,
-    CanonicalBackend backend = CanonicalBackend::DenseNauty,
+    CanonicalBackend backend = CanonicalBackend::Traces,
     CanonicalProfile* profile = nullptr
 );
 [[nodiscard]] std::string canonical_key_hex(const CanonicalKey& key);

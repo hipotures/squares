@@ -258,13 +258,18 @@ only at the end of a run when `--emit-keys` is requested.
 
 ## Canonical backend comparison
 
+Search defaults to `traces`. The target-host 30-second benchmark on
+`grid-4x4-minus-one` measured 396,297 candidates/s at 16 workers, versus 377,754 for
+sparse nauty and 192,157 for dense nauty. Dense and sparse backends remain selectable
+for regression testing and workload-specific comparisons.
+
 Search can now use any of three in-process canonical-labeling backends:
 
 - `dense-nauty`: the original dense `densenauty()` baseline;
 - `sparse-nauty`: nauty's sparse-graph interface;
 - `traces`: Traces on the same colored incidence graph.
 
-Select one in the native CLI with:
+Override the default in the native CLI with:
 
 ~~~bash
 ./build/sqtopology search grid-4x4-minus-one \

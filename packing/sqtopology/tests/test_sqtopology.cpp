@@ -387,8 +387,8 @@ void test_search_canonical_microprofile() {
         "search JSON must expose backend engine timing"
     );
     expect(
-        json.find("\"canonical_backend\":\"dense-nauty\"") != std::string::npos,
-        "search JSON must expose the canonical backend"
+        json.find("\"canonical_backend\":\"traces\"") != std::string::npos,
+        "default search JSON must expose Traces as the canonical backend"
     );
     expect(
         json.find("\"canonical_key_build_seconds\":") != std::string::npos,
