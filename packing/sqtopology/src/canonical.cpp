@@ -306,9 +306,18 @@ std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_sparse_edges(
     std::vector<std::pair<std::uint32_t, std::uint32_t>> edges;
     edges.reserve(static_cast<std::size_t>(sparse.nde) / 2U);
 
+    // Canonical vertices are visited in ascending order, so only each vertex's
+    // forward-neighbor list needs sorting. Incidence degrees are small; this is
+    // cheaper than collecting every edge and globally sorting O(E log E).
+    std::vector<std::uint32_t> forward_neighbors;
     for (std::size_t vertex = 0; vertex < n; ++vertex) {
+        forward_neighbors.clear();
         const auto begin = sparse.v[vertex];
         const auto degree = static_cast<std::size_t>(sparse.d[vertex]);
+        forward_neighbors.reserve(
+            std::max(forward_neighbors.capacity(), degree)
+        );
+
         for (std::size_t offset = 0; offset < degree; ++offset) {
             const int neighbor_raw = sparse.e[begin + offset];
             if (neighbor_raw < 0
@@ -324,20 +333,30 @@ std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_sparse_edges(
                 );
             }
             if (vertex < neighbor) {
-                edges.emplace_back(
-                    static_cast<std::uint32_t>(vertex),
+                forward_neighbors.push_back(
                     static_cast<std::uint32_t>(neighbor)
                 );
             }
         }
+
+        std::sort(forward_neighbors.begin(), forward_neighbors.end());
+        if (std::adjacent_find(
+                forward_neighbors.begin(),
+                forward_neighbors.end()
+            ) != forward_neighbors.end()) {
+            throw std::logic_error(
+                "canonical sparse graph unexpectedly contains duplicate edges"
+            );
+        }
+
+        for (const auto neighbor : forward_neighbors) {
+            edges.emplace_back(
+                static_cast<std::uint32_t>(vertex),
+                neighbor
+            );
+        }
     }
 
-    std::sort(edges.begin(), edges.end());
-    if (std::adjacent_find(edges.begin(), edges.end()) != edges.end()) {
-        throw std::logic_error(
-            "canonical sparse graph unexpectedly contains duplicate edges"
-        );
-    }
     if (edges.size() * 2U != static_cast<std::size_t>(sparse.nde)) {
         throw std::logic_error(
             "canonical sparse graph is not a simple undirected graph"
