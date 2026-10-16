@@ -181,7 +181,7 @@ A worker owns a coarse deterministic shard:
 ~~~
 
 The root's deterministic rewrite sequence is partitioned by `index mod shard_count`.
-After that first-level assignment, each process generates, validates, canonicalizes, and
+After that first-level assignment, each process generates, canonicalizes, and
 deduplicates its descendants locally.
 
 This has two consequences:
@@ -232,6 +232,21 @@ the semantic representation unchanged while removing avoidable work:
 
 The checked public incidence builder remains available for external callers. The native
 tests assert that the checked and validated fast paths produce the same canonical encoding.
+
+### Trusted rewrite validation
+
+Search fully validates its external seed. `generate_rewrites_validated()` then
+preserves validity by construction: removing a contact cannot introduce an error;
+new contacts use in-range features on distinct squares (or a valid wall), infer
+their kind, and exclude existing normalized events. This contract holds inductively
+for every search descendant. Release search therefore skips repeated full semantic
+validation of generated children.
+
+Use `search ... --validate-generated` to run full validation on every generated
+candidate and fail immediately if the construction invariant is violated. Tests
+exercise this diagnostic against the trusted path, including exact retained keys
+and deterministic shards. The public `generate_rewrites()`, `run_search()`, and
+`to_incidence_graph()` entry points still validate external input.
 
 ## Exact binary search key
 

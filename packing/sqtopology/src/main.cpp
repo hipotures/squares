@@ -75,6 +75,7 @@ void usage() {
         << "  --canonical-backend dense-nauty|sparse-nauty|traces (default: traces)\n"
         << "  --json\n"
         << "  --profile-canonical\n"
+        << "  --validate-generated    (diagnose rewrite invariants)\n"
         << "  --emit-keys FILE\n";
 }
 
@@ -183,6 +184,10 @@ int search_command(int argc, char** argv) {
         const std::string_view arg = argv[i];
         if (arg == "--json") {
             json = true;
+            continue;
+        }
+        if (arg == "--validate-generated") {
+            options.validate_generated = true;
             continue;
         }
         if (arg == "--profile-canonical") {

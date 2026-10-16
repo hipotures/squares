@@ -180,6 +180,62 @@ void test_rewrites_are_deterministic() {
     }
 }
 
+void test_rewrite_validity_contract() {
+    using namespace sqtopology;
+    for (const auto& name : fixture_names()) {
+        auto parent = make_fixture(name);
+        // Descend through several generated states, checking removals and both
+        // square/wall additions. Small fixtures exhaust the square-pair domain.
+        for (std::size_t depth = 0; depth < 4; ++depth) {
+            const RewriteOptions options{.max_additions = 256, .include_labels = false};
+            const auto checked = generate_rewrites(parent, options);
+            const auto trusted = generate_rewrites_validated(parent, options);
+            expect(checked.size() == trusted.size(), "trusted rewrite count must match");
+            for (std::size_t i = 0; i < trusted.size(); ++i) {
+                expect_valid(trusted[i].topology, "every generated state must be valid");
+                expect(trusted[i].topology.contacts() == checked[i].topology.contacts(),
+                       "trusted rewrites must preserve deterministic contact ordering");
+                expect(trusted[i].topology.contacts()
+                           == trusted[i].topology.normalized().contacts(),
+                       "generated contacts must remain normalized");
+            }
+            if (trusted.empty()) break;
+            parent = trusted[(depth * 71 + 13) % trusted.size()].topology;
+        }
+    }
+
+    SearchOptions options{
+        .max_candidates = 1500, .max_unique = 0, .max_depth = 3,
+        .max_additions_per_parent = 32, .retain_keys = true,
+    };
+    const auto seed = make_fixture("grid-3x3");
+    for (std::size_t shard = 0; shard < 3; ++shard) {
+        options.shard = Shard{.index = shard, .count = 3};
+        options.validate_generated = false;
+        const auto trusted = run_search(seed, options);
+        options.validate_generated = true;
+        const auto checked = run_search(seed, options);
+        expect(trusted.unique_encodings == checked.unique_encodings,
+               "diagnostic validation must preserve exact search keys and sharding");
+        expect(trusted.stats.raw_candidates == checked.stats.raw_candidates
+                   && trusted.stats.duplicates == checked.stats.duplicates,
+               "diagnostic validation must preserve the rewrite sequence");
+    }
+
+    Topology invalid(0);
+    bool rewrite_rejected = false;
+    bool search_rejected = false;
+    bool incidence_rejected = false;
+    try { (void)generate_rewrites(invalid); }
+    catch (const std::invalid_argument&) { rewrite_rejected = true; }
+    try { (void)run_search(invalid, options); }
+    catch (const std::invalid_argument&) { search_rejected = true; }
+    try { (void)to_incidence_graph(invalid); }
+    catch (const std::invalid_argument&) { incidence_rejected = true; }
+    expect(rewrite_rejected && search_rejected && incidence_rejected,
+           "external topology entry points must keep full validation");
+}
+
 void test_shard_reproducibility() {
     using namespace sqtopology;
 
@@ -517,6 +573,7 @@ int main() {
         test_distinct_topologies_remain_distinct();
         test_grid_3x3_central_square_has_eight_square_contacts();
         test_rewrites_are_deterministic();
+        test_rewrite_validity_contract();
         test_shard_reproducibility();
         test_export_smoke();
         test_validated_incidence_fast_path_matches_checked_path();

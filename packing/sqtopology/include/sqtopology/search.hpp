@@ -26,6 +26,8 @@ struct SearchOptions {
     bool retain_keys{false};
     bool profile_canonical{false};
     CanonicalBackend canonical_backend{CanonicalBackend::Traces};
+    // Diagnostic: check the construction-by-invariant contract on every child.
+    bool validate_generated{false};
 };
 
 struct SearchStats {

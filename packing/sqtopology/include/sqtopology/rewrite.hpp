@@ -27,7 +27,17 @@ struct RewriteOptions {
     bool include_labels{true};
 };
 
+// Checked entry point for external topologies. Rejects invalid input.
 [[nodiscard]] std::vector<Rewrite> generate_rewrites(
+    const Topology& topology,
+    const RewriteOptions& options = {}
+);
+
+// Requires a valid topology. Normalizes contact ordering before enumeration.
+// Removal preserves validity; additions use in-range, distinct-square features,
+// infer their contact kind, and exclude existing events. Thus every returned
+// topology is valid by construction. Search may trust this inductive invariant.
+[[nodiscard]] std::vector<Rewrite> generate_rewrites_validated(
     const Topology& topology,
     const RewriteOptions& options = {}
 );

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <stdexcept>
 
 namespace sqtopology {
 namespace {
@@ -40,6 +41,16 @@ std::string wall_contact_label(
 }  // namespace
 
 std::vector<Rewrite> generate_rewrites(
+    const Topology& input,
+    const RewriteOptions& options
+) {
+    if (!input.validate().ok()) {
+        throw std::invalid_argument("rewrite input topology is invalid");
+    }
+    return generate_rewrites_validated(input, options);
+}
+
+std::vector<Rewrite> generate_rewrites_validated(
     const Topology& input,
     const RewriteOptions& options
 ) {

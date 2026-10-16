@@ -105,18 +105,21 @@ SearchResult run_search(
         ++result.stats.raw_candidates;
         result.stats.total_candidate_contacts += candidate.contacts().size();
 
-        auto t0 = Clock::now();
-        const auto validation = candidate.validate();
-        auto t1 = Clock::now();
-        result.stats.validation_seconds += seconds_between(t0, t1);
-        if (!validation.ok()) {
-            return true;
+        // The seed is checked at entry; generate_rewrites_validated preserves
+        // validity inductively. Keep an opt-in check for invariant diagnostics.
+        if (options.validate_generated) {
+            const auto t0 = Clock::now();
+            const auto validation = candidate.validate();
+            result.stats.validation_seconds += seconds_between(t0, Clock::now());
+            if (!validation.ok()) {
+                throw std::logic_error("rewrite generated an invalid topology");
+            }
         }
         ++result.stats.valid_candidates;
 
-        t0 = Clock::now();
+        auto t0 = Clock::now();
         const auto incidence = to_incidence_graph_validated(candidate);
-        t1 = Clock::now();
+        auto t1 = Clock::now();
         result.stats.graph_conversion_seconds += seconds_between(t0, t1);
         result.stats.total_incidence_vertices += incidence.vertex_count();
         result.stats.total_incidence_edges += incidence.edges.size();
@@ -169,7 +172,7 @@ SearchResult run_search(
         };
 
         auto t0 = Clock::now();
-        auto root_rewrites = generate_rewrites(seed, rewrite_options);
+        auto root_rewrites = generate_rewrites_validated(seed, rewrite_options);
         auto t1 = Clock::now();
         result.stats.generation_seconds += seconds_between(t0, t1);
 
@@ -194,7 +197,7 @@ SearchResult run_search(
             }
 
             t0 = Clock::now();
-            auto rewrites = generate_rewrites(parent.topology, rewrite_options);
+            auto rewrites = generate_rewrites_validated(parent.topology, rewrite_options);
             t1 = Clock::now();
             result.stats.generation_seconds += seconds_between(t0, t1);
 
