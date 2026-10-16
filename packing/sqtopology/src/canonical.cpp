@@ -14,8 +14,21 @@
 extern "C" {
 #include <nauty/nausparse.h>
 #include <nauty/nauty.h>
+}
+
+// Ubuntu 24.04's nauty 2.8.x is configured with C11 TLS and exposes
+// TLS_ATTR as _Thread_local through traces.h/gtools.h.  C++ spells the
+// equivalent storage specifier thread_local, so translate the token while
+// parsing that C header.  The installed library ABI still uses ELF TLS.
+#ifdef __cplusplus
+#define _Thread_local thread_local
+#endif
+extern "C" {
 #include <nauty/traces.h>
 }
+#ifdef __cplusplus
+#undef _Thread_local
+#endif
 
 namespace sqtopology {
 namespace {
