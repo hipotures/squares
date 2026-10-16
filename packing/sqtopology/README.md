@@ -213,6 +213,22 @@ unique counts.
 
 Longer runs should use tens of seconds per width so startup cost is negligible.
 
+## Hot-path baseline cleanup
+
+The first measured 16-process run showed that rewrite generation and incidence-graph
+construction together cost more than nauty itself. The phase-1.1 hot path therefore keeps
+the semantic representation unchanged while removing avoidable work:
+
+- search rewrite labels are disabled unless a human-facing neighbor listing needs them;
+- generated children are moved into the frontier rather than normalized/copied again;
+- the search path validates a topology once and then uses a validated incidence builder;
+- incidence edges are preallocated and are not sorted merely for nauty input;
+- canonicalization consumes the incidence graph directly instead of copying/sorting it;
+- contact normalization uses structural tuples rather than temporary string keys.
+
+The checked public incidence builder remains available for external callers. The native
+tests assert that the checked and validated fast paths produce the same canonical encoding.
+
 ## Measurement fields
 
 Native search summaries separately report:
@@ -228,7 +244,10 @@ Native search summaries separately report:
 - semantic-validation time;
 - incidence-graph conversion time;
 - nauty canonicalization time;
-- deduplication time.
+- deduplication time;
+- unattributed wall time;
+- total candidate-contact count;
+- total incidence vertices and edges.
 
 The purpose is to locate the actual bottleneck before optimizing it.
 

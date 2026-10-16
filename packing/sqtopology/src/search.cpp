@@ -75,13 +75,14 @@ SearchResult run_search(
 
     std::deque<QueueItem> frontier;
 
-    const auto consider = [&](const Topology& candidate, std::size_t depth) -> bool {
+    const auto consider = [&](Topology candidate, std::size_t depth) -> bool {
         if (limit_reached(result.stats, options)
             || deadline_reached(started, options)) {
             return false;
         }
 
         ++result.stats.raw_candidates;
+        result.stats.total_candidate_contacts += candidate.contacts().size();
 
         auto t0 = Clock::now();
         const auto validation = candidate.validate();
@@ -93,9 +94,11 @@ SearchResult run_search(
         ++result.stats.valid_candidates;
 
         t0 = Clock::now();
-        const auto incidence = to_incidence_graph(candidate);
+        const auto incidence = to_incidence_graph_validated(candidate);
         t1 = Clock::now();
         result.stats.graph_conversion_seconds += seconds_between(t0, t1);
+        result.stats.total_incidence_vertices += incidence.vertex_count();
+        result.stats.total_incidence_edges += incidence.edges.size();
 
         t0 = Clock::now();
         const auto form = canonicalize_colored_graph(incidence);
@@ -114,7 +117,12 @@ SearchResult run_search(
         }
 
         result.stats.unique_states = seen.size();
-        frontier.push_back(QueueItem{.topology = candidate.normalized(), .depth = depth});
+        frontier.push_back(
+            QueueItem{
+                .topology = std::move(candidate),
+                .depth = depth,
+            }
+        );
         return !limit_reached(result.stats, options);
     };
 
@@ -125,10 +133,11 @@ SearchResult run_search(
             .include_removals = true,
             .include_additions = true,
             .max_additions = options.max_additions_per_parent,
+            .include_labels = false,
         };
 
         auto t0 = Clock::now();
-        const auto root_rewrites = generate_rewrites(seed, rewrite_options);
+        auto root_rewrites = generate_rewrites(seed, rewrite_options);
         auto t1 = Clock::now();
         result.stats.generation_seconds += seconds_between(t0, t1);
 
@@ -137,7 +146,7 @@ SearchResult run_search(
                 continue;
             }
             ++result.stats.first_level_selected;
-            if (!consider(root_rewrites[i].topology, 1)) {
+            if (!consider(std::move(root_rewrites[i].topology), 1)) {
                 break;
             }
         }
@@ -153,12 +162,12 @@ SearchResult run_search(
             }
 
             t0 = Clock::now();
-            const auto rewrites = generate_rewrites(parent.topology, rewrite_options);
+            auto rewrites = generate_rewrites(parent.topology, rewrite_options);
             t1 = Clock::now();
             result.stats.generation_seconds += seconds_between(t0, t1);
 
-            for (const auto& rewrite : rewrites) {
-                if (!consider(rewrite.topology, parent.depth + 1)) {
+            for (auto& rewrite : rewrites) {
+                if (!consider(std::move(rewrite.topology), parent.depth + 1)) {
                     break;
                 }
             }
@@ -179,10 +188,19 @@ std::string search_stats_to_json(
     const SearchStats& stats,
     Shard shard
 ) {
+    const double attributed_seconds =
+        stats.generation_seconds
+        + stats.validation_seconds
+        + stats.graph_conversion_seconds
+        + stats.canonicalization_seconds
+        + stats.dedup_seconds;
+    const double unattributed_seconds =
+        std::max(0.0, stats.wall_seconds - attributed_seconds);
+
     std::ostringstream out;
     out << std::setprecision(17)
         << '{'
-        << "\"schema\":\"sqtopology.search-summary.v1\","
+        << "\"schema\":\"sqtopology.search-summary.v2\","
         << "\"shard\":{\"index\":" << shard.index
         << ",\"count\":" << shard.count << "},"
         << "\"raw_candidates\":" << stats.raw_candidates << ','
@@ -191,12 +209,16 @@ std::string search_stats_to_json(
         << "\"duplicates\":" << stats.duplicates << ','
         << "\"unique_states\":" << stats.unique_states << ','
         << "\"first_level_selected\":" << stats.first_level_selected << ','
+        << "\"total_candidate_contacts\":" << stats.total_candidate_contacts << ','
+        << "\"total_incidence_vertices\":" << stats.total_incidence_vertices << ','
+        << "\"total_incidence_edges\":" << stats.total_incidence_edges << ','
         << "\"wall_seconds\":" << stats.wall_seconds << ','
         << "\"generation_seconds\":" << stats.generation_seconds << ','
         << "\"validation_seconds\":" << stats.validation_seconds << ','
         << "\"graph_conversion_seconds\":" << stats.graph_conversion_seconds << ','
         << "\"canonicalization_seconds\":" << stats.canonicalization_seconds << ','
-        << "\"dedup_seconds\":" << stats.dedup_seconds
+        << "\"dedup_seconds\":" << stats.dedup_seconds << ','
+        << "\"unattributed_seconds\":" << unattributed_seconds
         << "}\n";
     return out.str();
 }

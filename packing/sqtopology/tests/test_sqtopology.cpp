@@ -227,6 +227,19 @@ void test_export_smoke() {
     );
 }
 
+void test_validated_incidence_fast_path_matches_checked_path() {
+    using namespace sqtopology;
+
+    const auto topology = make_fixture("grid-4x4-minus-one").normalized();
+    const auto checked = canonicalize_colored_graph(to_incidence_graph(topology));
+    const auto fast = canonicalize_colored_graph(to_incidence_graph_validated(topology));
+
+    expect(
+        checked.encoding == fast.encoding,
+        "validated incidence fast path must preserve canonical semantics"
+    );
+}
+
 void test_canonical_equality_uses_encoding() {
     using namespace sqtopology;
 
@@ -256,6 +269,7 @@ int main() {
         test_rewrites_are_deterministic();
         test_shard_reproducibility();
         test_export_smoke();
+        test_validated_incidence_fast_path_matches_checked_path();
         test_canonical_equality_uses_encoding();
         std::cout << "sqtopology_tests: all tests passed\n";
         return 0;

@@ -18,6 +18,26 @@ auto feature_tuple(const FeatureRef& feature) {
     };
 }
 
+auto contact_sort_tuple(const Contact& contact) {
+    const auto b = contact.b.value_or(FeatureRef{
+        .square = 0,
+        .kind = FeatureKind::Corner,
+        .index = 0,
+    });
+    return std::tuple{
+        static_cast<int>(contact.kind),
+        contact.a.square,
+        static_cast<int>(contact.a.kind),
+        static_cast<int>(contact.a.index),
+        contact.b.has_value() ? 1 : 0,
+        b.square,
+        static_cast<int>(b.kind),
+        static_cast<int>(b.index),
+        contact.wall.has_value() ? 1 : 0,
+        contact.wall.has_value() ? static_cast<int>(*contact.wall) : 0,
+    };
+}
+
 Contact normalized_contact(Contact contact) {
     if (contact.kind != ContactKind::Wall && contact.b.has_value()) {
         if (feature_tuple(*contact.b) < feature_tuple(contact.a)) {
@@ -125,7 +145,7 @@ Topology Topology::normalized() const {
         result.contacts_.begin(),
         result.contacts_.end(),
         [](const Contact& lhs, const Contact& rhs) {
-            return contact_key(lhs) < contact_key(rhs);
+            return contact_sort_tuple(lhs) < contact_sort_tuple(rhs);
         }
     );
     return result;

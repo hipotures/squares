@@ -53,30 +53,17 @@ std::string validation_message(const ValidationResult& validation) {
     return out.str();
 }
 
-}  // namespace
-
-void ColoredGraph::normalize_edges() {
-    for (auto& [a, b] : edges) {
-        if (b < a) {
-            std::swap(a, b);
-        }
-    }
-    std::sort(edges.begin(), edges.end());
-    edges.erase(std::unique(edges.begin(), edges.end()), edges.end());
-}
-
-ColoredGraph to_incidence_graph(const Topology& input) {
-    const auto validation = input.validate();
-    if (!validation.ok()) {
-        throw std::invalid_argument(validation_message(validation));
-    }
-
-    const Topology topology = input.normalized();
+ColoredGraph build_incidence_graph(const Topology& topology) {
     ColoredGraph graph;
     graph.colors.reserve(
         static_cast<std::size_t>(topology.square_count()) * 9U
         + 5U
         + topology.contacts().size()
+    );
+    graph.edges.reserve(
+        static_cast<std::size_t>(topology.square_count()) * 16U
+        + 8U
+        + topology.contacts().size() * 2U
     );
 
     std::vector<std::array<std::uint32_t, 8>> ports(topology.square_count());
@@ -126,17 +113,39 @@ ColoredGraph to_incidence_graph(const Topology& input) {
         }
     }
 
-    graph.normalize_edges();
     return graph;
 }
 
-CanonicalForm canonicalize_colored_graph(const ColoredGraph& input) {
-    if (input.colors.empty()) {
-        throw std::invalid_argument("cannot canonicalize an empty graph");
+}  // namespace
+
+void ColoredGraph::normalize_edges() {
+    for (auto& [a, b] : edges) {
+        if (b < a) {
+            std::swap(a, b);
+        }
+    }
+    std::sort(edges.begin(), edges.end());
+    edges.erase(std::unique(edges.begin(), edges.end()), edges.end());
+}
+
+ColoredGraph to_incidence_graph(const Topology& input) {
+    const auto validation = input.validate();
+    if (!validation.ok()) {
+        throw std::invalid_argument(validation_message(validation));
     }
 
-    ColoredGraph graph = input;
-    graph.normalize_edges();
+    const Topology topology = input.normalized();
+    return build_incidence_graph(topology);
+}
+
+ColoredGraph to_incidence_graph_validated(const Topology& topology) {
+    return build_incidence_graph(topology);
+}
+
+CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph) {
+    if (graph.colors.empty()) {
+        throw std::invalid_argument("cannot canonicalize an empty graph");
+    }
 
     const int n = static_cast<int>(graph.vertex_count());
     const int m = SETWORDSNEEDED(n);

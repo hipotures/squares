@@ -24,6 +24,7 @@ struct RewriteOptions {
     bool include_removals{true};
     bool include_additions{true};
     std::size_t max_additions{256};
+    bool include_labels{true};
 };
 
 [[nodiscard]] std::vector<Rewrite> generate_rewrites(

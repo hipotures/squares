@@ -1,9 +1,43 @@
 #include "sqtopology/rewrite.hpp"
 
+#include <algorithm>
 #include <sstream>
-#include <unordered_set>
 
 namespace sqtopology {
+namespace {
+
+bool contains_contact(const Topology& topology, const Contact& contact) {
+    return std::find(topology.contacts().begin(), topology.contacts().end(), contact)
+        != topology.contacts().end();
+}
+
+std::string square_contact_label(
+    const Contact& contact,
+    SquareId a,
+    std::uint8_t a_ring,
+    SquareId b,
+    std::uint8_t b_ring
+) {
+    std::ostringstream label;
+    label << "add " << to_string(contact.kind)
+          << " s" << a << "/p" << static_cast<int>(a_ring)
+          << " s" << b << "/p" << static_cast<int>(b_ring);
+    return label.str();
+}
+
+std::string wall_contact_label(
+    SquareId square,
+    std::uint8_t ring,
+    std::uint8_t wall
+) {
+    std::ostringstream label;
+    label << "add wall s" << square
+          << "/p" << static_cast<int>(ring)
+          << " w" << static_cast<int>(wall);
+    return label.str();
+}
+
+}  // namespace
 
 std::vector<Rewrite> generate_rewrites(
     const Topology& input,
@@ -11,6 +45,10 @@ std::vector<Rewrite> generate_rewrites(
 ) {
     const Topology topology = input.normalized();
     std::vector<Rewrite> result;
+    result.reserve(
+        (options.include_removals ? topology.contacts().size() : 0U)
+        + (options.include_additions ? options.max_additions : 0U)
+    );
 
     if (options.include_removals) {
         for (std::size_t i = 0; i < topology.contacts().size(); ++i) {
@@ -20,8 +58,8 @@ std::vector<Rewrite> generate_rewrites(
             result.push_back(
                 Rewrite{
                     .kind = RewriteKind::RemoveContact,
-                    .label = "remove " + contact_key(removed),
-                    .topology = child.normalized(),
+                    .label = options.include_labels ? "remove " + contact_key(removed) : std::string{},
+                    .topology = std::move(child),
                 }
             );
         }
@@ -31,24 +69,15 @@ std::vector<Rewrite> generate_rewrites(
         return result;
     }
 
-    std::unordered_set<std::string> existing;
-    existing.reserve(topology.contacts().size() * 2U + 1U);
-    for (const auto& contact : topology.contacts()) {
-        existing.insert(contact_key(contact));
-    }
-
     std::size_t additions = 0;
     const auto append = [&](Contact contact, RewriteKind kind, std::string label) {
-        const auto key = contact_key(contact);
-        if (existing.contains(key) || additions >= options.max_additions) {
+        if (additions >= options.max_additions || contains_contact(topology, contact)) {
             return;
         }
+
         Topology child = topology;
         child.add_contact(std::move(contact));
-        const auto validation = child.validate();
-        if (!validation.ok()) {
-            return;
-        }
+
         result.push_back(
             Rewrite{
                 .kind = kind,
@@ -74,14 +103,13 @@ std::vector<Rewrite> generate_rewrites(
                     const auto first = feature_from_ring_index(a, a_ring);
                     const auto second = feature_from_ring_index(b, b_ring);
                     auto contact = make_square_contact(first, second);
-                    std::ostringstream label;
-                    label << "add " << to_string(contact.kind)
-                          << " s" << a << "/p" << static_cast<int>(a_ring)
-                          << " s" << b << "/p" << static_cast<int>(b_ring);
+
                     append(
-                        std::move(contact),
+                        contact,
                         RewriteKind::AddSquareContact,
-                        label.str()
+                        options.include_labels
+                            ? square_contact_label(contact, a, a_ring, b, b_ring)
+                            : std::string{}
                     );
                 }
             }
@@ -99,14 +127,13 @@ std::vector<Rewrite> generate_rewrites(
                  ++wall) {
                 const auto feature = feature_from_ring_index(square, ring);
                 auto contact = make_wall_contact(feature, wall);
-                std::ostringstream label;
-                label << "add wall s" << square
-                      << "/p" << static_cast<int>(ring)
-                      << " w" << static_cast<int>(wall);
+
                 append(
-                    std::move(contact),
+                    contact,
                     RewriteKind::AddWallContact,
-                    label.str()
+                    options.include_labels
+                        ? wall_contact_label(square, ring, wall)
+                        : std::string{}
                 );
             }
         }

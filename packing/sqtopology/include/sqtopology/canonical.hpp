@@ -39,6 +39,10 @@ struct CanonicalForm {
 };
 
 [[nodiscard]] ColoredGraph to_incidence_graph(const Topology& topology);
+
+// Hot-path entry point: caller guarantees semantic validation and normalized contact order.
+[[nodiscard]] ColoredGraph to_incidence_graph_validated(const Topology& topology);
+
 [[nodiscard]] CanonicalForm canonicalize_colored_graph(const ColoredGraph& graph);
 [[nodiscard]] CanonicalForm canonicalize(const Topology& topology);
 [[nodiscard]] std::uint64_t stable_fingerprint(std::string_view bytes);

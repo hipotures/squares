@@ -32,6 +32,9 @@ struct SearchStats {
     std::uint64_t duplicates{};
     std::uint64_t unique_states{};
     std::uint64_t first_level_selected{};
+    std::uint64_t total_candidate_contacts{};
+    std::uint64_t total_incidence_vertices{};
+    std::uint64_t total_incidence_edges{};
     double wall_seconds{};
     double generation_seconds{};
     double validation_seconds{};
