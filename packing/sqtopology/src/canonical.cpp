@@ -22,11 +22,16 @@ extern "C" {
 // parsing that C header.  The installed library ABI still uses ELF TLS.
 #ifdef __cplusplus
 #define _Thread_local thread_local
+#ifdef NORET_ATTR
+#undef NORET_ATTR
+#endif
+#define NORET_ATTR
 #endif
 extern "C" {
 #include <nauty/traces.h>
 }
 #ifdef __cplusplus
+#undef NORET_ATTR
 #undef _Thread_local
 #endif
 
