@@ -19,6 +19,22 @@ void expect(bool condition, const std::string& message) {
     }
 }
 
+void expect_valid(
+    const sqtopology::Topology& topology,
+    const std::string& message
+) {
+    const auto validation = topology.validate();
+    if (validation.ok()) {
+        return;
+    }
+
+    std::string detail = message;
+    for (const auto& error : validation.errors) {
+        detail += "; " + error;
+    }
+    throw std::runtime_error(detail);
+}
+
 std::string canonical_encoding(const sqtopology::Topology& topology) {
     return sqtopology::canonicalize(topology).encoding;
 }
@@ -26,8 +42,8 @@ std::string canonical_encoding(const sqtopology::Topology& topology) {
 void test_validation() {
     using namespace sqtopology;
 
-    expect(make_fixture("grid-3x3").validate().ok(), "grid fixture must validate");
-    expect(make_fixture("disjoint-2").validate().ok(), "free squares must be representable");
+    expect_valid(make_fixture("grid-3x3"), "grid fixture must validate");
+    expect_valid(make_fixture("disjoint-2"), "free squares must be representable");
 
     Topology self_contact(2);
     self_contact.add_contact(
