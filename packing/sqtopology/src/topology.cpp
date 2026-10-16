@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
@@ -64,7 +63,8 @@ void Topology::add_contact(Contact contact) {
 
 ValidationResult Topology::validate() const {
     ValidationResult result;
-    std::set<std::string> seen;
+    std::vector<std::string> seen;
+    seen.reserve(contacts_.size());
 
     if (square_count_ == 0) {
         result.errors.emplace_back("topology must contain at least one square");
@@ -107,8 +107,10 @@ ValidationResult Topology::validate() const {
         }
 
         const auto key = contact_key(normalized_contact(contact));
-        if (!seen.insert(key).second) {
+        if (std::find(seen.begin(), seen.end(), key) != seen.end()) {
             result.errors.push_back(prefix + "duplicate contact event");
+        } else {
+            seen.push_back(key);
         }
     }
 
