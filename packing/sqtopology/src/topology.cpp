@@ -63,9 +63,6 @@ void Topology::add_contact(Contact contact) {
 
 ValidationResult Topology::validate() const {
     ValidationResult result;
-    std::vector<std::string> seen;
-    seen.reserve(contacts_.size());
-
     if (square_count_ == 0) {
         result.errors.emplace_back("topology must contain at least one square");
     }
@@ -106,11 +103,12 @@ ValidationResult Topology::validate() const {
             }
         }
 
-        const auto key = contact_key(normalized_contact(contact));
-        if (std::find(seen.begin(), seen.end(), key) != seen.end()) {
-            result.errors.push_back(prefix + "duplicate contact event");
-        } else {
-            seen.push_back(key);
+        const auto normalized = normalized_contact(contact);
+        for (std::size_t previous = 0; previous < i; ++previous) {
+            if (normalized_contact(contacts_[previous]) == normalized) {
+                result.errors.push_back(prefix + "duplicate contact event");
+                break;
+            }
         }
     }
 
