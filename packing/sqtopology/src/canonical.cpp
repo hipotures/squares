@@ -4,6 +4,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <limits>
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
@@ -271,7 +272,79 @@ struct CanonicalBackendResult {
     int m{};
     std::vector<int> lab;
     std::vector<::graph> canonical_dense;
+    std::vector<std::pair<std::uint32_t, std::uint32_t>> canonical_edges;
 };
+
+std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_dense_edges(
+    const std::vector<::graph>& dense,
+    int m,
+    int n
+) {
+    std::vector<std::pair<std::uint32_t, std::uint32_t>> edges;
+    for (int i = 0; i < n; ++i) {
+        const auto* row = GRAPHROW(dense.data(), i, m);
+        for (int j = i + 1; j < n; ++j) {
+            if (ISELEMENT(row, j)) {
+                edges.emplace_back(
+                    static_cast<std::uint32_t>(i),
+                    static_cast<std::uint32_t>(j)
+                );
+            }
+        }
+    }
+    return edges;
+}
+
+std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_sparse_edges(
+    const sparsegraph& sparse
+) {
+    if (sparse.nv < 0) {
+        throw std::logic_error("canonical sparse graph has negative vertex count");
+    }
+
+    const auto n = static_cast<std::size_t>(sparse.nv);
+    std::vector<std::pair<std::uint32_t, std::uint32_t>> edges;
+    edges.reserve(static_cast<std::size_t>(sparse.nde) / 2U);
+
+    for (std::size_t vertex = 0; vertex < n; ++vertex) {
+        const auto begin = sparse.v[vertex];
+        const auto degree = static_cast<std::size_t>(sparse.d[vertex]);
+        for (std::size_t offset = 0; offset < degree; ++offset) {
+            const int neighbor_raw = sparse.e[begin + offset];
+            if (neighbor_raw < 0
+                || static_cast<std::size_t>(neighbor_raw) >= n) {
+                throw std::logic_error(
+                    "canonical sparse graph edge endpoint outside vertex range"
+                );
+            }
+            const auto neighbor = static_cast<std::size_t>(neighbor_raw);
+            if (neighbor == vertex) {
+                throw std::logic_error(
+                    "canonical sparse graph unexpectedly contains a self-loop"
+                );
+            }
+            if (vertex < neighbor) {
+                edges.emplace_back(
+                    static_cast<std::uint32_t>(vertex),
+                    static_cast<std::uint32_t>(neighbor)
+                );
+            }
+        }
+    }
+
+    std::sort(edges.begin(), edges.end());
+    if (std::adjacent_find(edges.begin(), edges.end()) != edges.end()) {
+        throw std::logic_error(
+            "canonical sparse graph unexpectedly contains duplicate edges"
+        );
+    }
+    if (edges.size() * 2U != static_cast<std::size_t>(sparse.nde)) {
+        throw std::logic_error(
+            "canonical sparse graph is not a simple undirected graph"
+        );
+    }
+    return edges;
+}
 
 void profile_add(
     double& destination,
@@ -362,6 +435,7 @@ CanonicalBackendResult run_dense_nauty(
         .m = m,
         .lab = std::move(partition.lab),
         .canonical_dense = std::move(canonical_dense),
+        .canonical_edges = {},
     };
 }
 
@@ -453,30 +527,19 @@ CanonicalBackendResult run_sparse_backend(
         }
     }
 
-    std::vector<::graph> canonical_dense(
-        static_cast<std::size_t>(m) * static_cast<std::size_t>(n)
-    );
-    int actual_m = 0;
-    const auto* converted = sg_to_nauty(
-        canonical.get(),
-        canonical_dense.data(),
-        m,
-        &actual_m
-    );
-    if (converted != canonical_dense.data() || actual_m != m) {
-        throw std::runtime_error("sparse canonical graph conversion returned unexpected storage");
-    }
+    auto canonical_edges = extract_sparse_edges(*canonical.get());
 
     if (profile != nullptr) {
-        profile_add(profile->output_conversion_seconds, profile, stage_started);
+        profile_add(profile->output_prepare_seconds, profile, stage_started);
     }
 
     return CanonicalBackendResult{
         .backend = backend,
         .n = n,
-        .m = m,
+        .m = 0,
         .lab = std::move(partition.lab),
-        .canonical_dense = std::move(canonical_dense),
+        .canonical_dense = {},
+        .canonical_edges = std::move(canonical_edges),
     };
 }
 
@@ -509,64 +572,94 @@ void append_u32_be(std::string& bytes, std::uint32_t value) {
     bytes.push_back(static_cast<char>(value & 0xffU));
 }
 
+std::uint8_t endpoint_width_for_vertex_count(std::uint32_t n) {
+    if (n <= 256U) {
+        return 1U;
+    }
+    if (n <= 65536U) {
+        return 2U;
+    }
+    return 4U;
+}
+
+void append_index_be(
+    std::string& bytes,
+    std::uint32_t value,
+    std::uint8_t width
+) {
+    for (std::uint8_t byte = 0; byte < width; ++byte) {
+        const auto shift = static_cast<unsigned>((width - 1U - byte) * 8U);
+        bytes.push_back(static_cast<char>((value >> shift) & 0xffU));
+    }
+}
+
 std::string build_binary_key_bytes(
     const ColoredGraph& graph,
     const CanonicalBackendResult& canonical
 ) {
-    constexpr std::string_view magic = "SQK3";
+    constexpr std::string_view magic = "SQK4";
 
-    const auto n = static_cast<std::size_t>(canonical.n);
-    const auto triangle_bits = n * (n - 1U) / 2U;
-    const auto triangle_bytes = (triangle_bits + 7U) / 8U;
+    if (canonical.n <= 0) {
+        throw std::logic_error("SQK4 requires a non-empty canonical graph");
+    }
+
+    std::vector<std::pair<std::uint32_t, std::uint32_t>> dense_edges;
+    const std::vector<std::pair<std::uint32_t, std::uint32_t>>* edges =
+        &canonical.canonical_edges;
+
+    if (canonical.backend == CanonicalBackend::DenseNauty) {
+        dense_edges = extract_dense_edges(
+            canonical.canonical_dense,
+            canonical.m,
+            canonical.n
+        );
+        edges = &dense_edges;
+    }
+
+    if (edges->size() > std::numeric_limits<std::uint32_t>::max()) {
+        throw std::logic_error("SQK4 edge count exceeds 32-bit encoding");
+    }
+
+    const auto n = static_cast<std::uint32_t>(canonical.n);
+    const auto endpoint_width = endpoint_width_for_vertex_count(n);
+    const auto edge_bytes =
+        edges->size()
+        * 2U
+        * static_cast<std::size_t>(endpoint_width);
 
     std::string bytes;
     bytes.reserve(
         magic.size()
-        + 5U
-        + n
-        + triangle_bytes
+        + 1U
+        + 4U
+        + 1U
+        + 4U
+        + static_cast<std::size_t>(n)
+        + edge_bytes
     );
 
     bytes.append(magic);
     bytes.push_back(static_cast<char>(canonical.backend));
-    append_u32_be(bytes, static_cast<std::uint32_t>(canonical.n));
+    append_u32_be(bytes, n);
+    bytes.push_back(static_cast<char>(endpoint_width));
+    append_u32_be(bytes, static_cast<std::uint32_t>(edges->size()));
 
     for (int i = 0; i < canonical.n; ++i) {
         const auto color = graph.colors[
             static_cast<std::size_t>(canonical.lab[static_cast<std::size_t>(i)])
         ];
         if (color < 0 || color > 255) {
-            throw std::logic_error("canonical vertex color outside SQK3 byte range");
+            throw std::logic_error("canonical vertex color outside SQK4 byte range");
         }
         bytes.push_back(static_cast<char>(color));
     }
 
-    std::uint8_t packed = 0;
-    unsigned bit_in_byte = 0;
-    for (int i = 0; i < canonical.n; ++i) {
-        const auto* row = GRAPHROW(
-            canonical.canonical_dense.data(),
-            i,
-            canonical.m
-        );
-        for (int j = i + 1; j < canonical.n; ++j) {
-            if (ISELEMENT(row, j)) {
-                packed |= static_cast<std::uint8_t>(1U << (7U - bit_in_byte));
-            }
-            ++bit_in_byte;
-            if (bit_in_byte == 8U) {
-                bytes.push_back(static_cast<char>(packed));
-                packed = 0;
-                bit_in_byte = 0;
-            }
+    for (const auto& [a, b] : *edges) {
+        if (a >= b || b >= n) {
+            throw std::logic_error("SQK4 canonical edge list is not normalized");
         }
-    }
-    if (bit_in_byte != 0U) {
-        bytes.push_back(static_cast<char>(packed));
-    }
-
-    if (bytes.size() != magic.size() + 5U + n + triangle_bytes) {
-        throw std::logic_error("SQK3 key packing produced an unexpected size");
+        append_index_be(bytes, a, endpoint_width);
+        append_index_be(bytes, b, endpoint_width);
     }
 
     return bytes;
@@ -659,7 +752,7 @@ std::string canonical_key_hex(const CanonicalKey& key) {
     constexpr char hex[] = "0123456789abcdef";
     std::string text;
     text.reserve(8U + key.bytes.size() * 2U);
-    text.append("SQK3HEX:");
+    text.append("SQK4HEX:");
     for (const unsigned char byte : key.bytes) {
         text.push_back(hex[byte >> 4U]);
         text.push_back(hex[byte & 0x0fU]);

@@ -163,8 +163,8 @@ def run_width(
         "canonical_engine_seconds": summed(
             summaries, "canonical_engine_seconds"
         ),
-        "canonical_output_conversion_seconds": summed(
-            summaries, "canonical_output_conversion_seconds"
+        "canonical_output_prepare_seconds": summed(
+            summaries, "canonical_output_prepare_seconds"
         ),
         "canonical_key_build_seconds": summed(
             summaries, "canonical_key_build_seconds"
@@ -210,7 +210,7 @@ def print_canonical_profile(rows: list[dict[str, object]]) -> None:
     print("canonical microprofile (microseconds per profiled canonicalization)")
     print(
         f"{'workers':>7} {'input':>9} {'partition':>10} {'engine':>9} "
-        f"{'convert':>9} {'keybuild':>10} {'hash':>8} {'other':>8} {'total':>9}"
+        f"{'output':>9} {'keybuild':>10} {'hash':>8} {'other':>8} {'total':>9}"
     )
 
     for row in rows:
@@ -222,7 +222,7 @@ def print_canonical_profile(rows: list[dict[str, object]]) -> None:
         input_build = float(row["canonical_input_build_seconds"]) * scale
         partition = float(row["canonical_partition_seconds"]) * scale
         engine = float(row["canonical_engine_seconds"]) * scale
-        conversion = float(row["canonical_output_conversion_seconds"]) * scale
+        output = float(row["canonical_output_prepare_seconds"]) * scale
         key_build = float(row["canonical_key_build_seconds"]) * scale
         hash_time = float(row["canonical_hash_seconds"]) * scale
         other = float(row["canonical_profile_other_seconds"]) * scale
@@ -230,7 +230,7 @@ def print_canonical_profile(rows: list[dict[str, object]]) -> None:
 
         print(
             f"{int(row['workers']):7d} {input_build:9.2f} {partition:10.2f} "
-            f"{engine:9.2f} {conversion:9.2f} {key_build:10.2f} "
+            f"{engine:9.2f} {output:9.2f} {key_build:10.2f} "
             f"{hash_time:8.2f} {other:8.2f} {total:9.2f}"
         )
 
@@ -311,7 +311,7 @@ def main() -> int:
         args.json_report.write_text(
             json.dumps(
                 {
-                    "schema": "sqtopology.scaling-report.v4",
+                    "schema": "sqtopology.scaling-report.v5",
                     "fixture": args.fixture,
                     "seconds": args.seconds,
                     "profile_canonical": args.profile_canonical,

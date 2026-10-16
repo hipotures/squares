@@ -77,10 +77,9 @@ Packed-square object vertices all share one color. nauty may therefore permute t
 square IDs are also quotiented out.
 
 The human-facing canonical form remains the full versioned textual encoding (`SQT1|...`).
-Search uses a separate exact binary key (`SQK3`) containing the canonical color sequence
-and one packed upper triangle of the canonical simple-graph adjacency matrix. Its 64-bit
-FNV-1a fingerprint is only the unordered-set bucket hash: equality is always decided by
-the complete binary bytes.
+Search uses a separate exact binary key (`SQK4`) containing the canonical color sequence
+and an exact sorted canonical edge list. Its 64-bit FNV-1a fingerprint is only the
+unordered-set bucket hash: equality is always decided by the complete binary bytes.
 
 ### Deliberate coarse choices
 
@@ -194,7 +193,7 @@ The second point is deliberate in phase 1. Shard outputs can be merged offline, 
 future canonical-augmentation search can remove cross-shard overlap if measurements show
 that it matters. Therefore current shard runs are **not** an exhaustive partition proof.
 
-`--emit-keys FILE` writes sorted exact search keys as `SQK3HEX:<hex>` text for offline
+`--emit-keys FILE` writes sorted exact search keys as `SQK4HEX:<hex>` text for offline
 comparison or merge. The hexadecimal rendering is generated only when explicitly requested;
 it is not built per candidate in the search hot path.
 
@@ -238,19 +237,25 @@ tests assert that the checked and validated fast paths produce the same canonica
 
 Phase 1.3 removes human-readable canonical serialization from the search hot path.
 
-After the selected canonical-labeling backend returns, search builds an exact `SQK3`
+After the selected canonical-labeling backend returns, search builds an exact `SQK4`
 binary key directly from:
 
 - a version marker and backend tag;
-- canonical vertex count;
+- canonical vertex count and encoded endpoint width;
+- exact canonical edge count;
 - the canonical vertex-color sequence;
-- the strict upper triangle of the canonical adjacency matrix, packed one bit per edge
-  position in deterministic row-major order.
+- the sorted canonical undirected edge list.
 
-Because the graph is simple and undirected, the lower triangle and diagonal contain no
-additional information. For a representative ~190-vertex incidence graph this reduces
-the adjacency payload from roughly 4.6 KiB of dense nauty words to about 2.2 KiB of
-packed triangle bits before colors/header overhead.
+Endpoint indices use one byte while the canonical graph has at most 256 vertices, two
+bytes up to 65,536 vertices, and four bytes above that. For the current ~190-vertex,
+~350-edge incidence graphs this puts the adjacency payload near 700 bytes, versus about
+2.2 KiB for the earlier packed-triangle SQK3 and roughly 4.6 KiB of dense nauty words.
+
+Sparse nauty and Traces now extract the canonical edge list directly from their canonical
+sparse graph in O(V+E) plus sorting of E edges. They no longer convert the canonical
+result to a dense matrix or scan O(V^2) possible adjacency positions. Dense nauty remains
+available as a comparison backend and extracts its edge list from the dense canonical
+matrix.
 
 The key is stored in an `unordered_set` together with a cached 64-bit fingerprint used
 only for bucket selection. Hash collisions do not affect correctness because the full
@@ -261,7 +266,7 @@ debugging, and semantic regression tests. Search does not extract canonical edge
 or run `ostringstream` for every candidate anymore.
 
 Tests compare binary-key equality against textual canonical-form equality across symmetry
-transforms and distinct contact types. Retained search keys are rendered as `SQK3HEX:...`
+transforms and distinct contact types. Retained search keys are rendered as `SQK4HEX:...`
 only at the end of a run when `--emit-keys` is requested.
 
 ## Canonical backend comparison
@@ -305,11 +310,11 @@ python3 tools/bench_scaling.py \
 ~~~
 
 All backends consume the same `ColoredGraph` and the same initial color partition.
-Sparse nauty and Traces build sparse adjacency only inside canonicalization, and their
-canonical output is converted to dense words before the exact-key builder packs the same
-upper-triangle representation used for all backends.
+Sparse nauty and Traces keep their canonical output sparse through exact-key construction.
+The canonical adjacency is normalized to a sorted undirected edge list before serialization.
+Dense nauty uses the same SQK4 logical format after extracting edges from its dense output.
 
-The exact search key format is now `SQK3` and includes a backend tag. This is deliberate:
+The exact search key format is now `SQK4` and includes a backend tag. This is deliberate:
 different canonical-labeling engines are required to identify the same isomorphism classes,
 but they are not required to choose byte-identical canonical labels. Therefore emitted
 keys from different backends must not be merged as if they belonged to one key namespace.
@@ -318,6 +323,12 @@ Native tests verify that all three backends induce the same equivalence relation
 symmetry-transformed fixtures and agree on duplicate/unique counts in a bounded search.
 
 ## Exact-key payload accounting
+
+The first SQK3 packed-triangle implementation reduced retained key memory but scanned
+the full O(V^2) canonical adjacency triangle. On the target host that raised Traces
+key-build cost to about 12 us/candidate and reduced 16-worker throughput from about
+396k to 348k candidates/s. SQK4 replaces that scan with the sparse canonical edge-list
+path above.
 
 Search summaries report both total candidate-key bytes and the exact payload bytes retained
 for unique states. The scaling harness prints an `exact canonical-key footprint` table
@@ -353,7 +364,7 @@ The search hot path is split into:
 - backend input graph construction;
 - initial colored partition/labelling setup;
 - canonical engine call (`densenauty`, `sparsenauty`, or `Traces`);
-- sparse canonical-output conversion when required;
+- sparse canonical-output preparation;
 - exact binary-key construction;
 - cached FNV-1a bucket hash;
 - residual canonical-block time not covered by those regions.
@@ -386,7 +397,7 @@ Native search summaries separately report:
 - total incidence vertices and edges;
 - total candidate exact-key bytes and stored unique-key payload bytes;
 - number of profiled canonicalizations;
-- backend input-build, partition, engine, output-conversion, binary-key build, hash,
+- backend input-build, partition, engine, output-preparation, binary-key build, hash,
   and residual search canonicalization times when profiling is enabled;
 - extraction and textual-encoding timers for callers that explicitly use `CanonicalForm`.
 

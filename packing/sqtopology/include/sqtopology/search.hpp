@@ -51,7 +51,7 @@ struct SearchStats {
     double canonical_input_build_seconds{};
     double canonical_partition_seconds{};
     double canonical_engine_seconds{};
-    double canonical_output_conversion_seconds{};
+    double canonical_output_prepare_seconds{};
     double canonical_key_build_seconds{};
     double canonical_extraction_seconds{};
     double canonical_encoding_seconds{};

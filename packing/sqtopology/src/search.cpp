@@ -28,7 +28,7 @@ void accumulate_canonical_profile(
     stats.canonical_input_build_seconds += profile.input_build_seconds;
     stats.canonical_partition_seconds += profile.partition_seconds;
     stats.canonical_engine_seconds += profile.engine_seconds;
-    stats.canonical_output_conversion_seconds += profile.output_conversion_seconds;
+    stats.canonical_output_prepare_seconds += profile.output_prepare_seconds;
     stats.canonical_key_build_seconds += profile.key_build_seconds;
     stats.canonical_extraction_seconds += profile.extraction_seconds;
     stats.canonical_encoding_seconds += profile.encoding_seconds;
@@ -236,7 +236,7 @@ std::string search_stats_to_json(
         stats.canonical_input_build_seconds
         + stats.canonical_partition_seconds
         + stats.canonical_engine_seconds
-        + stats.canonical_output_conversion_seconds
+        + stats.canonical_output_prepare_seconds
         + stats.canonical_key_build_seconds
         + stats.canonical_extraction_seconds
         + stats.canonical_encoding_seconds
@@ -280,8 +280,8 @@ std::string search_stats_to_json(
         << stats.canonical_partition_seconds << ','
         << "\"canonical_engine_seconds\":"
         << stats.canonical_engine_seconds << ','
-        << "\"canonical_output_conversion_seconds\":"
-        << stats.canonical_output_conversion_seconds << ','
+        << "\"canonical_output_prepare_seconds\":"
+        << stats.canonical_output_prepare_seconds << ','
         << "\"canonical_key_build_seconds\":"
         << stats.canonical_key_build_seconds << ','
         << "\"canonical_extraction_seconds\":"

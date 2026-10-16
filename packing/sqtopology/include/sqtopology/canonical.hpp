@@ -48,8 +48,8 @@ struct CanonicalForm {
 };
 
 // Exact search equality key. fingerprint is only the unordered-set bucket hash;
-// bytes remain the equality oracle. SQK3 keys are backend-tagged and store only
-// the upper triangle of the canonical simple graph adjacency matrix.
+// bytes remain the equality oracle. SQK4 keys are backend-tagged and encode the
+// canonical simple graph as an exact sorted edge list.
 struct CanonicalKey {
     std::string bytes;
     std::uint64_t fingerprint{};
@@ -70,7 +70,7 @@ struct CanonicalProfile {
     double input_build_seconds{};
     double partition_seconds{};
     double engine_seconds{};
-    double output_conversion_seconds{};
+    double output_prepare_seconds{};
     double key_build_seconds{};
     double extraction_seconds{};
     double encoding_seconds{};
@@ -83,7 +83,7 @@ struct CanonicalProfile {
 [[nodiscard]] ColoredGraph to_incidence_graph_validated(const Topology& topology);
 
 // Search-only exact key. All three backends consume the same ColoredGraph and return
-// exact backend-local canonical keys.
+// exact backend-local canonical keys. Traces is the measured target-host default.
 [[nodiscard]] CanonicalKey canonical_key_colored_graph(
     const ColoredGraph& graph,
     CanonicalBackend backend = CanonicalBackend::Traces,

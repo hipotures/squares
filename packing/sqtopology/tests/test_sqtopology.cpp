@@ -318,7 +318,7 @@ void test_binary_key_matches_textual_equivalence() {
         }
 
         expect(
-            canonical_key_hex(binary_keys.front()).starts_with("SQK3HEX:"),
+            canonical_key_hex(binary_keys.front()).starts_with("SQK4HEX:"),
             "retained binary key text must carry the SQK2HEX version marker"
         );
     }
@@ -335,20 +335,27 @@ void test_compact_binary_key_layout() {
     );
 
     const auto n = incidence.vertex_count();
-    const auto triangle_bits = n * (n - 1U) / 2U;
-    const auto triangle_bytes = (triangle_bits + 7U) / 8U;
-    const auto expected_bytes = 4U + 1U + 4U + n + triangle_bytes;
+    const std::size_t endpoint_width =
+        n <= 256U ? 1U : (n <= 65536U ? 2U : 4U);
+    const auto expected_bytes =
+        4U
+        + 1U
+        + 4U
+        + 1U
+        + 4U
+        + n
+        + incidence.edges.size() * 2U * endpoint_width;
 
     expect(
         key.bytes.size() == expected_bytes,
-        "SQK3 must store exactly one packed adjacency triangle"
+        "SQK4 must store colors plus one exact canonical edge list"
     );
 
-    const auto full_matrix_bits = n * n;
-    const auto full_matrix_bytes = (full_matrix_bits + 7U) / 8U;
+    const auto triangle_bits = n * (n - 1U) / 2U;
+    const auto triangle_bytes = (triangle_bits + 7U) / 8U;
     expect(
-        triangle_bytes < full_matrix_bytes,
-        "packed upper triangle must be smaller than a full adjacency matrix"
+        incidence.edges.size() * 2U * endpoint_width < triangle_bytes,
+        "sparse edge-list payload must beat the packed triangle for this fixture"
     );
 }
 
@@ -375,7 +382,7 @@ void test_canonical_microprofile_preserves_semantics() {
     expect(profile.partition_seconds >= 0.0, "partition timing must be non-negative");
     expect(profile.engine_seconds >= 0.0, "engine timing must be non-negative");
     expect(
-        profile.output_conversion_seconds >= 0.0,
+        profile.output_prepare_seconds >= 0.0,
         "output-conversion timing must be non-negative"
     );
     expect(profile.key_build_seconds >= 0.0, "key-build timing must be non-negative");
