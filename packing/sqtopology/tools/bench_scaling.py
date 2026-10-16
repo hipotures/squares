@@ -15,10 +15,27 @@ import time
 from pathlib import Path
 
 
+BACKENDS = ("dense-nauty", "sparse-nauty", "traces")
+
+
 def parse_workers(raw: str) -> list[int]:
     values = [int(item) for item in raw.split(",") if item.strip()]
     if not values or any(value < 1 for value in values):
         raise argparse.ArgumentTypeError("workers must be positive comma-separated integers")
+    return values
+
+
+def parse_backends(raw: str) -> list[str]:
+    values = [item.strip() for item in raw.split(",") if item.strip()]
+    if not values:
+        raise argparse.ArgumentTypeError("backends must not be empty")
+    unknown = [value for value in values if value not in BACKENDS]
+    if unknown:
+        raise argparse.ArgumentTypeError(
+            "unknown backend(s): "
+            + ", ".join(unknown)
+            + "; expected dense-nauty,sparse-nauty,traces"
+        )
     return values
 
 
@@ -27,6 +44,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--fixture", default="grid-4x4-minus-one")
     parser.add_argument("--workers", type=parse_workers, default=parse_workers("1,2,4,8,16"))
+    parser.add_argument(
+        "--backends",
+        type=parse_backends,
+        default=parse_backends("dense-nauty"),
+        help="comma-separated canonical backends: dense-nauty,sparse-nauty,traces",
+    )
     parser.add_argument("--seconds", type=float, default=10.0)
     parser.add_argument("--max-candidates", type=int, default=0)
     parser.add_argument("--max-unique", type=int, default=200_000)
@@ -45,7 +68,11 @@ def summed(summaries: list[dict[str, object]], key: str) -> float:
     return sum(float(item.get(key, 0.0)) for item in summaries)
 
 
-def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
+def run_width(
+    args: argparse.Namespace,
+    backend: str,
+    workers: int,
+) -> dict[str, object]:
     processes: list[subprocess.Popen[str]] = []
     started = time.perf_counter()
 
@@ -64,6 +91,8 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
             str(args.max_depth),
             "--max-additions",
             str(args.max_additions),
+            "--canonical-backend",
+            backend,
             "--shard",
             f"{shard}/{workers}",
             "--json",
@@ -85,9 +114,16 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
         stdout, stderr = process.communicate()
         if process.returncode != 0:
             raise RuntimeError(
-                f"sqtopology worker failed with {process.returncode}:\n{stderr}"
+                f"sqtopology worker failed with {process.returncode} "
+                f"for backend {backend}:\n{stderr}"
             )
-        summaries.append(json.loads(stdout))
+        summary = json.loads(stdout)
+        if summary.get("canonical_backend") != backend:
+            raise RuntimeError(
+                "worker reported unexpected canonical backend: "
+                f"{summary.get('canonical_backend')!r}, expected {backend!r}"
+            )
+        summaries.append(summary)
 
     external_wall = time.perf_counter() - started
     raw = sum(int(item["raw_candidates"]) for item in summaries)
@@ -97,6 +133,7 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
     max_worker_wall = max(float(item["wall_seconds"]) for item in summaries)
 
     return {
+        "backend": backend,
         "workers": workers,
         "external_wall_seconds": external_wall,
         "max_worker_wall_seconds": max_worker_wall,
@@ -109,13 +146,18 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
             int(item.get("canonical_profiled_calls", 0)) for item in summaries
         ),
         "canonicalization_seconds": summed(summaries, "canonicalization_seconds"),
-        "canonical_dense_build_seconds": summed(
-            summaries, "canonical_dense_build_seconds"
+        "canonical_input_build_seconds": summed(
+            summaries, "canonical_input_build_seconds"
         ),
         "canonical_partition_seconds": summed(
             summaries, "canonical_partition_seconds"
         ),
-        "canonical_nauty_seconds": summed(summaries, "canonical_nauty_seconds"),
+        "canonical_engine_seconds": summed(
+            summaries, "canonical_engine_seconds"
+        ),
+        "canonical_output_conversion_seconds": summed(
+            summaries, "canonical_output_conversion_seconds"
+        ),
         "canonical_key_build_seconds": summed(
             summaries, "canonical_key_build_seconds"
         ),
@@ -133,53 +175,16 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
     }
 
 
-def print_canonical_profile(rows: list[dict[str, object]]) -> None:
-    print()
-    print("canonical microprofile (microseconds per profiled canonicalization)")
-    print(
-        f"{'workers':>7} {'dense':>9} {'partition':>10} {'nauty':>9} "
-        f"{'keybuild':>10} {'hash':>8} {'other':>8} {'total':>9}"
-    )
-
-    for row in rows:
-        calls = int(row["canonical_profiled_calls"])
-        if calls == 0:
-            continue
-
-        scale = 1_000_000.0 / calls
-        dense = float(row["canonical_dense_build_seconds"]) * scale
-        partition = float(row["canonical_partition_seconds"]) * scale
-        nauty = float(row["canonical_nauty_seconds"]) * scale
-        key_build = float(row["canonical_key_build_seconds"]) * scale
-        hash_time = float(row["canonical_hash_seconds"]) * scale
-        other = float(row["canonical_profile_other_seconds"]) * scale
-        total = float(row["canonicalization_seconds"]) * scale
-
-        print(
-            f"{int(row['workers']):7d} {dense:9.2f} {partition:10.2f} {nauty:9.2f} "
-            f"{key_build:10.2f} {hash_time:8.2f} "
-            f"{other:8.2f} {total:9.2f}"
-        )
-
-
-def main() -> int:
-    args = parse_args()
-    if not args.binary.is_file():
-        raise SystemExit(f"binary does not exist: {args.binary}")
-    if args.seconds <= 0:
-        raise SystemExit("--seconds must be positive for scaling measurements")
-
-    rows: list[dict[str, object]] = []
+def print_scaling_table(rows: list[dict[str, object]]) -> None:
     baseline: float | None = None
 
     print(
         f"{'workers':>7} {'cand/s':>14} {'speedup':>9} {'eff%':>8} "
         f"{'candidates':>12} {'wall_s':>9} {'local_unique':>13}"
     )
-    for workers in args.workers:
-        row = run_width(args, workers)
-        rows.append(row)
+    for row in rows:
         throughput = float(row["candidates_per_second"])
+        workers = int(row["workers"])
         if baseline is None:
             baseline = throughput
         speedup = throughput / baseline if baseline else 0.0
@@ -191,18 +196,98 @@ def main() -> int:
             f"{int(row['local_unique_sum']):13d}"
         )
 
-    if args.profile_canonical:
-        print_canonical_profile(rows)
+
+def print_canonical_profile(rows: list[dict[str, object]]) -> None:
+    print()
+    print("canonical microprofile (microseconds per profiled canonicalization)")
+    print(
+        f"{'workers':>7} {'input':>9} {'partition':>10} {'engine':>9} "
+        f"{'convert':>9} {'keybuild':>10} {'hash':>8} {'other':>8} {'total':>9}"
+    )
+
+    for row in rows:
+        calls = int(row["canonical_profiled_calls"])
+        if calls == 0:
+            continue
+
+        scale = 1_000_000.0 / calls
+        input_build = float(row["canonical_input_build_seconds"]) * scale
+        partition = float(row["canonical_partition_seconds"]) * scale
+        engine = float(row["canonical_engine_seconds"]) * scale
+        conversion = float(row["canonical_output_conversion_seconds"]) * scale
+        key_build = float(row["canonical_key_build_seconds"]) * scale
+        hash_time = float(row["canonical_hash_seconds"]) * scale
+        other = float(row["canonical_profile_other_seconds"]) * scale
+        total = float(row["canonicalization_seconds"]) * scale
+
+        print(
+            f"{int(row['workers']):7d} {input_build:9.2f} {partition:10.2f} "
+            f"{engine:9.2f} {conversion:9.2f} {key_build:10.2f} "
+            f"{hash_time:8.2f} {other:8.2f} {total:9.2f}"
+        )
+
+
+def print_backend_comparison(rows: list[dict[str, object]]) -> None:
+    if len({str(row["backend"]) for row in rows}) < 2:
+        return
+
+    dense_by_workers = {
+        int(row["workers"]): float(row["candidates_per_second"])
+        for row in rows
+        if row["backend"] == "dense-nauty"
+    }
+
+    print()
+    print("backend comparison")
+    print(
+        f"{'backend':>13} {'workers':>7} {'cand/s':>14} {'vs-dense':>10}"
+    )
+    for row in rows:
+        workers = int(row["workers"])
+        throughput = float(row["candidates_per_second"])
+        dense = dense_by_workers.get(workers)
+        relative = throughput / dense if dense else 0.0
+        relative_text = f"{relative:9.3f}x" if dense else "       n/a"
+        print(
+            f"{str(row['backend']):>13} {workers:7d} "
+            f"{throughput:14.1f} {relative_text:>10}"
+        )
+
+
+def main() -> int:
+    args = parse_args()
+    if not args.binary.is_file():
+        raise SystemExit(f"binary does not exist: {args.binary}")
+    if args.seconds <= 0:
+        raise SystemExit("--seconds must be positive for scaling measurements")
+
+    rows: list[dict[str, object]] = []
+
+    for backend in args.backends:
+        print()
+        print(f"backend: {backend}")
+        backend_rows: list[dict[str, object]] = []
+        for workers in args.workers:
+            row = run_width(args, backend, workers)
+            backend_rows.append(row)
+            rows.append(row)
+
+        print_scaling_table(backend_rows)
+        if args.profile_canonical:
+            print_canonical_profile(backend_rows)
+
+    print_backend_comparison(rows)
 
     if args.json_report is not None:
         args.json_report.parent.mkdir(parents=True, exist_ok=True)
         args.json_report.write_text(
             json.dumps(
                 {
-                    "schema": "sqtopology.scaling-report.v2",
+                    "schema": "sqtopology.scaling-report.v3",
                     "fixture": args.fixture,
                     "seconds": args.seconds,
                     "profile_canonical": args.profile_canonical,
+                    "backends": args.backends,
                     "rows": rows,
                 },
                 indent=2,

@@ -61,7 +61,8 @@ jobs:
           python3 tools/bench_scaling.py \
             --binary ./build/sqtopology \
             --fixture grid-3x3 \
-            --workers 1,2 \
+            --backends dense-nauty,sparse-nauty,traces \
+            --workers 1 \
             --seconds 1 \
             --max-unique 2000 \
             --max-depth 2 \

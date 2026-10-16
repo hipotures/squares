@@ -23,6 +23,15 @@ enum class VertexColor : int {
     ContactWall = 9,
 };
 
+enum class CanonicalBackend : std::uint8_t {
+    DenseNauty = 1,
+    SparseNauty = 2,
+    Traces = 3,
+};
+
+[[nodiscard]] std::string_view to_string(CanonicalBackend backend) noexcept;
+[[nodiscard]] CanonicalBackend canonical_backend_from_string(std::string_view text);
+
 struct ColoredGraph {
     std::vector<int> colors;
     std::vector<std::pair<std::uint32_t, std::uint32_t>> edges;
@@ -39,7 +48,8 @@ struct CanonicalForm {
 };
 
 // Exact search equality key. fingerprint is only the unordered-set bucket hash;
-// bytes remain the equality oracle.
+// bytes remain the equality oracle. SQK2 keys are backend-tagged because different
+// canonical-labeling engines are not required to choose identical canonical labels.
 struct CanonicalKey {
     std::string bytes;
     std::uint64_t fingerprint{};
@@ -57,9 +67,10 @@ struct CanonicalKeyHash {
 
 struct CanonicalProfile {
     std::uint64_t calls{};
-    double dense_build_seconds{};
+    double input_build_seconds{};
     double partition_seconds{};
-    double nauty_seconds{};
+    double engine_seconds{};
+    double output_conversion_seconds{};
     double key_build_seconds{};
     double extraction_seconds{};
     double encoding_seconds{};
@@ -71,13 +82,16 @@ struct CanonicalProfile {
 // Hot-path entry point: caller guarantees semantic validation and normalized contact order.
 [[nodiscard]] ColoredGraph to_incidence_graph_validated(const Topology& topology);
 
-// Search-only exact key: avoids canonical edge extraction and textual SQT1 encoding.
+// Search-only exact key. All three backends consume the same ColoredGraph and return
+// exact backend-local canonical keys.
 [[nodiscard]] CanonicalKey canonical_key_colored_graph(
     const ColoredGraph& graph,
+    CanonicalBackend backend = CanonicalBackend::DenseNauty,
     CanonicalProfile* profile = nullptr
 );
 [[nodiscard]] std::string canonical_key_hex(const CanonicalKey& key);
 
+// Human-facing SQT1 form remains dense-nauty based for stable inspection/export.
 [[nodiscard]] CanonicalForm canonicalize_colored_graph(
     const ColoredGraph& graph,
     CanonicalProfile* profile = nullptr

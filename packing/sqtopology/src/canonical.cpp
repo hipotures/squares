@@ -12,7 +12,9 @@
 #include <vector>
 
 extern "C" {
+#include <nauty/nausparse.h>
 #include <nauty/nauty.h>
+#include <nauty/traces.h>
 }
 
 namespace sqtopology {
@@ -20,8 +22,8 @@ namespace {
 
 using Clock = std::chrono::steady_clock;
 
-static_assert(WORDSIZE <= 64, "SQK1 binary key currently supports nauty WORDSIZE <= 64");
-static_assert((WORDSIZE % 8) == 0, "SQK1 binary key requires byte-sized nauty words");
+static_assert(WORDSIZE <= 64, "SQK2 binary key currently supports nauty WORDSIZE <= 64");
+static_assert((WORDSIZE % 8) == 0, "SQK2 binary key requires byte-sized nauty words");
 
 double seconds_between(Clock::time_point start, Clock::time_point end) {
     return std::chrono::duration<double>(end - start).count();
@@ -129,34 +131,156 @@ ColoredGraph build_incidence_graph(const Topology& topology) {
     return graph;
 }
 
-struct NautyCanonicalResult {
+struct Partition {
+    std::vector<int> lab;
+    std::vector<int> ptn;
+    std::vector<int> orbits;
+};
+
+Partition build_partition(const ColoredGraph& graph) {
+    const auto n = graph.vertex_count();
+
+    Partition partition{
+        .lab = std::vector<int>(n),
+        .ptn = std::vector<int>(n, 0),
+        .orbits = std::vector<int>(n, 0),
+    };
+    std::iota(partition.lab.begin(), partition.lab.end(), 0);
+
+    std::stable_sort(
+        partition.lab.begin(),
+        partition.lab.end(),
+        [&graph](int lhs, int rhs) {
+            const auto lhs_color = graph.colors[static_cast<std::size_t>(lhs)];
+            const auto rhs_color = graph.colors[static_cast<std::size_t>(rhs)];
+            if (lhs_color != rhs_color) {
+                return lhs_color < rhs_color;
+            }
+            return lhs < rhs;
+        }
+    );
+
+    for (std::size_t i = 0; i + 1U < n; ++i) {
+        const auto current = graph.colors[
+            static_cast<std::size_t>(partition.lab[i])
+        ];
+        const auto next = graph.colors[
+            static_cast<std::size_t>(partition.lab[i + 1U])
+        ];
+        partition.ptn[i] = current == next ? 1 : 0;
+    }
+    if (!partition.ptn.empty()) {
+        partition.ptn.back() = 0;
+    }
+
+    return partition;
+}
+
+class SparseGraphOwner {
+public:
+    SparseGraphOwner() {
+        SG_INIT(graph_);
+    }
+
+    ~SparseGraphOwner() {
+        SG_FREE(graph_);
+    }
+
+    SparseGraphOwner(const SparseGraphOwner&) = delete;
+    SparseGraphOwner& operator=(const SparseGraphOwner&) = delete;
+
+    [[nodiscard]] sparsegraph* get() noexcept {
+        return &graph_;
+    }
+
+    [[nodiscard]] const sparsegraph* get() const noexcept {
+        return &graph_;
+    }
+
+private:
+    sparsegraph graph_{};
+};
+
+void fill_sparse_graph(
+    const ColoredGraph& graph,
+    sparsegraph& sparse
+) {
+    const auto n = graph.vertex_count();
+    const auto directed_edges = graph.edges.size() * 2U;
+
+    SG_ALLOC(
+        sparse,
+        n,
+        directed_edges,
+        "sqtopology sparse canonical graph"
+    );
+
+    sparse.nv = static_cast<int>(n);
+    sparse.nde = directed_edges;
+
+    for (std::size_t vertex = 0; vertex < n; ++vertex) {
+        sparse.d[vertex] = 0;
+    }
+
+    for (const auto& [a_raw, b_raw] : graph.edges) {
+        if (a_raw >= n || b_raw >= n) {
+            throw std::invalid_argument("colored graph edge endpoint outside vertex range");
+        }
+        if (a_raw == b_raw) {
+            throw std::invalid_argument("colored graph contains a self-loop");
+        }
+        ++sparse.d[a_raw];
+        ++sparse.d[b_raw];
+    }
+
+    std::size_t cursor = 0;
+    for (std::size_t vertex = 0; vertex < n; ++vertex) {
+        sparse.v[vertex] = cursor;
+        cursor += static_cast<std::size_t>(sparse.d[vertex]);
+    }
+
+    std::vector<std::size_t> next(n);
+    for (std::size_t vertex = 0; vertex < n; ++vertex) {
+        next[vertex] = sparse.v[vertex];
+    }
+
+    for (const auto& [a_raw, b_raw] : graph.edges) {
+        sparse.e[next[a_raw]++] = static_cast<int>(b_raw);
+        sparse.e[next[b_raw]++] = static_cast<int>(a_raw);
+    }
+}
+
+struct CanonicalBackendResult {
+    CanonicalBackend backend{CanonicalBackend::DenseNauty};
     int n{};
     int m{};
     std::vector<int> lab;
     std::vector<::graph> canonical_dense;
 };
 
-NautyCanonicalResult run_nauty(
+void profile_add(
+    double& destination,
+    CanonicalProfile* profile,
+    Clock::time_point start
+) {
+    if (profile != nullptr) {
+        destination += seconds_between(start, Clock::now());
+    }
+}
+
+CanonicalBackendResult run_dense_nauty(
     const ColoredGraph& graph,
     CanonicalProfile* profile
 ) {
-    if (graph.colors.empty()) {
-        throw std::invalid_argument("cannot canonicalize an empty graph");
-    }
-    if (profile != nullptr) {
-        ++profile->calls;
-    }
-
-    Clock::time_point stage_started{};
-    if (profile != nullptr) {
-        stage_started = Clock::now();
-    }
-
     const int n = static_cast<int>(graph.vertex_count());
     const int m = SETWORDSNEEDED(n);
     nauty_check(WORDSIZE, m, n, NAUTYVERSIONID);
 
-    std::vector<::graph> dense(static_cast<std::size_t>(m) * static_cast<std::size_t>(n));
+    auto stage_started = Clock::now();
+
+    std::vector<::graph> dense(
+        static_cast<std::size_t>(m) * static_cast<std::size_t>(n)
+    );
     std::vector<::graph> canonical_dense(
         static_cast<std::size_t>(m) * static_cast<std::size_t>(n)
     );
@@ -178,37 +302,14 @@ NautyCanonicalResult run_nauty(
     }
 
     if (profile != nullptr) {
-        profile->dense_build_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->input_build_seconds, profile, stage_started);
         stage_started = Clock::now();
     }
 
-    std::vector<int> lab(static_cast<std::size_t>(n));
-    std::vector<int> ptn(static_cast<std::size_t>(n), 0);
-    std::vector<int> orbits(static_cast<std::size_t>(n), 0);
-    std::iota(lab.begin(), lab.end(), 0);
-
-    std::stable_sort(
-        lab.begin(),
-        lab.end(),
-        [&graph](int lhs, int rhs) {
-            if (graph.colors[static_cast<std::size_t>(lhs)]
-                != graph.colors[static_cast<std::size_t>(rhs)]) {
-                return graph.colors[static_cast<std::size_t>(lhs)]
-                    < graph.colors[static_cast<std::size_t>(rhs)];
-            }
-            return lhs < rhs;
-        }
-    );
-
-    for (int i = 0; i + 1 < n; ++i) {
-        const auto current = graph.colors[static_cast<std::size_t>(lab[i])];
-        const auto next = graph.colors[static_cast<std::size_t>(lab[i + 1])];
-        ptn[static_cast<std::size_t>(i)] = current == next ? 1 : 0;
-    }
-    ptn.back() = 0;
+    auto partition = build_partition(graph);
 
     if (profile != nullptr) {
-        profile->partition_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->partition_seconds, profile, stage_started);
         stage_started = Clock::now();
     }
 
@@ -219,9 +320,9 @@ NautyCanonicalResult run_nauty(
 
     densenauty(
         dense.data(),
-        lab.data(),
-        ptn.data(),
-        orbits.data(),
+        partition.lab.data(),
+        partition.ptn.data(),
+        partition.orbits.data(),
         &options,
         &stats,
         m,
@@ -230,22 +331,160 @@ NautyCanonicalResult run_nauty(
     );
 
     if (profile != nullptr) {
-        profile->nauty_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->engine_seconds, profile, stage_started);
     }
 
     if (stats.errstatus != 0) {
         throw std::runtime_error(
-            "nauty canonicalization failed with errstatus "
+            "densenauty canonicalization failed with errstatus "
             + std::to_string(stats.errstatus)
         );
     }
 
-    return NautyCanonicalResult{
+    return CanonicalBackendResult{
+        .backend = CanonicalBackend::DenseNauty,
         .n = n,
         .m = m,
-        .lab = std::move(lab),
+        .lab = std::move(partition.lab),
         .canonical_dense = std::move(canonical_dense),
     };
+}
+
+CanonicalBackendResult run_sparse_backend(
+    const ColoredGraph& graph,
+    CanonicalBackend backend,
+    CanonicalProfile* profile
+) {
+    if (backend != CanonicalBackend::SparseNauty
+        && backend != CanonicalBackend::Traces) {
+        throw std::logic_error("run_sparse_backend called with a dense backend");
+    }
+
+    const int n = static_cast<int>(graph.vertex_count());
+    const int m = SETWORDSNEEDED(n);
+    nauty_check(WORDSIZE, m, n, NAUTYVERSIONID);
+
+    auto stage_started = Clock::now();
+
+    SparseGraphOwner input;
+    SparseGraphOwner canonical;
+    fill_sparse_graph(graph, *input.get());
+
+    if (profile != nullptr) {
+        profile_add(profile->input_build_seconds, profile, stage_started);
+        stage_started = Clock::now();
+    }
+
+    auto partition = build_partition(graph);
+
+    if (profile != nullptr) {
+        profile_add(profile->partition_seconds, profile, stage_started);
+        stage_started = Clock::now();
+    }
+
+    if (backend == CanonicalBackend::SparseNauty) {
+        DEFAULTOPTIONS_SPARSEGRAPH(options);
+        options.getcanon = TRUE;
+        options.defaultptn = FALSE;
+        statsblk stats{};
+
+        sparsenauty(
+            input.get(),
+            partition.lab.data(),
+            partition.ptn.data(),
+            partition.orbits.data(),
+            &options,
+            &stats,
+            canonical.get()
+        );
+
+        if (profile != nullptr) {
+            profile_add(profile->engine_seconds, profile, stage_started);
+            stage_started = Clock::now();
+        }
+
+        if (stats.errstatus != 0) {
+            throw std::runtime_error(
+                "sparsenauty canonicalization failed with errstatus "
+                + std::to_string(stats.errstatus)
+            );
+        }
+    } else {
+        DEFAULTOPTIONS_TRACES(options);
+        options.getcanon = TRUE;
+        options.defaultptn = FALSE;
+        TracesStats stats{};
+
+        Traces(
+            input.get(),
+            partition.lab.data(),
+            partition.ptn.data(),
+            partition.orbits.data(),
+            &options,
+            &stats,
+            canonical.get()
+        );
+
+        if (profile != nullptr) {
+            profile_add(profile->engine_seconds, profile, stage_started);
+            stage_started = Clock::now();
+        }
+
+        if (stats.errstatus != 0) {
+            throw std::runtime_error(
+                "Traces canonicalization failed with errstatus "
+                + std::to_string(stats.errstatus)
+            );
+        }
+    }
+
+    std::vector<::graph> canonical_dense(
+        static_cast<std::size_t>(m) * static_cast<std::size_t>(n)
+    );
+    int actual_m = 0;
+    const auto* converted = sg_to_nauty(
+        canonical.get(),
+        canonical_dense.data(),
+        m,
+        &actual_m
+    );
+    if (converted != canonical_dense.data() || actual_m != m) {
+        throw std::runtime_error("sparse canonical graph conversion returned unexpected storage");
+    }
+
+    if (profile != nullptr) {
+        profile_add(profile->output_conversion_seconds, profile, stage_started);
+    }
+
+    return CanonicalBackendResult{
+        .backend = backend,
+        .n = n,
+        .m = m,
+        .lab = std::move(partition.lab),
+        .canonical_dense = std::move(canonical_dense),
+    };
+}
+
+CanonicalBackendResult run_backend(
+    const ColoredGraph& graph,
+    CanonicalBackend backend,
+    CanonicalProfile* profile
+) {
+    if (graph.colors.empty()) {
+        throw std::invalid_argument("cannot canonicalize an empty graph");
+    }
+    if (profile != nullptr) {
+        ++profile->calls;
+    }
+
+    switch (backend) {
+        case CanonicalBackend::DenseNauty:
+            return run_dense_nauty(graph, profile);
+        case CanonicalBackend::SparseNauty:
+        case CanonicalBackend::Traces:
+            return run_sparse_backend(graph, backend, profile);
+    }
+    throw std::logic_error("unknown canonical backend");
 }
 
 void append_u32_be(std::string& bytes, std::uint32_t value) {
@@ -257,20 +496,21 @@ void append_u32_be(std::string& bytes, std::uint32_t value) {
 
 std::string build_binary_key_bytes(
     const ColoredGraph& graph,
-    const NautyCanonicalResult& canonical
+    const CanonicalBackendResult& canonical
 ) {
-    constexpr std::string_view magic = "SQK1";
+    constexpr std::string_view magic = "SQK2";
     constexpr std::size_t word_bytes = static_cast<std::size_t>(WORDSIZE / 8);
 
     std::string bytes;
     bytes.reserve(
         magic.size()
-        + 5U
+        + 6U
         + static_cast<std::size_t>(canonical.n)
         + canonical.canonical_dense.size() * word_bytes
     );
 
     bytes.append(magic);
+    bytes.push_back(static_cast<char>(canonical.backend));
     append_u32_be(bytes, static_cast<std::uint32_t>(canonical.n));
     bytes.push_back(static_cast<char>(WORDSIZE));
 
@@ -279,7 +519,7 @@ std::string build_binary_key_bytes(
             static_cast<std::size_t>(canonical.lab[static_cast<std::size_t>(i)])
         ];
         if (color < 0 || color > 255) {
-            throw std::logic_error("canonical vertex color outside SQK1 byte range");
+            throw std::logic_error("canonical vertex color outside SQK2 byte range");
         }
         bytes.push_back(static_cast<char>(color));
     }
@@ -298,6 +538,34 @@ std::string build_binary_key_bytes(
 }
 
 }  // namespace
+
+std::string_view to_string(CanonicalBackend backend) noexcept {
+    switch (backend) {
+        case CanonicalBackend::DenseNauty:
+            return "dense-nauty";
+        case CanonicalBackend::SparseNauty:
+            return "sparse-nauty";
+        case CanonicalBackend::Traces:
+            return "traces";
+    }
+    return "unknown";
+}
+
+CanonicalBackend canonical_backend_from_string(std::string_view text) {
+    if (text == "dense-nauty" || text == "dense") {
+        return CanonicalBackend::DenseNauty;
+    }
+    if (text == "sparse-nauty" || text == "sparse") {
+        return CanonicalBackend::SparseNauty;
+    }
+    if (text == "traces") {
+        return CanonicalBackend::Traces;
+    }
+    throw std::invalid_argument(
+        "unknown canonical backend '" + std::string(text)
+        + "' (expected dense-nauty, sparse-nauty, or traces)"
+    );
+}
 
 void ColoredGraph::normalize_edges() {
     for (auto& [a, b] : edges) {
@@ -325,9 +593,10 @@ ColoredGraph to_incidence_graph_validated(const Topology& topology) {
 
 CanonicalKey canonical_key_colored_graph(
     const ColoredGraph& graph,
+    CanonicalBackend backend,
     CanonicalProfile* profile
 ) {
-    const auto canonical = run_nauty(graph, profile);
+    const auto canonical = run_backend(graph, backend, profile);
 
     Clock::time_point stage_started{};
     if (profile != nullptr) {
@@ -338,14 +607,14 @@ CanonicalKey canonical_key_colored_graph(
     key.bytes = build_binary_key_bytes(graph, canonical);
 
     if (profile != nullptr) {
-        profile->key_build_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->key_build_seconds, profile, stage_started);
         stage_started = Clock::now();
     }
 
     key.fingerprint = stable_fingerprint(key.bytes);
 
     if (profile != nullptr) {
-        profile->hash_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->hash_seconds, profile, stage_started);
     }
 
     return key;
@@ -355,7 +624,7 @@ std::string canonical_key_hex(const CanonicalKey& key) {
     constexpr char hex[] = "0123456789abcdef";
     std::string text;
     text.reserve(8U + key.bytes.size() * 2U);
-    text.append("SQK1HEX:");
+    text.append("SQK2HEX:");
     for (const unsigned char byte : key.bytes) {
         text.push_back(hex[byte >> 4U]);
         text.push_back(hex[byte & 0x0fU]);
@@ -367,7 +636,11 @@ CanonicalForm canonicalize_colored_graph(
     const ColoredGraph& graph,
     CanonicalProfile* profile
 ) {
-    const auto canonical = run_nauty(graph, profile);
+    const auto canonical = run_backend(
+        graph,
+        CanonicalBackend::DenseNauty,
+        profile
+    );
 
     Clock::time_point stage_started{};
     if (profile != nullptr) {
@@ -400,7 +673,7 @@ CanonicalForm canonicalize_colored_graph(
     }
 
     if (profile != nullptr) {
-        profile->extraction_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->extraction_seconds, profile, stage_started);
         stage_started = Clock::now();
     }
 
@@ -424,14 +697,14 @@ CanonicalForm canonicalize_colored_graph(
     result.encoding = encoding.str();
 
     if (profile != nullptr) {
-        profile->encoding_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->encoding_seconds, profile, stage_started);
         stage_started = Clock::now();
     }
 
     result.fingerprint = stable_fingerprint(result.encoding);
 
     if (profile != nullptr) {
-        profile->hash_seconds += seconds_between(stage_started, Clock::now());
+        profile_add(profile->hash_seconds, profile, stage_started);
     }
 
     return result;

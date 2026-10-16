@@ -256,10 +256,58 @@ Tests compare binary-key equality against textual canonical-form equality across
 transforms and distinct contact types. Retained search keys are rendered as `SQK1HEX:...`
 only at the end of a run when `--emit-keys` is requested.
 
+## Canonical backend comparison
+
+Search can now use any of three in-process canonical-labeling backends:
+
+- `dense-nauty`: the original dense `densenauty()` baseline;
+- `sparse-nauty`: nauty's sparse-graph interface;
+- `traces`: Traces on the same colored incidence graph.
+
+Select one in the native CLI with:
+
+~~~bash
+./build/sqtopology search grid-4x4-minus-one \
+  --canonical-backend sparse-nauty \
+  --seconds 30 \
+  --max-unique 0 \
+  --json
+~~~
+
+Or benchmark all three through the existing coarse-process harness:
+
+~~~bash
+python3 tools/bench_scaling.py \
+  --binary ./build/sqtopology \
+  --fixture grid-4x4-minus-one \
+  --backends dense-nauty,sparse-nauty,traces \
+  --workers 1,2,4,8,16 \
+  --seconds 30 \
+  --max-candidates 0 \
+  --max-unique 0 \
+  --max-depth 3 \
+  --max-additions 256 \
+  --profile-canonical \
+  --json-report /tmp/sqtopology-backends.json
+~~~
+
+All backends consume the same `ColoredGraph` and the same initial color partition.
+Sparse nauty and Traces build sparse adjacency only inside canonicalization, and their
+canonical output is converted to dense words before exact-key construction so the
+post-backend key path is measured consistently.
+
+The exact search key format is now `SQK2` and includes a backend tag. This is deliberate:
+different canonical-labeling engines are required to identify the same isomorphism classes,
+but they are not required to choose byte-identical canonical labels. Therefore emitted
+keys from different backends must not be merged as if they belonged to one key namespace.
+
+Native tests verify that all three backends induce the same equivalence relation on
+symmetry-transformed fixtures and agree on duplicate/unique counts in a bounded search.
+
 ## Canonicalization microprofiling
 
 The phase-1.2 instrumentation can split the canonicalization block without changing the
-search semantics. It is opt-in so ordinary search throughput is not charged for several
+search semantics. The same instrumentation now applies to dense nauty, sparse nauty, and Traces. It is opt-in so ordinary search throughput is not charged for several
 extra high-resolution clock reads per candidate.
 
 Use:
@@ -281,9 +329,10 @@ python3 tools/bench_scaling.py \
 The harness prints a second table in microseconds per profiled search canonicalization.
 The search hot path is split into:
 
-- dense nauty graph allocation/construction;
+- backend input graph construction;
 - initial colored partition/labelling setup;
-- the `densenauty()` call itself;
+- canonical engine call (`densenauty`, `sparsenauty`, or `Traces`);
+- sparse canonical-output conversion when required;
 - exact binary-key construction;
 - cached FNV-1a bucket hash;
 - residual canonical-block time not covered by those regions.
@@ -315,8 +364,8 @@ Native search summaries separately report:
 - total candidate-contact count;
 - total incidence vertices and edges;
 - number of profiled canonicalizations;
-- dense-build, partition, `densenauty`, binary-key build, hash, and residual search
-  canonicalization times when canonical profiling is enabled;
+- backend input-build, partition, engine, output-conversion, binary-key build, hash,
+  and residual search canonicalization times when profiling is enabled;
 - extraction and textual-encoding timers for callers that explicitly use `CanonicalForm`.
 
 The purpose is to locate the actual bottleneck before optimizing it.

@@ -39,9 +39,13 @@ std::string canonical_encoding(const sqtopology::Topology& topology) {
     return sqtopology::canonicalize(topology).encoding;
 }
 
-sqtopology::CanonicalKey canonical_key(const sqtopology::Topology& topology) {
+sqtopology::CanonicalKey canonical_key(
+    const sqtopology::Topology& topology,
+    sqtopology::CanonicalBackend backend = sqtopology::CanonicalBackend::DenseNauty
+) {
     return sqtopology::canonical_key_colored_graph(
-        sqtopology::to_incidence_graph(topology)
+        sqtopology::to_incidence_graph(topology),
+        backend
     );
 }
 
@@ -246,6 +250,27 @@ void test_validated_incidence_fast_path_matches_checked_path() {
     );
 }
 
+void test_backend_names() {
+    using namespace sqtopology;
+
+    expect(
+        canonical_backend_from_string("dense-nauty") == CanonicalBackend::DenseNauty,
+        "dense-nauty backend name must parse"
+    );
+    expect(
+        canonical_backend_from_string("sparse-nauty") == CanonicalBackend::SparseNauty,
+        "sparse-nauty backend name must parse"
+    );
+    expect(
+        canonical_backend_from_string("traces") == CanonicalBackend::Traces,
+        "traces backend name must parse"
+    );
+    expect(
+        to_string(CanonicalBackend::DenseNauty) == "dense-nauty",
+        "dense backend must have a stable name"
+    );
+}
+
 void test_binary_key_matches_textual_equivalence() {
     using namespace sqtopology;
 
@@ -267,25 +292,36 @@ void test_binary_key_matches_textual_equivalence() {
     };
 
     std::vector<std::string> text_keys;
-    std::vector<CanonicalKey> binary_keys;
     for (const auto& topology : samples) {
         text_keys.push_back(canonical_encoding(topology));
-        binary_keys.push_back(canonical_key(topology));
     }
 
-    for (std::size_t i = 0; i < samples.size(); ++i) {
-        for (std::size_t j = 0; j < samples.size(); ++j) {
-            expect(
-                (text_keys[i] == text_keys[j]) == (binary_keys[i] == binary_keys[j]),
-                "binary and textual canonical forms must induce the same equivalence relation"
-            );
+    const std::vector<CanonicalBackend> backends{
+        CanonicalBackend::DenseNauty,
+        CanonicalBackend::SparseNauty,
+        CanonicalBackend::Traces,
+    };
+
+    for (const auto backend : backends) {
+        std::vector<CanonicalKey> binary_keys;
+        for (const auto& topology : samples) {
+            binary_keys.push_back(canonical_key(topology, backend));
         }
-    }
 
-    expect(
-        canonical_key_hex(binary_keys.front()).starts_with("SQK1HEX:"),
-        "retained binary key text must carry the SQK1HEX version marker"
-    );
+        for (std::size_t i = 0; i < samples.size(); ++i) {
+            for (std::size_t j = 0; j < samples.size(); ++j) {
+                expect(
+                    (text_keys[i] == text_keys[j]) == (binary_keys[i] == binary_keys[j]),
+                    "every backend binary key must induce the textual equivalence relation"
+                );
+            }
+        }
+
+        expect(
+            canonical_key_hex(binary_keys.front()).starts_with("SQK2HEX:"),
+            "retained binary key text must carry the SQK2HEX version marker"
+        );
+    }
 }
 
 void test_canonical_microprofile_preserves_semantics() {
@@ -307,9 +343,13 @@ void test_canonical_microprofile_preserves_semantics() {
         "canonical microprofiling must not change the canonical fingerprint"
     );
     expect(profile.calls == 1, "canonical profile must count the profiled call");
-    expect(profile.dense_build_seconds >= 0.0, "dense-build timing must be non-negative");
+    expect(profile.input_build_seconds >= 0.0, "input-build timing must be non-negative");
     expect(profile.partition_seconds >= 0.0, "partition timing must be non-negative");
-    expect(profile.nauty_seconds >= 0.0, "nauty timing must be non-negative");
+    expect(profile.engine_seconds >= 0.0, "engine timing must be non-negative");
+    expect(
+        profile.output_conversion_seconds >= 0.0,
+        "output-conversion timing must be non-negative"
+    );
     expect(profile.key_build_seconds >= 0.0, "key-build timing must be non-negative");
     expect(profile.extraction_seconds >= 0.0, "extraction timing must be non-negative");
     expect(profile.encoding_seconds >= 0.0, "encoding timing must be non-negative");
@@ -343,8 +383,12 @@ void test_search_canonical_microprofile() {
         "search JSON must report enabled canonical profiling"
     );
     expect(
-        json.find("\"canonical_nauty_seconds\":") != std::string::npos,
-        "search JSON must expose nauty microprofile timing"
+        json.find("\"canonical_engine_seconds\":") != std::string::npos,
+        "search JSON must expose backend engine timing"
+    );
+    expect(
+        json.find("\"canonical_backend\":\"dense-nauty\"") != std::string::npos,
+        "search JSON must expose the canonical backend"
     );
     expect(
         json.find("\"canonical_key_build_seconds\":") != std::string::npos,
@@ -357,6 +401,53 @@ void test_search_canonical_microprofile() {
     expect(
         result.stats.canonical_encoding_seconds == 0.0,
         "search binary-key path must not build textual SQT1 encodings"
+    );
+}
+
+void test_search_backends_agree() {
+    using namespace sqtopology;
+
+    SearchOptions options{
+        .max_candidates = 240,
+        .max_unique = 0,
+        .max_depth = 2,
+        .max_additions_per_parent = 32,
+        .wall_seconds = 0.0,
+        .shard = Shard{.index = 0, .count = 1},
+        .retain_keys = false,
+        .profile_canonical = false,
+    };
+
+    const auto seed = make_fixture("grid-3x3");
+
+    options.canonical_backend = CanonicalBackend::DenseNauty;
+    const auto dense = run_search(seed, options);
+
+    options.canonical_backend = CanonicalBackend::SparseNauty;
+    const auto sparse = run_search(seed, options);
+
+    options.canonical_backend = CanonicalBackend::Traces;
+    const auto traces = run_search(seed, options);
+
+    expect(
+        dense.stats.raw_candidates == sparse.stats.raw_candidates
+            && dense.stats.raw_candidates == traces.stats.raw_candidates,
+        "all canonical backends must process the same bounded candidate count"
+    );
+    expect(
+        dense.stats.valid_candidates == sparse.stats.valid_candidates
+            && dense.stats.valid_candidates == traces.stats.valid_candidates,
+        "all canonical backends must agree on valid candidate count"
+    );
+    expect(
+        dense.stats.duplicates == sparse.stats.duplicates
+            && dense.stats.duplicates == traces.stats.duplicates,
+        "all canonical backends must agree on duplicate classification"
+    );
+    expect(
+        dense.stats.unique_states == sparse.stats.unique_states
+            && dense.stats.unique_states == traces.stats.unique_states,
+        "all canonical backends must agree on unique-state count"
     );
 }
 
@@ -390,9 +481,11 @@ int main() {
         test_shard_reproducibility();
         test_export_smoke();
         test_validated_incidence_fast_path_matches_checked_path();
+        test_backend_names();
         test_binary_key_matches_textual_equivalence();
         test_canonical_microprofile_preserves_semantics();
         test_search_canonical_microprofile();
+        test_search_backends_agree();
         test_canonical_equality_uses_encoding();
         std::cout << "sqtopology_tests: all tests passed\n";
         return 0;

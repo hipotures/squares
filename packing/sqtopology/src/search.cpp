@@ -25,9 +25,10 @@ void accumulate_canonical_profile(
     const CanonicalProfile& profile
 ) {
     stats.canonical_profiled_calls += profile.calls;
-    stats.canonical_dense_build_seconds += profile.dense_build_seconds;
+    stats.canonical_input_build_seconds += profile.input_build_seconds;
     stats.canonical_partition_seconds += profile.partition_seconds;
-    stats.canonical_nauty_seconds += profile.nauty_seconds;
+    stats.canonical_engine_seconds += profile.engine_seconds;
+    stats.canonical_output_conversion_seconds += profile.output_conversion_seconds;
     stats.canonical_key_build_seconds += profile.key_build_seconds;
     stats.canonical_extraction_seconds += profile.extraction_seconds;
     stats.canonical_encoding_seconds += profile.encoding_seconds;
@@ -75,6 +76,7 @@ SearchResult run_search(
     }
 
     SearchResult result;
+    result.stats.canonical_backend = options.canonical_backend;
     const auto started = Clock::now();
 
     std::unordered_set<CanonicalKey, CanonicalKeyHash> seen;
@@ -83,7 +85,12 @@ SearchResult run_search(
     }
 
     const auto seed_incidence = to_incidence_graph_validated(seed.normalized());
-    seen.insert(canonical_key_colored_graph(seed_incidence));
+    seen.insert(
+        canonical_key_colored_graph(
+            seed_incidence,
+            options.canonical_backend
+        )
+    );
     result.stats.canonicalizations = 1;
     result.stats.unique_states = 1;
 
@@ -118,6 +125,7 @@ SearchResult run_search(
         t0 = Clock::now();
         auto key = canonical_key_colored_graph(
             incidence,
+            options.canonical_backend,
             options.profile_canonical ? &canonical_profile : nullptr
         );
         t1 = Clock::now();
@@ -222,9 +230,10 @@ std::string search_stats_to_json(
         std::max(0.0, stats.wall_seconds - attributed_seconds);
 
     const double canonical_profile_sum =
-        stats.canonical_dense_build_seconds
+        stats.canonical_input_build_seconds
         + stats.canonical_partition_seconds
-        + stats.canonical_nauty_seconds
+        + stats.canonical_engine_seconds
+        + stats.canonical_output_conversion_seconds
         + stats.canonical_key_build_seconds
         + stats.canonical_extraction_seconds
         + stats.canonical_encoding_seconds
@@ -237,7 +246,8 @@ std::string search_stats_to_json(
     std::ostringstream out;
     out << std::setprecision(17)
         << '{'
-        << "\"schema\":\"sqtopology.search-summary.v4\","
+        << "\"schema\":\"sqtopology.search-summary.v5\","
+        << "\"canonical_backend\":\"" << to_string(stats.canonical_backend) << "\","
         << "\"shard\":{\"index\":" << shard.index
         << ",\"count\":" << shard.count << "},"
         << "\"raw_candidates\":" << stats.raw_candidates << ','
@@ -259,14 +269,24 @@ std::string search_stats_to_json(
         << "\"canonicalization_seconds\":" << stats.canonicalization_seconds << ','
         << "\"dedup_seconds\":" << stats.dedup_seconds << ','
         << "\"unattributed_seconds\":" << unattributed_seconds << ','
-        << "\"canonical_dense_build_seconds\":" << stats.canonical_dense_build_seconds << ','
-        << "\"canonical_partition_seconds\":" << stats.canonical_partition_seconds << ','
-        << "\"canonical_nauty_seconds\":" << stats.canonical_nauty_seconds << ','
-        << "\"canonical_key_build_seconds\":" << stats.canonical_key_build_seconds << ','
-        << "\"canonical_extraction_seconds\":" << stats.canonical_extraction_seconds << ','
-        << "\"canonical_encoding_seconds\":" << stats.canonical_encoding_seconds << ','
-        << "\"canonical_hash_seconds\":" << stats.canonical_hash_seconds << ','
-        << "\"canonical_profile_other_seconds\":" << canonical_profile_other_seconds
+        << "\"canonical_input_build_seconds\":"
+        << stats.canonical_input_build_seconds << ','
+        << "\"canonical_partition_seconds\":"
+        << stats.canonical_partition_seconds << ','
+        << "\"canonical_engine_seconds\":"
+        << stats.canonical_engine_seconds << ','
+        << "\"canonical_output_conversion_seconds\":"
+        << stats.canonical_output_conversion_seconds << ','
+        << "\"canonical_key_build_seconds\":"
+        << stats.canonical_key_build_seconds << ','
+        << "\"canonical_extraction_seconds\":"
+        << stats.canonical_extraction_seconds << ','
+        << "\"canonical_encoding_seconds\":"
+        << stats.canonical_encoding_seconds << ','
+        << "\"canonical_hash_seconds\":"
+        << stats.canonical_hash_seconds << ','
+        << "\"canonical_profile_other_seconds\":"
+        << canonical_profile_other_seconds
         << "}\n";
     return out.str();
 }

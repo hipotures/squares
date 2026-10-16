@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sqtopology/canonical.hpp"
 #include "sqtopology/rewrite.hpp"
 #include "sqtopology/topology.hpp"
 
@@ -24,9 +25,11 @@ struct SearchOptions {
     Shard shard{};
     bool retain_keys{false};
     bool profile_canonical{false};
+    CanonicalBackend canonical_backend{CanonicalBackend::DenseNauty};
 };
 
 struct SearchStats {
+    CanonicalBackend canonical_backend{CanonicalBackend::DenseNauty};
     std::uint64_t raw_candidates{};
     std::uint64_t valid_candidates{};
     std::uint64_t canonicalizations{};
@@ -43,9 +46,10 @@ struct SearchStats {
     double graph_conversion_seconds{};
     double canonicalization_seconds{};
     double dedup_seconds{};
-    double canonical_dense_build_seconds{};
+    double canonical_input_build_seconds{};
     double canonical_partition_seconds{};
-    double canonical_nauty_seconds{};
+    double canonical_engine_seconds{};
+    double canonical_output_conversion_seconds{};
     double canonical_key_build_seconds{};
     double canonical_extraction_seconds{};
     double canonical_encoding_seconds{};

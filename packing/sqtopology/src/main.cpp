@@ -72,6 +72,7 @@ void usage() {
         << "  --max-depth N\n"
         << "  --max-additions N\n"
         << "  --shard INDEX/COUNT\n"
+        << "  --canonical-backend dense-nauty|sparse-nauty|traces\n"
         << "  --json\n"
         << "  --profile-canonical\n"
         << "  --emit-keys FILE\n";
@@ -205,6 +206,8 @@ int search_command(int argc, char** argv) {
             options.max_additions_per_parent = parse_size(value, arg);
         } else if (arg == "--shard") {
             options.shard = parse_shard(value);
+        } else if (arg == "--canonical-backend") {
+            options.canonical_backend = sqtopology::canonical_backend_from_string(value);
         } else if (arg == "--emit-keys") {
             emit_keys = std::string(value);
             options.retain_keys = true;
@@ -232,7 +235,8 @@ int search_command(int argc, char** argv) {
             ? static_cast<double>(stats.raw_candidates) / stats.wall_seconds
             : 0.0;
         std::cout
-            << "shard=" << options.shard.index << '/' << options.shard.count
+            << "backend=" << sqtopology::to_string(options.canonical_backend)
+            << " shard=" << options.shard.index << '/' << options.shard.count
             << " candidates=" << stats.raw_candidates
             << " valid=" << stats.valid_candidates
             << " canonicalizations=" << stats.canonicalizations
