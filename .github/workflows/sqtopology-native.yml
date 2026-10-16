@@ -1,0 +1,68 @@
+name: sqtopology native
+
+"on":
+  workflow_dispatch: {}
+  pull_request:
+    paths:
+      - "packing/sqtopology/**"
+      - ".github/workflows/sqtopology-native.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packing/sqtopology/**"
+      - ".github/workflows/sqtopology-native.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sqtopology-native-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packing/sqtopology
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install native dependencies
+        run: |
+          sudo apt-get update
+          if apt-cache show libnauty-dev >/dev/null 2>&1; then
+            nauty_dev=libnauty-dev
+          else
+            nauty_dev=libnauty2-dev
+          fi
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build pkg-config graphviz "$nauty_dev"
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build -j2
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Inspection smoke
+        run: |
+          ./build/sqtopology inspect grid-3x3 \
+            --json "$RUNNER_TEMP/grid-3x3.json" \
+            --dot "$RUNNER_TEMP/grid-3x3.dot"
+          dot -Tsvg "$RUNNER_TEMP/grid-3x3.dot" -o "$RUNNER_TEMP/grid-3x3.svg"
+
+      - name: Coarse-process smoke
+        run: |
+          python3 tools/bench_scaling.py \
+            --binary ./build/sqtopology \
+            --fixture grid-3x3 \
+            --workers 1,2 \
+            --seconds 1 \
+            --max-unique 2000 \
+            --max-depth 2 \
+            --max-additions 32
