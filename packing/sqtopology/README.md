@@ -76,8 +76,10 @@ feature ports. A wall contact connects a square feature port to a container-wall
 Packed-square object vertices all share one color. nauty may therefore permute them, so
 square IDs are also quotiented out.
 
-The canonical equality key is the full versioned encoding (`SQT1|...`), not its 64-bit
-fingerprint. The FNV-1a fingerprint is only a compact display/index aid.
+The human-facing canonical form remains the full versioned textual encoding (`SQT1|...`).
+Search uses a separate exact binary key (`SQK1`) containing the canonical color sequence
+and nauty's canonical dense adjacency words. Its 64-bit FNV-1a fingerprint is only the
+unordered-set bucket hash: equality is always decided by the complete binary bytes.
 
 ### Deliberate coarse choices
 
@@ -191,7 +193,9 @@ The second point is deliberate in phase 1. Shard outputs can be merged offline, 
 future canonical-augmentation search can remove cross-shard overlap if measurements show
 that it matters. Therefore current shard runs are **not** an exhaustive partition proof.
 
-`--emit-keys FILE` writes sorted full canonical encodings for offline comparison or merge.
+`--emit-keys FILE` writes sorted exact search keys as `SQK1HEX:<hex>` text for offline
+comparison or merge. The hexadecimal rendering is generated only when explicitly requested;
+it is not built per candidate in the search hot path.
 
 ## Process scaling
 
@@ -229,6 +233,29 @@ the semantic representation unchanged while removing avoidable work:
 The checked public incidence builder remains available for external callers. The native
 tests assert that the checked and validated fast paths produce the same canonical encoding.
 
+## Exact binary search key
+
+Phase 1.3 removes human-readable canonical serialization from the search hot path.
+
+After `densenauty()`, search now builds an exact `SQK1` binary key directly from:
+
+- a version marker;
+- canonical vertex count and nauty word size;
+- the canonical vertex-color sequence;
+- canonical dense adjacency words encoded in deterministic byte order.
+
+The key is stored in an `unordered_set` together with a cached 64-bit fingerprint used
+only for bucket selection. Hash collisions do not affect correctness because the full
+binary key bytes remain the equality oracle.
+
+The old `CanonicalForm` / `SQT1|...` representation is retained for inspection, JSON,
+debugging, and semantic regression tests. Search does not extract canonical edge vectors
+or run `ostringstream` for every candidate anymore.
+
+Tests compare binary-key equality against textual canonical-form equality across symmetry
+transforms and distinct contact types. Retained search keys are rendered as `SQK1HEX:...`
+only at the end of a run when `--emit-keys` is requested.
+
 ## Canonicalization microprofiling
 
 The phase-1.2 instrumentation can split the canonicalization block without changing the
@@ -251,16 +278,18 @@ python3 tools/bench_scaling.py \
   --json-report /tmp/sqtopology-canonical-profile.json
 ~~~
 
-The harness prints a second table in microseconds per profiled canonicalization. The
-instrumented block is split into:
+The harness prints a second table in microseconds per profiled search canonicalization.
+The search hot path is split into:
 
 - dense nauty graph allocation/construction;
 - initial colored partition/labelling setup;
 - the `densenauty()` call itself;
-- canonical graph extraction;
-- deterministic full-key encoding;
-- FNV-1a display/index hash;
-- residual canonical-block time not covered by the six measured regions.
+- exact binary-key construction;
+- cached FNV-1a bucket hash;
+- residual canonical-block time not covered by those regions.
+
+The human-facing `CanonicalForm` path still has extraction and textual-encoding timers,
+but ordinary search no longer executes those stages.
 
 The unprofiled command remains the correct throughput benchmark. A run with
 `--profile-canonical` is diagnostic and should not be compared directly with the
@@ -286,8 +315,9 @@ Native search summaries separately report:
 - total candidate-contact count;
 - total incidence vertices and edges;
 - number of profiled canonicalizations;
-- dense-build, partition, `densenauty`, extraction, encoding, hash, and residual
-  canonicalization times when canonical profiling is enabled.
+- dense-build, partition, `densenauty`, binary-key build, hash, and residual search
+  canonicalization times when canonical profiling is enabled;
+- extraction and textual-encoding timers for callers that explicitly use `CanonicalForm`.
 
 The purpose is to locate the actual bottleneck before optimizing it.
 

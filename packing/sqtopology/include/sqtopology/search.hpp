@@ -46,6 +46,7 @@ struct SearchStats {
     double canonical_dense_build_seconds{};
     double canonical_partition_seconds{};
     double canonical_nauty_seconds{};
+    double canonical_key_build_seconds{};
     double canonical_extraction_seconds{};
     double canonical_encoding_seconds{};
     double canonical_hash_seconds{};
@@ -53,6 +54,7 @@ struct SearchStats {
 
 struct SearchResult {
     SearchStats stats;
+    // When retained, exact binary search keys are rendered as versioned hexadecimal text.
     std::vector<std::string> unique_encodings;
 };
 

@@ -39,6 +39,12 @@ std::string canonical_encoding(const sqtopology::Topology& topology) {
     return sqtopology::canonicalize(topology).encoding;
 }
 
+sqtopology::CanonicalKey canonical_key(const sqtopology::Topology& topology) {
+    return sqtopology::canonical_key_colored_graph(
+        sqtopology::to_incidence_graph(topology)
+    );
+}
+
 void test_validation() {
     using namespace sqtopology;
 
@@ -240,6 +246,48 @@ void test_validated_incidence_fast_path_matches_checked_path() {
     );
 }
 
+void test_binary_key_matches_textual_equivalence() {
+    using namespace sqtopology;
+
+    const auto base = make_fixture("grid-3x3");
+    std::vector<SquareId> permutation(base.square_count());
+    for (SquareId old = 0; old < base.square_count(); ++old) {
+        permutation[old] = base.square_count() - 1U - old;
+    }
+
+    const std::vector<Topology> samples{
+        base,
+        permute_squares(base, permutation),
+        relabel_square(base, 4, D4Transform{.rotation = 1, .reflected = true}),
+        relabel_container(base, D4Transform{.rotation = 3, .reflected = true}),
+        make_fixture("corner-corner-2"),
+        make_fixture("corner-side-2"),
+        make_fixture("side-side-2"),
+        make_fixture("disjoint-2"),
+    };
+
+    std::vector<std::string> text_keys;
+    std::vector<CanonicalKey> binary_keys;
+    for (const auto& topology : samples) {
+        text_keys.push_back(canonical_encoding(topology));
+        binary_keys.push_back(canonical_key(topology));
+    }
+
+    for (std::size_t i = 0; i < samples.size(); ++i) {
+        for (std::size_t j = 0; j < samples.size(); ++j) {
+            expect(
+                (text_keys[i] == text_keys[j]) == (binary_keys[i] == binary_keys[j]),
+                "binary and textual canonical forms must induce the same equivalence relation"
+            );
+        }
+    }
+
+    expect(
+        canonical_key_hex(binary_keys.front()).starts_with("SQK1HEX:"),
+        "retained binary key text must carry the SQK1HEX version marker"
+    );
+}
+
 void test_canonical_microprofile_preserves_semantics() {
     using namespace sqtopology;
 
@@ -262,6 +310,7 @@ void test_canonical_microprofile_preserves_semantics() {
     expect(profile.dense_build_seconds >= 0.0, "dense-build timing must be non-negative");
     expect(profile.partition_seconds >= 0.0, "partition timing must be non-negative");
     expect(profile.nauty_seconds >= 0.0, "nauty timing must be non-negative");
+    expect(profile.key_build_seconds >= 0.0, "key-build timing must be non-negative");
     expect(profile.extraction_seconds >= 0.0, "extraction timing must be non-negative");
     expect(profile.encoding_seconds >= 0.0, "encoding timing must be non-negative");
     expect(profile.hash_seconds >= 0.0, "hash timing must be non-negative");
@@ -297,6 +346,18 @@ void test_search_canonical_microprofile() {
         json.find("\"canonical_nauty_seconds\":") != std::string::npos,
         "search JSON must expose nauty microprofile timing"
     );
+    expect(
+        json.find("\"canonical_key_build_seconds\":") != std::string::npos,
+        "search JSON must expose binary-key construction timing"
+    );
+    expect(
+        result.stats.canonical_extraction_seconds == 0.0,
+        "search binary-key path must not extract canonical edge vectors"
+    );
+    expect(
+        result.stats.canonical_encoding_seconds == 0.0,
+        "search binary-key path must not build textual SQT1 encodings"
+    );
 }
 
 void test_canonical_equality_uses_encoding() {
@@ -329,6 +390,7 @@ int main() {
         test_shard_reproducibility();
         test_export_smoke();
         test_validated_incidence_fast_path_matches_checked_path();
+        test_binary_key_matches_textual_equivalence();
         test_canonical_microprofile_preserves_semantics();
         test_search_canonical_microprofile();
         test_canonical_equality_uses_encoding();

@@ -116,6 +116,9 @@ def run_width(args: argparse.Namespace, workers: int) -> dict[str, object]:
             summaries, "canonical_partition_seconds"
         ),
         "canonical_nauty_seconds": summed(summaries, "canonical_nauty_seconds"),
+        "canonical_key_build_seconds": summed(
+            summaries, "canonical_key_build_seconds"
+        ),
         "canonical_extraction_seconds": summed(
             summaries, "canonical_extraction_seconds"
         ),
@@ -135,7 +138,7 @@ def print_canonical_profile(rows: list[dict[str, object]]) -> None:
     print("canonical microprofile (microseconds per profiled canonicalization)")
     print(
         f"{'workers':>7} {'dense':>9} {'partition':>10} {'nauty':>9} "
-        f"{'extract':>9} {'encoding':>10} {'hash':>8} {'other':>8} {'total':>9}"
+        f"{'keybuild':>10} {'hash':>8} {'other':>8} {'total':>9}"
     )
 
     for row in rows:
@@ -147,15 +150,14 @@ def print_canonical_profile(rows: list[dict[str, object]]) -> None:
         dense = float(row["canonical_dense_build_seconds"]) * scale
         partition = float(row["canonical_partition_seconds"]) * scale
         nauty = float(row["canonical_nauty_seconds"]) * scale
-        extraction = float(row["canonical_extraction_seconds"]) * scale
-        encoding = float(row["canonical_encoding_seconds"]) * scale
+        key_build = float(row["canonical_key_build_seconds"]) * scale
         hash_time = float(row["canonical_hash_seconds"]) * scale
         other = float(row["canonical_profile_other_seconds"]) * scale
         total = float(row["canonicalization_seconds"]) * scale
 
         print(
             f"{int(row['workers']):7d} {dense:9.2f} {partition:10.2f} {nauty:9.2f} "
-            f"{extraction:9.2f} {encoding:10.2f} {hash_time:8.2f} "
+            f"{key_build:10.2f} {hash_time:8.2f} "
             f"{other:8.2f} {total:9.2f}"
         )
 

@@ -3,10 +3,13 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 extern "C" {
 #include <nauty/nauty.h>
@@ -16,6 +19,9 @@ namespace sqtopology {
 namespace {
 
 using Clock = std::chrono::steady_clock;
+
+static_assert(WORDSIZE <= 64, "SQK1 binary key currently supports nauty WORDSIZE <= 64");
+static_assert((WORDSIZE % 8) == 0, "SQK1 binary key requires byte-sized nauty words");
 
 double seconds_between(Clock::time_point start, Clock::time_point end) {
     return std::chrono::duration<double>(end - start).count();
@@ -123,33 +129,14 @@ ColoredGraph build_incidence_graph(const Topology& topology) {
     return graph;
 }
 
-}  // namespace
+struct NautyCanonicalResult {
+    int n{};
+    int m{};
+    std::vector<int> lab;
+    std::vector<::graph> canonical_dense;
+};
 
-void ColoredGraph::normalize_edges() {
-    for (auto& [a, b] : edges) {
-        if (b < a) {
-            std::swap(a, b);
-        }
-    }
-    std::sort(edges.begin(), edges.end());
-    edges.erase(std::unique(edges.begin(), edges.end()), edges.end());
-}
-
-ColoredGraph to_incidence_graph(const Topology& input) {
-    const auto validation = input.validate();
-    if (!validation.ok()) {
-        throw std::invalid_argument(validation_message(validation));
-    }
-
-    const Topology topology = input.normalized();
-    return build_incidence_graph(topology);
-}
-
-ColoredGraph to_incidence_graph_validated(const Topology& topology) {
-    return build_incidence_graph(topology);
-}
-
-CanonicalForm canonicalize_colored_graph(
+NautyCanonicalResult run_nauty(
     const ColoredGraph& graph,
     CanonicalProfile* profile
 ) {
@@ -244,7 +231,6 @@ CanonicalForm canonicalize_colored_graph(
 
     if (profile != nullptr) {
         profile->nauty_seconds += seconds_between(stage_started, Clock::now());
-        stage_started = Clock::now();
     }
 
     if (stats.errstatus != 0) {
@@ -254,16 +240,156 @@ CanonicalForm canonicalize_colored_graph(
         );
     }
 
-    CanonicalForm result;
-    result.canonical_colors.resize(static_cast<std::size_t>(n));
-    for (int i = 0; i < n; ++i) {
-        result.canonical_colors[static_cast<std::size_t>(i)] =
-            graph.colors[static_cast<std::size_t>(lab[static_cast<std::size_t>(i)])];
+    return NautyCanonicalResult{
+        .n = n,
+        .m = m,
+        .lab = std::move(lab),
+        .canonical_dense = std::move(canonical_dense),
+    };
+}
+
+void append_u32_be(std::string& bytes, std::uint32_t value) {
+    bytes.push_back(static_cast<char>((value >> 24U) & 0xffU));
+    bytes.push_back(static_cast<char>((value >> 16U) & 0xffU));
+    bytes.push_back(static_cast<char>((value >> 8U) & 0xffU));
+    bytes.push_back(static_cast<char>(value & 0xffU));
+}
+
+std::string build_binary_key_bytes(
+    const ColoredGraph& graph,
+    const NautyCanonicalResult& canonical
+) {
+    constexpr std::string_view magic = "SQK1";
+    constexpr std::size_t word_bytes = static_cast<std::size_t>(WORDSIZE / 8);
+
+    std::string bytes;
+    bytes.reserve(
+        magic.size()
+        + 5U
+        + static_cast<std::size_t>(canonical.n)
+        + canonical.canonical_dense.size() * word_bytes
+    );
+
+    bytes.append(magic);
+    append_u32_be(bytes, static_cast<std::uint32_t>(canonical.n));
+    bytes.push_back(static_cast<char>(WORDSIZE));
+
+    for (int i = 0; i < canonical.n; ++i) {
+        const auto color = graph.colors[
+            static_cast<std::size_t>(canonical.lab[static_cast<std::size_t>(i)])
+        ];
+        if (color < 0 || color > 255) {
+            throw std::logic_error("canonical vertex color outside SQK1 byte range");
+        }
+        bytes.push_back(static_cast<char>(color));
     }
 
-    for (int i = 0; i < n; ++i) {
-        const auto* row = GRAPHROW(canonical_dense.data(), i, m);
-        for (int j = i + 1; j < n; ++j) {
+    for (const auto raw_word : canonical.canonical_dense) {
+        const auto word = static_cast<std::uint64_t>(raw_word);
+        for (std::size_t byte = 0; byte < word_bytes; ++byte) {
+            const auto shift = static_cast<unsigned>(
+                (word_bytes - 1U - byte) * 8U
+            );
+            bytes.push_back(static_cast<char>((word >> shift) & 0xffU));
+        }
+    }
+
+    return bytes;
+}
+
+}  // namespace
+
+void ColoredGraph::normalize_edges() {
+    for (auto& [a, b] : edges) {
+        if (b < a) {
+            std::swap(a, b);
+        }
+    }
+    std::sort(edges.begin(), edges.end());
+    edges.erase(std::unique(edges.begin(), edges.end()), edges.end());
+}
+
+ColoredGraph to_incidence_graph(const Topology& input) {
+    const auto validation = input.validate();
+    if (!validation.ok()) {
+        throw std::invalid_argument(validation_message(validation));
+    }
+
+    const Topology topology = input.normalized();
+    return build_incidence_graph(topology);
+}
+
+ColoredGraph to_incidence_graph_validated(const Topology& topology) {
+    return build_incidence_graph(topology);
+}
+
+CanonicalKey canonical_key_colored_graph(
+    const ColoredGraph& graph,
+    CanonicalProfile* profile
+) {
+    const auto canonical = run_nauty(graph, profile);
+
+    Clock::time_point stage_started{};
+    if (profile != nullptr) {
+        stage_started = Clock::now();
+    }
+
+    CanonicalKey key;
+    key.bytes = build_binary_key_bytes(graph, canonical);
+
+    if (profile != nullptr) {
+        profile->key_build_seconds += seconds_between(stage_started, Clock::now());
+        stage_started = Clock::now();
+    }
+
+    key.fingerprint = stable_fingerprint(key.bytes);
+
+    if (profile != nullptr) {
+        profile->hash_seconds += seconds_between(stage_started, Clock::now());
+    }
+
+    return key;
+}
+
+std::string canonical_key_hex(const CanonicalKey& key) {
+    constexpr char hex[] = "0123456789abcdef";
+    std::string text;
+    text.reserve(8U + key.bytes.size() * 2U);
+    text.append("SQK1HEX:");
+    for (const unsigned char byte : key.bytes) {
+        text.push_back(hex[byte >> 4U]);
+        text.push_back(hex[byte & 0x0fU]);
+    }
+    return text;
+}
+
+CanonicalForm canonicalize_colored_graph(
+    const ColoredGraph& graph,
+    CanonicalProfile* profile
+) {
+    const auto canonical = run_nauty(graph, profile);
+
+    Clock::time_point stage_started{};
+    if (profile != nullptr) {
+        stage_started = Clock::now();
+    }
+
+    CanonicalForm result;
+    result.canonical_colors.resize(static_cast<std::size_t>(canonical.n));
+    for (int i = 0; i < canonical.n; ++i) {
+        result.canonical_colors[static_cast<std::size_t>(i)] =
+            graph.colors[
+                static_cast<std::size_t>(canonical.lab[static_cast<std::size_t>(i)])
+            ];
+    }
+
+    for (int i = 0; i < canonical.n; ++i) {
+        const auto* row = GRAPHROW(
+            canonical.canonical_dense.data(),
+            i,
+            canonical.m
+        );
+        for (int j = i + 1; j < canonical.n; ++j) {
             if (ISELEMENT(row, j)) {
                 result.canonical_edges.emplace_back(
                     static_cast<std::uint32_t>(i),
@@ -279,7 +405,7 @@ CanonicalForm canonicalize_colored_graph(
     }
 
     std::ostringstream encoding;
-    encoding << "SQT1|n:" << n << "|c:";
+    encoding << "SQT1|n:" << canonical.n << "|c:";
     for (std::size_t i = 0; i < result.canonical_colors.size(); ++i) {
         if (i != 0) {
             encoding << ',';

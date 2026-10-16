@@ -28,6 +28,7 @@ void accumulate_canonical_profile(
     stats.canonical_dense_build_seconds += profile.dense_build_seconds;
     stats.canonical_partition_seconds += profile.partition_seconds;
     stats.canonical_nauty_seconds += profile.nauty_seconds;
+    stats.canonical_key_build_seconds += profile.key_build_seconds;
     stats.canonical_extraction_seconds += profile.extraction_seconds;
     stats.canonical_encoding_seconds += profile.encoding_seconds;
     stats.canonical_hash_seconds += profile.hash_seconds;
@@ -76,13 +77,13 @@ SearchResult run_search(
     SearchResult result;
     const auto started = Clock::now();
 
-    std::unordered_set<std::string> seen;
+    std::unordered_set<CanonicalKey, CanonicalKeyHash> seen;
     if (options.max_unique != 0) {
         seen.reserve(options.max_unique);
     }
 
-    const auto seed_form = canonicalize(seed);
-    seen.insert(seed_form.encoding);
+    const auto seed_incidence = to_incidence_graph_validated(seed.normalized());
+    seen.insert(canonical_key_colored_graph(seed_incidence));
     result.stats.canonicalizations = 1;
     result.stats.unique_states = 1;
 
@@ -115,7 +116,7 @@ SearchResult run_search(
 
         CanonicalProfile canonical_profile;
         t0 = Clock::now();
-        const auto form = canonicalize_colored_graph(
+        auto key = canonical_key_colored_graph(
             incidence,
             options.profile_canonical ? &canonical_profile : nullptr
         );
@@ -127,7 +128,7 @@ SearchResult run_search(
         }
 
         t0 = Clock::now();
-        const bool inserted = seen.insert(form.encoding).second;
+        const bool inserted = seen.insert(std::move(key)).second;
         t1 = Clock::now();
         result.stats.dedup_seconds += seconds_between(t0, t1);
 
@@ -198,7 +199,10 @@ SearchResult run_search(
     result.stats.wall_seconds = seconds_between(started, Clock::now());
 
     if (options.retain_keys) {
-        result.unique_encodings.assign(seen.begin(), seen.end());
+        result.unique_encodings.reserve(seen.size());
+        for (const auto& key : seen) {
+            result.unique_encodings.push_back(canonical_key_hex(key));
+        }
         std::sort(result.unique_encodings.begin(), result.unique_encodings.end());
     }
     return result;
@@ -221,6 +225,7 @@ std::string search_stats_to_json(
         stats.canonical_dense_build_seconds
         + stats.canonical_partition_seconds
         + stats.canonical_nauty_seconds
+        + stats.canonical_key_build_seconds
         + stats.canonical_extraction_seconds
         + stats.canonical_encoding_seconds
         + stats.canonical_hash_seconds;
@@ -232,7 +237,7 @@ std::string search_stats_to_json(
     std::ostringstream out;
     out << std::setprecision(17)
         << '{'
-        << "\"schema\":\"sqtopology.search-summary.v3\","
+        << "\"schema\":\"sqtopology.search-summary.v4\","
         << "\"shard\":{\"index\":" << shard.index
         << ",\"count\":" << shard.count << "},"
         << "\"raw_candidates\":" << stats.raw_candidates << ','
@@ -257,6 +262,7 @@ std::string search_stats_to_json(
         << "\"canonical_dense_build_seconds\":" << stats.canonical_dense_build_seconds << ','
         << "\"canonical_partition_seconds\":" << stats.canonical_partition_seconds << ','
         << "\"canonical_nauty_seconds\":" << stats.canonical_nauty_seconds << ','
+        << "\"canonical_key_build_seconds\":" << stats.canonical_key_build_seconds << ','
         << "\"canonical_extraction_seconds\":" << stats.canonical_extraction_seconds << ','
         << "\"canonical_encoding_seconds\":" << stats.canonical_encoding_seconds << ','
         << "\"canonical_hash_seconds\":" << stats.canonical_hash_seconds << ','
