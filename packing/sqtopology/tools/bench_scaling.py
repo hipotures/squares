@@ -127,6 +127,7 @@ def run_width(
 
     external_wall = time.perf_counter() - started
     raw = sum(int(item["raw_candidates"]) for item in summaries)
+    valid = sum(int(item["valid_candidates"]) for item in summaries)
     canonicalizations = sum(int(item["canonicalizations"]) for item in summaries)
     duplicates = sum(int(item["duplicates"]) for item in summaries)
     local_unique_sum = sum(int(item["unique_states"]) for item in summaries)
@@ -138,12 +139,19 @@ def run_width(
         "external_wall_seconds": external_wall,
         "max_worker_wall_seconds": max_worker_wall,
         "raw_candidates": raw,
+        "valid_candidates": valid,
         "canonicalizations": canonicalizations,
         "duplicates": duplicates,
         "local_unique_sum": local_unique_sum,
         "candidates_per_second": raw / external_wall if external_wall else 0.0,
         "canonical_profiled_calls": sum(
             int(item.get("canonical_profiled_calls", 0)) for item in summaries
+        ),
+        "total_canonical_key_bytes": sum(
+            int(item.get("total_canonical_key_bytes", 0)) for item in summaries
+        ),
+        "stored_canonical_key_bytes": sum(
+            int(item.get("stored_canonical_key_bytes", 0)) for item in summaries
         ),
         "canonicalization_seconds": summed(summaries, "canonicalization_seconds"),
         "canonical_input_build_seconds": summed(
@@ -227,6 +235,25 @@ def print_canonical_profile(rows: list[dict[str, object]]) -> None:
         )
 
 
+def print_key_footprint(rows: list[dict[str, object]]) -> None:
+    print()
+    print("exact canonical-key footprint")
+    print(
+        f"{'workers':>7} {'avg_key_B':>12} {'stored_MiB':>12} "
+        f"{'unique':>12}"
+    )
+    for row in rows:
+        valid = int(row["valid_candidates"])
+        total_bytes = int(row["total_canonical_key_bytes"])
+        stored_bytes = int(row["stored_canonical_key_bytes"])
+        avg_key = total_bytes / valid if valid else 0.0
+        stored_mib = stored_bytes / (1024.0 * 1024.0)
+        print(
+            f"{int(row['workers']):7d} {avg_key:12.1f} {stored_mib:12.1f} "
+            f"{int(row['local_unique_sum']):12d}"
+        )
+
+
 def print_backend_comparison(rows: list[dict[str, object]]) -> None:
     if len({str(row["backend"]) for row in rows}) < 2:
         return
@@ -273,6 +300,7 @@ def main() -> int:
             rows.append(row)
 
         print_scaling_table(backend_rows)
+        print_key_footprint(backend_rows)
         if args.profile_canonical:
             print_canonical_profile(backend_rows)
 
@@ -283,7 +311,7 @@ def main() -> int:
         args.json_report.write_text(
             json.dumps(
                 {
-                    "schema": "sqtopology.scaling-report.v3",
+                    "schema": "sqtopology.scaling-report.v4",
                     "fixture": args.fixture,
                     "seconds": args.seconds,
                     "profile_canonical": args.profile_canonical,

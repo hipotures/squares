@@ -85,12 +85,12 @@ SearchResult run_search(
     }
 
     const auto seed_incidence = to_incidence_graph_validated(seed.normalized());
-    seen.insert(
-        canonical_key_colored_graph(
-            seed_incidence,
-            options.canonical_backend
-        )
+    auto seed_key = canonical_key_colored_graph(
+        seed_incidence,
+        options.canonical_backend
     );
+    result.stats.stored_canonical_key_bytes = seed_key.bytes.size();
+    seen.insert(std::move(seed_key));
     result.stats.canonicalizations = 1;
     result.stats.unique_states = 1;
 
@@ -131,6 +131,8 @@ SearchResult run_search(
         t1 = Clock::now();
         result.stats.canonicalization_seconds += seconds_between(t0, t1);
         ++result.stats.canonicalizations;
+        result.stats.total_canonical_key_bytes += key.bytes.size();
+        const auto key_bytes = key.bytes.size();
         if (options.profile_canonical) {
             accumulate_canonical_profile(result.stats, canonical_profile);
         }
@@ -145,6 +147,7 @@ SearchResult run_search(
             return true;
         }
 
+        result.stats.stored_canonical_key_bytes += key_bytes;
         result.stats.unique_states = seen.size();
         frontier.push_back(
             QueueItem{
@@ -246,7 +249,7 @@ std::string search_stats_to_json(
     std::ostringstream out;
     out << std::setprecision(17)
         << '{'
-        << "\"schema\":\"sqtopology.search-summary.v5\","
+        << "\"schema\":\"sqtopology.search-summary.v6\","
         << "\"canonical_backend\":\"" << to_string(stats.canonical_backend) << "\","
         << "\"shard\":{\"index\":" << shard.index
         << ",\"count\":" << shard.count << "},"
@@ -259,6 +262,8 @@ std::string search_stats_to_json(
         << "\"total_candidate_contacts\":" << stats.total_candidate_contacts << ','
         << "\"total_incidence_vertices\":" << stats.total_incidence_vertices << ','
         << "\"total_incidence_edges\":" << stats.total_incidence_edges << ','
+        << "\"total_canonical_key_bytes\":" << stats.total_canonical_key_bytes << ','
+        << "\"stored_canonical_key_bytes\":" << stats.stored_canonical_key_bytes << ','
         << "\"canonical_profile_enabled\":"
         << (stats.canonical_profiled_calls > 0 ? "true" : "false") << ','
         << "\"canonical_profiled_calls\":" << stats.canonical_profiled_calls << ','

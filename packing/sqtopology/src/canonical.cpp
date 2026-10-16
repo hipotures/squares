@@ -40,9 +40,6 @@ namespace {
 
 using Clock = std::chrono::steady_clock;
 
-static_assert(WORDSIZE <= 64, "SQK2 binary key currently supports nauty WORDSIZE <= 64");
-static_assert((WORDSIZE % 8) == 0, "SQK2 binary key requires byte-sized nauty words");
-
 double seconds_between(Clock::time_point start, Clock::time_point end) {
     return std::chrono::duration<double>(end - start).count();
 }
@@ -516,40 +513,60 @@ std::string build_binary_key_bytes(
     const ColoredGraph& graph,
     const CanonicalBackendResult& canonical
 ) {
-    constexpr std::string_view magic = "SQK2";
-    constexpr std::size_t word_bytes = static_cast<std::size_t>(WORDSIZE / 8);
+    constexpr std::string_view magic = "SQK3";
+
+    const auto n = static_cast<std::size_t>(canonical.n);
+    const auto triangle_bits = n * (n - 1U) / 2U;
+    const auto triangle_bytes = (triangle_bits + 7U) / 8U;
 
     std::string bytes;
     bytes.reserve(
         magic.size()
-        + 6U
-        + static_cast<std::size_t>(canonical.n)
-        + canonical.canonical_dense.size() * word_bytes
+        + 5U
+        + n
+        + triangle_bytes
     );
 
     bytes.append(magic);
     bytes.push_back(static_cast<char>(canonical.backend));
     append_u32_be(bytes, static_cast<std::uint32_t>(canonical.n));
-    bytes.push_back(static_cast<char>(WORDSIZE));
 
     for (int i = 0; i < canonical.n; ++i) {
         const auto color = graph.colors[
             static_cast<std::size_t>(canonical.lab[static_cast<std::size_t>(i)])
         ];
         if (color < 0 || color > 255) {
-            throw std::logic_error("canonical vertex color outside SQK2 byte range");
+            throw std::logic_error("canonical vertex color outside SQK3 byte range");
         }
         bytes.push_back(static_cast<char>(color));
     }
 
-    for (const auto raw_word : canonical.canonical_dense) {
-        const auto word = static_cast<std::uint64_t>(raw_word);
-        for (std::size_t byte = 0; byte < word_bytes; ++byte) {
-            const auto shift = static_cast<unsigned>(
-                (word_bytes - 1U - byte) * 8U
-            );
-            bytes.push_back(static_cast<char>((word >> shift) & 0xffU));
+    std::uint8_t packed = 0;
+    unsigned bit_in_byte = 0;
+    for (int i = 0; i < canonical.n; ++i) {
+        const auto* row = GRAPHROW(
+            canonical.canonical_dense.data(),
+            i,
+            canonical.m
+        );
+        for (int j = i + 1; j < canonical.n; ++j) {
+            if (ISELEMENT(row, j)) {
+                packed |= static_cast<std::uint8_t>(1U << (7U - bit_in_byte));
+            }
+            ++bit_in_byte;
+            if (bit_in_byte == 8U) {
+                bytes.push_back(static_cast<char>(packed));
+                packed = 0;
+                bit_in_byte = 0;
+            }
         }
+    }
+    if (bit_in_byte != 0U) {
+        bytes.push_back(static_cast<char>(packed));
+    }
+
+    if (bytes.size() != magic.size() + 5U + n + triangle_bytes) {
+        throw std::logic_error("SQK3 key packing produced an unexpected size");
     }
 
     return bytes;
@@ -642,7 +659,7 @@ std::string canonical_key_hex(const CanonicalKey& key) {
     constexpr char hex[] = "0123456789abcdef";
     std::string text;
     text.reserve(8U + key.bytes.size() * 2U);
-    text.append("SQK2HEX:");
+    text.append("SQK3HEX:");
     for (const unsigned char byte : key.bytes) {
         text.push_back(hex[byte >> 4U]);
         text.push_back(hex[byte & 0x0fU]);

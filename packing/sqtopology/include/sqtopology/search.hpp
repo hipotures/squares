@@ -39,6 +39,8 @@ struct SearchStats {
     std::uint64_t total_candidate_contacts{};
     std::uint64_t total_incidence_vertices{};
     std::uint64_t total_incidence_edges{};
+    std::uint64_t total_canonical_key_bytes{};
+    std::uint64_t stored_canonical_key_bytes{};
     std::uint64_t canonical_profiled_calls{};
     double wall_seconds{};
     double generation_seconds{};

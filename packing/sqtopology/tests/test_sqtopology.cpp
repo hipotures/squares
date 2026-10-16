@@ -318,10 +318,38 @@ void test_binary_key_matches_textual_equivalence() {
         }
 
         expect(
-            canonical_key_hex(binary_keys.front()).starts_with("SQK2HEX:"),
+            canonical_key_hex(binary_keys.front()).starts_with("SQK3HEX:"),
             "retained binary key text must carry the SQK2HEX version marker"
         );
     }
+}
+
+void test_compact_binary_key_layout() {
+    using namespace sqtopology;
+
+    const auto topology = make_fixture("grid-4x4-minus-one").normalized();
+    const auto incidence = to_incidence_graph_validated(topology);
+    const auto key = canonical_key_colored_graph(
+        incidence,
+        CanonicalBackend::Traces
+    );
+
+    const auto n = incidence.vertex_count();
+    const auto triangle_bits = n * (n - 1U) / 2U;
+    const auto triangle_bytes = (triangle_bits + 7U) / 8U;
+    const auto expected_bytes = 4U + 1U + 4U + n + triangle_bytes;
+
+    expect(
+        key.bytes.size() == expected_bytes,
+        "SQK3 must store exactly one packed adjacency triangle"
+    );
+
+    const auto full_matrix_bits = n * n;
+    const auto full_matrix_bytes = (full_matrix_bits + 7U) / 8U;
+    expect(
+        triangle_bytes < full_matrix_bytes,
+        "packed upper triangle must be smaller than a full adjacency matrix"
+    );
 }
 
 void test_canonical_microprofile_preserves_semantics() {
@@ -393,6 +421,10 @@ void test_search_canonical_microprofile() {
     expect(
         json.find("\"canonical_key_build_seconds\":") != std::string::npos,
         "search JSON must expose binary-key construction timing"
+    );
+    expect(
+        json.find("\"stored_canonical_key_bytes\":") != std::string::npos,
+        "search JSON must expose exact stored key payload"
     );
     expect(
         result.stats.canonical_extraction_seconds == 0.0,
@@ -483,6 +515,7 @@ int main() {
         test_validated_incidence_fast_path_matches_checked_path();
         test_backend_names();
         test_binary_key_matches_textual_equivalence();
+        test_compact_binary_key_layout();
         test_canonical_microprofile_preserves_semantics();
         test_search_canonical_microprofile();
         test_search_backends_agree();

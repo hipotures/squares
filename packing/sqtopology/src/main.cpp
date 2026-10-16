@@ -72,7 +72,7 @@ void usage() {
         << "  --max-depth N\n"
         << "  --max-additions N\n"
         << "  --shard INDEX/COUNT\n"
-        << "  --canonical-backend dense-nauty|sparse-nauty|traces\n"
+        << "  --canonical-backend dense-nauty|sparse-nauty|traces (default: traces)\n"
         << "  --json\n"
         << "  --profile-canonical\n"
         << "  --emit-keys FILE\n";

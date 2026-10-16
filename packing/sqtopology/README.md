@@ -77,9 +77,10 @@ Packed-square object vertices all share one color. nauty may therefore permute t
 square IDs are also quotiented out.
 
 The human-facing canonical form remains the full versioned textual encoding (`SQT1|...`).
-Search uses a separate exact binary key (`SQK2`) containing the canonical color sequence
-and nauty's canonical dense adjacency words. Its 64-bit FNV-1a fingerprint is only the
-unordered-set bucket hash: equality is always decided by the complete binary bytes.
+Search uses a separate exact binary key (`SQK3`) containing the canonical color sequence
+and one packed upper triangle of the canonical simple-graph adjacency matrix. Its 64-bit
+FNV-1a fingerprint is only the unordered-set bucket hash: equality is always decided by
+the complete binary bytes.
 
 ### Deliberate coarse choices
 
@@ -193,7 +194,7 @@ The second point is deliberate in phase 1. Shard outputs can be merged offline, 
 future canonical-augmentation search can remove cross-shard overlap if measurements show
 that it matters. Therefore current shard runs are **not** an exhaustive partition proof.
 
-`--emit-keys FILE` writes sorted exact search keys as `SQK2HEX:<hex>` text for offline
+`--emit-keys FILE` writes sorted exact search keys as `SQK3HEX:<hex>` text for offline
 comparison or merge. The hexadecimal rendering is generated only when explicitly requested;
 it is not built per candidate in the search hot path.
 
@@ -237,12 +238,19 @@ tests assert that the checked and validated fast paths produce the same canonica
 
 Phase 1.3 removes human-readable canonical serialization from the search hot path.
 
-After the selected canonical-labeling backend returns, search builds an exact `SQK2` binary key directly from:
+After the selected canonical-labeling backend returns, search builds an exact `SQK3`
+binary key directly from:
 
 - a version marker and backend tag;
-- canonical vertex count and nauty word size;
+- canonical vertex count;
 - the canonical vertex-color sequence;
-- canonical dense adjacency words encoded in deterministic byte order.
+- the strict upper triangle of the canonical adjacency matrix, packed one bit per edge
+  position in deterministic row-major order.
+
+Because the graph is simple and undirected, the lower triangle and diagonal contain no
+additional information. For a representative ~190-vertex incidence graph this reduces
+the adjacency payload from roughly 4.6 KiB of dense nauty words to about 2.2 KiB of
+packed triangle bits before colors/header overhead.
 
 The key is stored in an `unordered_set` together with a cached 64-bit fingerprint used
 only for bucket selection. Hash collisions do not affect correctness because the full
@@ -253,7 +261,7 @@ debugging, and semantic regression tests. Search does not extract canonical edge
 or run `ostringstream` for every candidate anymore.
 
 Tests compare binary-key equality against textual canonical-form equality across symmetry
-transforms and distinct contact types. Retained search keys are rendered as `SQK2HEX:...`
+transforms and distinct contact types. Retained search keys are rendered as `SQK3HEX:...`
 only at the end of a run when `--emit-keys` is requested.
 
 ## Canonical backend comparison
@@ -298,16 +306,24 @@ python3 tools/bench_scaling.py \
 
 All backends consume the same `ColoredGraph` and the same initial color partition.
 Sparse nauty and Traces build sparse adjacency only inside canonicalization, and their
-canonical output is converted to dense words before exact-key construction so the
-post-backend key path is measured consistently.
+canonical output is converted to dense words before the exact-key builder packs the same
+upper-triangle representation used for all backends.
 
-The exact search key format is now `SQK2` and includes a backend tag. This is deliberate:
+The exact search key format is now `SQK3` and includes a backend tag. This is deliberate:
 different canonical-labeling engines are required to identify the same isomorphism classes,
 but they are not required to choose byte-identical canonical labels. Therefore emitted
 keys from different backends must not be merged as if they belonged to one key namespace.
 
 Native tests verify that all three backends induce the same equivalence relation on
 symmetry-transformed fixtures and agree on duplicate/unique counts in a bounded search.
+
+## Exact-key payload accounting
+
+Search summaries report both total candidate-key bytes and the exact payload bytes retained
+for unique states. The scaling harness prints an `exact canonical-key footprint` table
+with average key bytes and stored payload MiB. This is the payload of the equality keys
+themselves, not process RSS; allocator, hash-table, frontier, and topology overhead remain
+outside that number.
 
 ## Canonicalization microprofiling
 
@@ -368,6 +384,7 @@ Native search summaries separately report:
 - unattributed wall time;
 - total candidate-contact count;
 - total incidence vertices and edges;
+- total candidate exact-key bytes and stored unique-key payload bytes;
 - number of profiled canonicalizations;
 - backend input-build, partition, engine, output-conversion, binary-key build, hash,
   and residual search canonicalization times when profiling is enabled;

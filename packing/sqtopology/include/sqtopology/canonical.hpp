@@ -48,8 +48,8 @@ struct CanonicalForm {
 };
 
 // Exact search equality key. fingerprint is only the unordered-set bucket hash;
-// bytes remain the equality oracle. SQK2 keys are backend-tagged because different
-// canonical-labeling engines are not required to choose identical canonical labels.
+// bytes remain the equality oracle. SQK3 keys are backend-tagged and store only
+// the upper triangle of the canonical simple graph adjacency matrix.
 struct CanonicalKey {
     std::string bytes;
     std::uint64_t fingerprint{};
