@@ -77,7 +77,7 @@ Packed-square object vertices all share one color. nauty may therefore permute t
 square IDs are also quotiented out.
 
 The human-facing canonical form remains the full versioned textual encoding (`SQT1|...`).
-Search uses a separate exact binary key (`SQK1`) containing the canonical color sequence
+Search uses a separate exact binary key (`SQK2`) containing the canonical color sequence
 and nauty's canonical dense adjacency words. Its 64-bit FNV-1a fingerprint is only the
 unordered-set bucket hash: equality is always decided by the complete binary bytes.
 
@@ -193,7 +193,7 @@ The second point is deliberate in phase 1. Shard outputs can be merged offline, 
 future canonical-augmentation search can remove cross-shard overlap if measurements show
 that it matters. Therefore current shard runs are **not** an exhaustive partition proof.
 
-`--emit-keys FILE` writes sorted exact search keys as `SQK1HEX:<hex>` text for offline
+`--emit-keys FILE` writes sorted exact search keys as `SQK2HEX:<hex>` text for offline
 comparison or merge. The hexadecimal rendering is generated only when explicitly requested;
 it is not built per candidate in the search hot path.
 
@@ -237,9 +237,9 @@ tests assert that the checked and validated fast paths produce the same canonica
 
 Phase 1.3 removes human-readable canonical serialization from the search hot path.
 
-After `densenauty()`, search now builds an exact `SQK1` binary key directly from:
+After the selected canonical-labeling backend returns, search builds an exact `SQK2` binary key directly from:
 
-- a version marker;
+- a version marker and backend tag;
 - canonical vertex count and nauty word size;
 - the canonical vertex-color sequence;
 - canonical dense adjacency words encoded in deterministic byte order.
@@ -253,7 +253,7 @@ debugging, and semantic regression tests. Search does not extract canonical edge
 or run `ostringstream` for every candidate anymore.
 
 Tests compare binary-key equality against textual canonical-form equality across symmetry
-transforms and distinct contact types. Retained search keys are rendered as `SQK1HEX:...`
+transforms and distinct contact types. Retained search keys are rendered as `SQK2HEX:...`
 only at the end of a run when `--emit-keys` is requested.
 
 ## Canonical backend comparison
