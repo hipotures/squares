@@ -6,8 +6,28 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(NAUTY REQUIRED IMPORTED_TARGET libnauty)
+# Ubuntu 26.04 ships libnauty.pc, while Ubuntu 24.04's libnauty-dev does not.
+# Prefer pkg-config when present, but keep a direct header/library fallback so the
+# native experiment builds on both supported development hosts.
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(NAUTY QUIET IMPORTED_TARGET libnauty)
+endif()
+
+if(TARGET PkgConfig::NAUTY)
+    set(SQTOPOLOGY_NAUTY_TARGET PkgConfig::NAUTY)
+else()
+    find_path(NAUTY_INCLUDE_DIR NAMES nauty.h PATH_SUFFIXES nauty REQUIRED)
+    find_library(NAUTY_LIBRARY NAMES nauty REQUIRED)
+    add_library(sqtopology_nauty UNKNOWN IMPORTED)
+    set_target_properties(
+        sqtopology_nauty
+        PROPERTIES
+            IMPORTED_LOCATION "${NAUTY_LIBRARY}"
+            INTERFACE_INCLUDE_DIRECTORIES "${NAUTY_INCLUDE_DIR}"
+    )
+    set(SQTOPOLOGY_NAUTY_TARGET sqtopology_nauty)
+endif()
 
 add_library(
     sqtopology_core
@@ -19,7 +39,7 @@ add_library(
     src/topology.cpp
 )
 target_include_directories(sqtopology_core PUBLIC include)
-target_link_libraries(sqtopology_core PUBLIC PkgConfig::NAUTY)
+target_link_libraries(sqtopology_core PUBLIC ${SQTOPOLOGY_NAUTY_TARGET})
 target_compile_options(sqtopology_core PRIVATE -Wall -Wextra -Wpedantic)
 
 add_executable(sqtopology src/main.cpp)
