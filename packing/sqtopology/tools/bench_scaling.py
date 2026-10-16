@@ -153,7 +153,16 @@ def run_width(
         "stored_canonical_key_bytes": sum(
             int(item.get("stored_canonical_key_bytes", 0)) for item in summaries
         ),
-        "canonicalization_seconds": summed(summaries, "canonicalization_seconds"),
+        **{
+            key: summed(summaries, key)
+            for key in (
+                "wall_seconds", "generation_seconds", "validation_seconds",
+                "graph_conversion_seconds", "canonicalization_seconds",
+                "dedup_seconds", "unattributed_seconds", "first_level_selected",
+                "total_candidate_contacts", "total_incidence_vertices",
+                "total_incidence_edges",
+            )
+        },
         "canonical_input_build_seconds": summed(
             summaries, "canonical_input_build_seconds"
         ),
@@ -203,6 +212,25 @@ def print_scaling_table(rows: list[dict[str, object]]) -> None:
             f"{float(row['external_wall_seconds']):9.3f} "
             f"{int(row['local_unique_sum']):13d}"
         )
+
+
+def print_stage_profile(rows: list[dict[str, object]]) -> None:
+    print()
+    print("search stages (microseconds per raw candidate; summed worker time)")
+    fields = (
+        ("generation", "generation_seconds"),
+        ("validation", "validation_seconds"),
+        ("graph", "graph_conversion_seconds"),
+        ("canonical", "canonicalization_seconds"),
+        ("dedup", "dedup_seconds"),
+        ("other", "unattributed_seconds"),
+    )
+    print(f"{'workers':>7}" + "".join(f"{label:>12}" for label, _ in fields))
+    for row in rows:
+        scale = 1_000_000.0 / int(row["raw_candidates"]) if row["raw_candidates"] else 0.0
+        print(f"{int(row['workers']):7d}" + "".join(
+            f"{float(row[key]) * scale:12.2f}" for _, key in fields
+        ))
 
 
 def print_canonical_profile(rows: list[dict[str, object]]) -> None:
@@ -300,6 +328,7 @@ def main() -> int:
             rows.append(row)
 
         print_scaling_table(backend_rows)
+        print_stage_profile(backend_rows)
         print_key_footprint(backend_rows)
         if args.profile_canonical:
             print_canonical_profile(backend_rows)
@@ -311,7 +340,7 @@ def main() -> int:
         args.json_report.write_text(
             json.dumps(
                 {
-                    "schema": "sqtopology.scaling-report.v5",
+                    "schema": "sqtopology.scaling-report.v6",
                     "fixture": args.fixture,
                     "seconds": args.seconds,
                     "profile_canonical": args.profile_canonical,
