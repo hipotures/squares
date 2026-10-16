@@ -32,6 +32,11 @@ void expect_valid(
     for (const auto& error : validation.errors) {
         detail += "; " + error;
     }
+    detail += "; keys=[";
+    for (const auto& contact : topology.contacts()) {
+        detail += contact_key(contact) + ",";
+    }
+    detail += "]";
     throw std::runtime_error(detail);
 }
 
