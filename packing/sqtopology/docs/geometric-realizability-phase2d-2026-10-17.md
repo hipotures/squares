@@ -342,7 +342,7 @@ packing geometry.
   acceptances**.
 - **Crossed-pair analytic initializer:** scanning the 148 unresolved CS+CS-dup
   classes found the four tolerance-accepted scenes described in Section 6.
-  The initializer is effective at reaching the approximately `1e-6)-wide
+  The initializer is effective at reaching the approximately `1e-6`-wide
   numerical boundary window that generic starts miss.
 - For the other duplicated kinds no analogous tolerance window was found.
   This is irrelevant to strict geometry (Section 5 already proves all
