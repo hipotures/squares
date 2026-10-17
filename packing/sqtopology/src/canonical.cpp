@@ -334,14 +334,21 @@ std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_dense_edges(
     return edges;
 }
 
+template<bool Relabel = false>
 std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_sparse_edges(
-    const sparsegraph& sparse
+    const sparsegraph& sparse,
+    const std::vector<int>& lab = {}
 ) {
     if (sparse.nv < 0) {
         throw std::logic_error("canonical sparse graph has negative vertex count");
     }
 
     const auto n = static_cast<std::size_t>(sparse.nv);
+    std::vector<int> inverse;
+    if constexpr (Relabel) {
+        inverse.resize(n);
+        for (std::size_t i = 0; i < n; ++i) inverse[static_cast<std::size_t>(lab[i])] = static_cast<int>(i);
+    }
     std::vector<std::pair<std::uint32_t, std::uint32_t>> edges;
     edges.reserve(static_cast<std::size_t>(sparse.nde) / 2U);
 
@@ -349,12 +356,17 @@ std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_sparse_edges(
         // Exact row ordering with four machine words avoids temporary neighbor
         // vectors and comparison sorting. Iterate only occupied words/bits.
         for (std::size_t vertex = 0; vertex < n; ++vertex) {
+            const auto source = Relabel ? static_cast<std::size_t>(lab[vertex]) : vertex;
             std::array<std::uint64_t, 4> neighbors{};
             unsigned occupied = 0;
-            for (int offset = 0; offset < sparse.d[vertex]; ++offset) {
-                const int raw = sparse.e[sparse.v[vertex] + static_cast<std::size_t>(offset)];
-                if (raw < 0 || static_cast<std::size_t>(raw) >= n || raw == static_cast<int>(vertex)) {
+            for (int offset = 0; offset < sparse.d[source]; ++offset) {
+                int raw = sparse.e[sparse.v[source] + static_cast<std::size_t>(offset)];
+                if (raw < 0 || static_cast<std::size_t>(raw) >= n) {
                     throw std::logic_error("canonical sparse graph has an invalid endpoint");
+                }
+                if constexpr (Relabel) raw = inverse[static_cast<std::size_t>(raw)];
+                if (raw == static_cast<int>(vertex)) {
+                    throw std::logic_error("canonical sparse graph contains a self-loop");
                 }
                 const auto neighbor = static_cast<unsigned>(raw);
                 if (vertex < neighbor) {
@@ -390,20 +402,22 @@ std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_sparse_edges(
     std::vector<std::uint32_t> forward_neighbors;
     for (std::size_t vertex = 0; vertex < n; ++vertex) {
         forward_neighbors.clear();
-        const auto begin = sparse.v[vertex];
-        const auto degree = static_cast<std::size_t>(sparse.d[vertex]);
+        const auto source = Relabel ? static_cast<std::size_t>(lab[vertex]) : vertex;
+        const auto begin = sparse.v[source];
+        const auto degree = static_cast<std::size_t>(sparse.d[source]);
         forward_neighbors.reserve(
             std::max(forward_neighbors.capacity(), degree)
         );
 
         for (std::size_t offset = 0; offset < degree; ++offset) {
-            const int neighbor_raw = sparse.e[begin + offset];
+            int neighbor_raw = sparse.e[begin + offset];
             if (neighbor_raw < 0
                 || static_cast<std::size_t>(neighbor_raw) >= n) {
                 throw std::logic_error(
                     "canonical sparse graph edge endpoint outside vertex range"
                 );
             }
+            if constexpr (Relabel) neighbor_raw = inverse[static_cast<std::size_t>(neighbor_raw)];
             const auto neighbor = static_cast<std::size_t>(neighbor_raw);
             if (neighbor == vertex) {
                 throw std::logic_error(
@@ -614,7 +628,7 @@ CanonicalBackendResult run_sparse_backend(
             partition.orbits.data(),
             &options,
             &stats,
-            canonical.get()
+            nullptr
         );
 
         if (profile != nullptr) {
@@ -630,7 +644,11 @@ CanonicalBackendResult run_sparse_backend(
         }
     }
 
-    auto canonical_edges = extract_sparse_edges(*canonical.get());
+    // Traces supports returning the canonical labelling without materializing
+    // canong. Relabel the input CSR directly, exactly as updatecan_tr would.
+    auto canonical_edges = backend == CanonicalBackend::Traces
+        ? extract_sparse_edges<true>(*input.get(), partition.lab)
+        : extract_sparse_edges(*canonical.get());
 
     if (profile != nullptr) {
         profile_add(profile->output_prepare_seconds, profile, stage_started);

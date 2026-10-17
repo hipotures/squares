@@ -208,3 +208,22 @@ row-local storage, not an O(V²) bit-by-bit adjacency scan. Native tests and the
 
 Output ordering fell from 1.44–1.61 to 1.08–1.23 µs across widths.
 Raw measurement: `/tmp/sqtopology-row-bitsets.json`.
+
+## Keep: request only the canonical labeling from Traces
+
+The matching source confirms `canong == NULL` skips only inverse-label copying
+and canonical sparse graph materialization. The wrapper applies the returned
+labeling directly to the input CSR, exactly matching `updatecan_tr`. Sparse nauty
+retains its original output-graph path. Native tests and the 12,000-graph exact
+byte differential pass.
+
+| Workers | Candidates/s | Relative to row bitsets | Engine µs | Output µs |
+| --- | --- | --- | --- | --- |
+| 1 | 100603.4 | 1.032x | 5.02 | 1.27 |
+| 2 | 197729.7 | 1.037x | 5.11 | 1.30 |
+| 4 | 390620.1 | 1.042x | 5.11 | 1.32 |
+| 8 | 752275.2 | 1.027x | 5.28 | 1.37 |
+| 16 | 1348990.0 | 1.034x | 5.66 | 1.45 |
+
+Engine time falls, while output preparation includes the explicit inverse map.
+The combined canonical block improves. Raw measurement: `/tmp/sqtopology-label-only.json`.
