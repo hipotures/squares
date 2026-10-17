@@ -10,15 +10,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # build driven by tools/pgo_train.sh: configure with SQTOPOLOGY_PGO=generate,
 # build, run a training search, then configure with SQTOPOLOGY_PGO=use and
 # rebuild in the same build tree.  The .gcda data therefore lives only in the
-# build directory and is never committed.  PGO changes inlining and block
-# layout but keeps the compiler's default target ISA, so the resulting binary
-# still runs on any x86-64 host; only the tuning is host-specific.
+# build directory and is never committed.  PGO changes inlining and block layout
+# only: it does not introduce a host-specific ISA beyond the compiler and
+# toolchain's normal target configuration.  The resulting optimization is still
+# tuned to the training workload, so the default build leaves it disabled.
 set(SQTOPOLOGY_PGO "" CACHE STRING "Profile-guided optimization: empty, generate, or use")
 if(SQTOPOLOGY_PGO STREQUAL "generate")
     add_compile_options(-fprofile-generate)
     add_link_options(-fprofile-generate)
 elseif(SQTOPOLOGY_PGO STREQUAL "use")
-    add_compile_options(-fprofile-use -fprofile-correction -Wno-missing-profile)
+    # Profile diagnostics are not suppressed here.  The per-target block below
+    # makes a missing or unreadable profile a hard error for every object the
+    # training run links, so a use build cannot silently fall back to non-PGO code.
+    add_compile_options(-fprofile-use -fprofile-correction)
 elseif(NOT SQTOPOLOGY_PGO STREQUAL "")
     message(FATAL_ERROR "SQTOPOLOGY_PGO must be empty, generate, or use")
 endif()
@@ -98,6 +102,21 @@ add_executable(sqtopology_tests tests/test_sqtopology.cpp)
 target_link_libraries(sqtopology_tests PRIVATE sqtopology_core)
 target_compile_options(sqtopology_tests PRIVATE -Wall -Wextra -Wpedantic)
 add_test(NAME sqtopology_tests COMMAND sqtopology_tests)
+
+if(SQTOPOLOGY_PGO STREQUAL "use")
+    # Every object that the training run links into the sqtopology binary must have
+    # profile data.  Turning a missing or unreadable profile into an error here means
+    # a misconfigured use build fails loudly instead of silently dropping PGO.
+    foreach(target sqtopology_core sqtopology)
+        target_compile_options(${target} PRIVATE -Wmissing-profile -Werror=missing-profile)
+    endforeach()
+    if(TARGET sqtopology_cached_traces)
+        target_compile_options(sqtopology_cached_traces PRIVATE
+            -Wmissing-profile -Werror=missing-profile)
+    endif()
+    # The test binary is not part of the training workload, so it has no profile.
+    target_compile_options(sqtopology_tests PRIVATE -Wno-missing-profile)
+endif()
 
 option(SQTOPOLOGY_BOOST_FLAT_SET "Use Boost's exact flat set for search deduplication" ON)
 if(SQTOPOLOGY_BOOST_FLAT_SET)
