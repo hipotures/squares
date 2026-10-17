@@ -78,7 +78,7 @@ square IDs are also quotiented out.
 
 The human-facing canonical form remains the full versioned textual encoding (`SQT1|...`).
 Search uses a separate exact binary key (`SQK4`) containing the canonical color sequence
-and an exact sorted canonical edge list. Its 64-bit FNV-1a fingerprint is only the
+and an exact sorted canonical edge list. Its cached standard-library string fingerprint is only the
 unordered-set bucket hash: equality is always decided by the complete binary bytes.
 
 ### Deliberate coarse choices
@@ -272,7 +272,7 @@ result to a dense matrix or scan O(V^2) possible adjacency positions. Dense naut
 available as a comparison backend and extracts its edge list from the dense canonical
 matrix.
 
-The key is stored in an `unordered_set` together with a cached 64-bit fingerprint used
+The key is stored in an `unordered_set` together with a cached string fingerprint used
 only for bucket selection. Hash collisions do not affect correctness because the full
 binary key bytes remain the equality oracle.
 
@@ -381,7 +381,7 @@ The search hot path is split into:
 - canonical engine call (`densenauty`, `sparsenauty`, or `Traces`);
 - sparse canonical-output preparation;
 - exact binary-key construction;
-- cached FNV-1a bucket hash;
+- cached standard-library bucket hash;
 - residual canonical-block time not covered by those regions.
 
 The human-facing `CanonicalForm` path still has extraction and textual-encoding timers,

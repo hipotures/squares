@@ -10,6 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 namespace {
@@ -590,6 +591,19 @@ void test_search_backends_agree() {
     );
 }
 
+void test_search_key_hash_collisions() {
+    using namespace sqtopology;
+    auto first = canonical_key(make_fixture("corner-corner-2"), CanonicalBackend::Traces);
+    auto second = canonical_key(make_fixture("side-side-2"), CanonicalBackend::Traces);
+    // Deliberately force the same bucket hash for different complete keys.
+    second.fingerprint = first.fingerprint;
+    std::unordered_set<CanonicalKey, CanonicalKeyHash> seen;
+    expect(seen.insert(first).second, "first exact key must insert");
+    expect(seen.insert(second).second, "hash collisions must retain distinct exact keys");
+    expect(!seen.insert(first).second, "identical full bytes must deduplicate");
+    expect(seen.size() == 2, "hash values must never decide canonical equality");
+}
+
 void test_canonical_equality_uses_encoding() {
     using namespace sqtopology;
 
@@ -629,6 +643,7 @@ int main() {
         test_canonical_microprofile_preserves_semantics();
         test_search_canonical_microprofile();
         test_search_backends_agree();
+        test_search_key_hash_collisions();
         test_canonical_equality_uses_encoding();
         std::cout << "sqtopology_tests: all tests passed\n";
         return 0;

@@ -94,3 +94,30 @@ contact ordering to append-and-normalize, including reversed endpoints. The
 | 16 | 971772.5 | 1.095x | 0.27 |
 
 Raw measurement: `/tmp/sqtopology-insert.json`.
+
+## Reject: wrapper sparsegraph buffer reuse
+
+Reusing thread-local sparse input/output owners and the CSR fill cursor saved
+only about 0.05 µs of input setup and 0.04 µs of residual canonical time.
+Measured rates were 72,825 / 143,570 / 282,807 / 550,205 / 961,111 candidates/s.
+Relative to sorted insertion this is +1.3 / +2.2 / +0.5 / +1.5 / -1.1 percent.
+The result is too small/noisy, with no 16-worker gain; revert the experiment
+completely. Raw measurement: `/tmp/sqtopology-sparse-reuse.json`.
+
+## Keep: block-based bucket hashing with exact byte equality
+
+Search caches the standard-library string hash. Human-facing canonical-form
+FNV fingerprints and emitted exact-key bytes are unchanged. A forced hash
+collision test verifies that full key bytes still decide set membership.
+The clean benchmark excludes the rejected sparse buffer experiment.
+
+| Workers | Candidates/s | Relative to sorted insertion |
+| --- | --- | --- |
+| 1 | 75741.2 | 1.054x |
+| 2 | 149038.8 | 1.061x |
+| 4 | 291850.2 | 1.037x |
+| 8 | 566251.5 | 1.044x |
+| 16 | 1021216.5 | 1.051x |
+
+Hash time fell from about 0.68 to 0.10 µs at one worker.
+Raw measurement: `/tmp/sqtopology-hash-only.json`.

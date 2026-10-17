@@ -4,6 +4,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <numeric>
 #include <sstream>
@@ -777,7 +778,9 @@ CanonicalKey canonical_key_colored_graph(
         stage_started = Clock::now();
     }
 
-    key.fingerprint = stable_fingerprint(key.bytes);
+    // Bucket selection only: full bytes remain the equality oracle. libstdc++
+    // hashes blocks rather than the serial byte-at-a-time inspection FNV hash.
+    key.fingerprint = std::hash<std::string_view>{}(key.bytes);
 
     if (profile != nullptr) {
         profile_add(profile->hash_seconds, profile, stage_started);
