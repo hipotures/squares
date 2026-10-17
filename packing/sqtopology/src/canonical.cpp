@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -343,6 +344,45 @@ std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_sparse_edges(
     const auto n = static_cast<std::size_t>(sparse.nv);
     std::vector<std::pair<std::uint32_t, std::uint32_t>> edges;
     edges.reserve(static_cast<std::size_t>(sparse.nde) / 2U);
+
+    if (n <= 256U) {
+        // Exact row ordering with four machine words avoids temporary neighbor
+        // vectors and comparison sorting. Iterate only occupied words/bits.
+        for (std::size_t vertex = 0; vertex < n; ++vertex) {
+            std::array<std::uint64_t, 4> neighbors{};
+            unsigned occupied = 0;
+            for (int offset = 0; offset < sparse.d[vertex]; ++offset) {
+                const int raw = sparse.e[sparse.v[vertex] + static_cast<std::size_t>(offset)];
+                if (raw < 0 || static_cast<std::size_t>(raw) >= n || raw == static_cast<int>(vertex)) {
+                    throw std::logic_error("canonical sparse graph has an invalid endpoint");
+                }
+                const auto neighbor = static_cast<unsigned>(raw);
+                if (vertex < neighbor) {
+                    const auto word = neighbor / 64U;
+                    const auto bit = std::uint64_t{1} << (neighbor % 64U);
+                    if (neighbors[word] & bit) {
+                        throw std::logic_error("canonical sparse graph contains duplicate edges");
+                    }
+                    neighbors[word] |= bit;
+                    occupied |= 1U << word;
+                }
+            }
+            while (occupied) {
+                const auto word = std::countr_zero(occupied);
+                occupied &= occupied - 1U;
+                auto bits = neighbors[static_cast<std::size_t>(word)];
+                while (bits) {
+                    const auto neighbor = static_cast<std::uint32_t>(word * 64 + std::countr_zero(bits));
+                    bits &= bits - 1U;
+                    edges.emplace_back(static_cast<std::uint32_t>(vertex), neighbor);
+                }
+            }
+        }
+        if (edges.size() * 2U != static_cast<std::size_t>(sparse.nde)) {
+            throw std::logic_error("canonical sparse graph is not simple and undirected");
+        }
+        return edges;
+    }
 
     // Canonical vertices are visited in ascending order, so only each vertex's
     // forward-neighbor list needs sorting. Incidence degrees are small; this is

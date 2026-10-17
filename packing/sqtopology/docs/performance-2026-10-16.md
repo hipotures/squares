@@ -189,3 +189,22 @@ idempotence on all backends. The 12,000-graph byte differential passes.
 Key construction fell from ~0.84 to ~0.34 µs at one worker. Its engine timer
 returned to 5.57 µs, consistent with the earlier source-cache controls.
 Raw measurement: `/tmp/sqtopology-byte-writer.json`.
+
+## Keep: small sparse-row bitset ordering
+
+For graphs with at most 256 vertices, four 64-bit words order each exact forward
+neighbor set by occupied-word and set-bit iteration. Larger graphs keep local
+comparison sorting. Duplicate/range/self-loop checks remain. This is bounded
+row-local storage, not an O(V²) bit-by-bit adjacency scan. Native tests and the
+12,000-graph byte differential pass.
+
+| Workers | Candidates/s | Relative to direct byte writer | Output µs |
+| --- | --- | --- | --- |
+| 1 | 97509.6 | 1.034x | 1.08 |
+| 2 | 190693.5 | 1.019x | 1.12 |
+| 4 | 374960.5 | 1.031x | 1.15 |
+| 8 | 732844.1 | 1.032x | 1.17 |
+| 16 | 1304655.8 | 1.030x | 1.23 |
+
+Output ordering fell from 1.44–1.61 to 1.08–1.23 µs across widths.
+Raw measurement: `/tmp/sqtopology-row-bitsets.json`.
