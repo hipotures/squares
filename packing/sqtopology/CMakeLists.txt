@@ -114,6 +114,29 @@ target_compile_definitions(sqtopology_tests PRIVATE
     SQTOPOLOGY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME sqtopology_tests COMMAND sqtopology_tests)
 
+add_executable(sqtopology_orbit_tests tests/test_orbit.cpp)
+target_link_libraries(sqtopology_orbit_tests PRIVATE sqtopology_core)
+target_compile_options(sqtopology_orbit_tests PRIVATE -Wall -Wextra -Wpedantic)
+target_compile_definitions(sqtopology_orbit_tests PRIVATE
+    SQTOPOLOGY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(NAME sqtopology_orbit_tests COMMAND sqtopology_orbit_tests)
+
+# Independent Python re-implementation of the n=1..n=3 Burnside counts. It
+# exists only as a differential validator for the C++ oracle and is skipped
+# when no Python 3 interpreter is available. The deep brute-force mode also
+# recomputes small hypercube layers directly from the action without Burnside.
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND)
+    add_test(
+        NAME sqtopology_orbit_reference
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tools/orbit_reference.py
+            --check-tool $<TARGET_FILE:sqtopology_orbit>
+            --max-n 3
+            --deep-brute
+    )
+endif()
+
 if(SQTOPOLOGY_PGO STREQUAL "use")
     # Every object that the training run links into the sqtopology binary must have
     # profile data.  Turning a missing or unreadable profile into an error here means
