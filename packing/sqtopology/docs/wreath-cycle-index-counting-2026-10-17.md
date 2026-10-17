@@ -46,10 +46,14 @@ enumeration is still the wrong tool at `n = 5`, just less so by 25%.
   `C(d+2, 2)` (proved in section 5; verified for `d <= 5`). The `a_0..a_6`
   table for `n = 1..11` is committed as a golden; `a_6` is still rising at
   `n = 11`, and the theorem predicts `a_6(12) = 443,748,944`.
-- Staged symmetry compression (local `D4^n`, `S_n x D4_container`,
-  `D4 wr S_n`, full `G_n`) is computed for `n <= 6` and weight `<= 4`; stage 4
-  equals the full low-weight counter, and the compression is dominated by the
-  square permutations plus the container, not by the local `D4`s.
+- Symmetry-subgroup compression is computed for `n <= 6` and weight `<= 4`
+  under `D4^n`, `S_n x D4_container`, `D4 wr S_n`, and the full `G_n`.
+  These are comparison quotients from related subgroups, not one four-step nested
+  chain: `D4^n < D4 wr S_n < G_n`, while `S_n x D4_container` is a different
+  subgroup of `G_n`. The data therefore do not support attributing "most" of the
+  compression to one symmetry source by comparing the partial-quotient counts
+  directly. At `n=6`, weight 4, the local-only quotient actually reduces the
+  labeled layer slightly more than the square-permutation-plus-container quotient.
 - Trivial-stabilizer spectra: an elementary bound (trivial stabilizer implies
   support `= n`, hence `n <= 2d`) is checked; for `n = 1` the full weight
   spectrum `0..32` is symmetric and reaches 0.9925 at `d = 15`; for `n = 2,
@@ -377,35 +381,48 @@ The `a_d(2d)` values themselves (`5, 125, 3660, 152283, 7646706, ...`) are
 computed, not derived; only their increments at the stabilization point have
 the proof above.
 
-## 6. Staged symmetry compression
+## 6. Symmetry-subgroup compression: related quotients, not one nested chain
 
-Four nested quotients were computed for `n <= 6`, weight `<= 4`:
+Four exact quotient counts were computed for `n <= 6`, weight `<= 4`:
 
-| stage | group | order |
+| label | group | order |
 |---|---|---|
-| 1. `local_only` | `D4^n` | `8^n` |
-| 2. `squares_only` | `S_n x D4_container` | `n! * 8` |
-| 3. `local_and_squares` | `D4 wr S_n` | `n! * 8^n` |
-| 4. `full` | `G_n` | `n! * 8^n * 8` |
+| `local_only` | `D4^n` | `8^n` |
+| `squares_only` | `S_n x D4_container` | `n! * 8` |
+| `local_and_squares` | `D4 wr S_n` | `n! * 8^n` |
+| `full` | `G_n` | `n! * 8^n * 8` |
 
-Stage 4 is exactly the low-weight mode of the full counter (asserted for every
-`n = 2..6` in the tests). Full rows for `n = 1` and `n = 2`:
+The earlier wording called these "four nested quotients". That is not correct.
+The containments are
 
-| n | stage | `a_0` | `a_1` | `a_2` | `a_3` | `a_4` |
+```
+D4^n  <  D4 wr S_n  <  G_n,
+S_n x D4_container  <  G_n,
+```
+
+while `D4^n` and `S_n x D4_container` are not consecutive members of one
+subgroup chain. Consequently, ratios involving `local_only` and
+`squares_only` are useful comparative measurements, but they cannot be read
+as an additive or uniquely attributable decomposition of the total compression.
+The symmetry actions overlap and interact.
+
+The `full` row is exactly the low-weight mode of the full counter (asserted for
+every `n = 2..6` in the tests). Full rows for `n = 1` and `n = 2`:
+
+| n | quotient | `a_0` | `a_1` | `a_2` | `a_3` | `a_4` |
 |---:|---|---:|---:|---:|---:|---:|
 | 1 | local | 1 | 8 | 84 | 696 | 4748 |
-| 1 | squares | 1 | 8 | 100 | 792 | 5244 |
+| 1 | squares+container | 1 | 8 | 100 | 792 | 5244 |
 | 1 | wreath | 1 | 8 | 84 | 696 | 4748 |
 | 1 | full | 1 | 2 | 22 | 116 | 744 |
 | 2 | local | 1 | 20 | 456 | 10224 | 228500 |
-| 2 | squares | 1 | 44 | 1756 | 53028 | 1303352 |
+| 2 | squares+container | 1 | 44 | 1756 | 53028 | 1303352 |
 | 2 | wreath | 1 | 11 | 236 | 5150 | 114490 |
 | 2 | full | 1 | 5 | 87 | 1411 | 26620 |
 
-Weight-4 column for all computed rows, with the compression factor against
-the full count:
+Weight-4 column for all computed rows:
 
-| n | local | squares | wreath | full | local/full | squares/full |
+| n | local | squares+container | wreath | full | local/full | squares/full |
 |---:|---:|---:|---:|---:|---:|---:|
 | 1 | 4748 | 5244 | 4748 | 744 | 6.4x | 7.0x |
 | 2 | 228500 | 1303352 | 114490 | 26620 | 8.6x | 49.0x |
@@ -414,21 +431,48 @@ the full count:
 | 5 | 26649780 | 87797686 | 432142 | 150193 | 177.4x | 584.6x |
 | 6 | 72228348 | 98039030 | 435031 | 152092 | 474.9x | 644.6x |
 
-Observations:
+The last two columns answer a specific conditional question: how much smaller the
+full quotient is than each partial quotient. They do **not** say which symmetry
+source "caused most" of the total compression.
 
-- The local `D4^n` quotient becomes weaker as `n` grows (many events, small
-  group), while the square-permutation/container stages carry nearly all of
-  the compression at larger `n`. At `n = 6` weight 4, full/local ~ 1/475 and
-  full/squares ~ 1/645.
-- At `n = 1` the wreath stage equals the local stage because
-  `D4 wr S_1 = D4`, and `squares_only = S_1 x D4_container = D4`; the two
-  `D4` actions differ in their embedding relative to the events (local rings
-  vs container rings), which is why `squares_only` differs from `local_only`
-  from weight 2 on.
-- Like `a_d(n)` itself, every stage stabilizes for `n >= 2d` (same support
-  argument). At `n = 6` the full weight-4 column (152092) is still below its
-  `n = 8` value 152283; the other stages were not computed at `n = 7, 8`
-  (staged is capped at `n = 6`).
+For a cleaner baseline, at `n=6`, weight 4, the unquotiented labeled layer has
+
+```
+C(E(6),4) = C(1152,4) = 73,001,944,800
+```
+
+configurations. Relative to that same labeled layer:
+
+- local `D4^6`: `73,001,944,800 / 72,228,348 ~= 1,010.7x` compression;
+- `S_6 x D4_container`: `73,001,944,800 / 98,039,030 ~= 744.6x`;
+- `D4 wr S_6`: `73,001,944,800 / 435,031 ~= 167,808.6x`;
+- full `G_6`: `73,001,944,800 / 152,092 ~= 479,985.4x`.
+
+Thus the previous conclusion that square permutations plus the container
+"dominate" while local `D4` is weak is not supported. On this measured layer,
+the local-only quotient is itself slightly stronger than the
+square-permutation-plus-container quotient. Along the genuinely nested chain
+
+```
+labeled -> D4^6 -> D4 wr S_6 -> G_6
+```
+
+the successive reductions at weight 4 are approximately `1010.7x`,
+`166.0x`, and `2.86x`. Along the alternative comparison
+`labeled -> (S_6 x D4_container) -> G_6`, the reductions are approximately
+`744.6x` and `644.6x`. These numbers demonstrate strong contribution from
+both symmetry families and a substantial interaction; they should not be
+interpreted as a unique factorization of compression.
+
+At `n = 1` the wreath quotient equals the local quotient because
+`D4 wr S_1 = D4`, while `S_1 x D4_container = D4` acts on a different
+coordinate factor (container walls rather than local square features), so the
+two partial quotient counts need not agree beyond weight 1.
+
+Like `a_d(n)` itself, every subgroup-orbit count shown here stabilizes once
+`n >= 2d` by the same support argument. At `n = 6` the full weight-4 value
+(152092) is still below its `n = 8` stabilized value 152283; the other
+subgroup rows were not extended to `n=7,8` in this campaign.
 
 ## 7. Trivial-stabilizer spectra
 
