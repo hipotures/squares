@@ -9,6 +9,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <unordered_set>
+#ifdef SQTOPOLOGY_BOOST_FLAT_SET
+#include <boost/unordered/unordered_flat_set.hpp>
+#endif
 #include <utility>
 
 #include <sys/resource.h>
@@ -83,7 +86,11 @@ SearchResult run_search(
     const bool have_initial_usage = getrusage(RUSAGE_SELF, &initial_usage) == 0;
     const auto started = Clock::now();
 
+#ifdef SQTOPOLOGY_BOOST_FLAT_SET
+    boost::unordered_flat_set<CanonicalKey, CanonicalKeyHash> seen;
+#else
     std::unordered_set<CanonicalKey, CanonicalKeyHash> seen;
+#endif
     if (options.max_unique != 0) {
         seen.reserve(options.max_unique);
     }

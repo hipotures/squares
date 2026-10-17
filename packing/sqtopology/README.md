@@ -277,8 +277,10 @@ result to a dense matrix or scan O(V^2) possible adjacency positions. Dense naut
 available as a comparison backend and extracts its edge list from the dense canonical
 matrix.
 
-The key is stored in an `unordered_set` together with a cached string fingerprint used
-only for bucket selection. Hash collisions do not affect correctness because the full
+The key is stored in an exact hash set together with a cached string fingerprint
+used for bucket selection. Search uses Boost's `unordered_flat_set` when its headers
+are available, with `std::unordered_set` as a fallback. Set
+`-DSQTOPOLOGY_BOOST_FLAT_SET=OFF` for the standard-container comparison. Hash collisions do not affect correctness because the full
 binary key bytes remain the equality oracle.
 
 The old `CanonicalForm` / `SQT1|...` representation is retained for inspection, JSON,

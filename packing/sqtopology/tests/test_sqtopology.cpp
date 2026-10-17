@@ -13,6 +13,9 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
+#ifdef SQTOPOLOGY_BOOST_FLAT_SET
+#include <boost/unordered/unordered_flat_set.hpp>
+#endif
 #include <vector>
 
 namespace {
@@ -664,7 +667,11 @@ void test_search_key_hash_collisions() {
     auto second = canonical_key(make_fixture("side-side-2"), CanonicalBackend::Traces);
     // Deliberately force the same bucket hash for different complete keys.
     second.fingerprint = first.fingerprint;
+#ifdef SQTOPOLOGY_BOOST_FLAT_SET
+    boost::unordered_flat_set<CanonicalKey, CanonicalKeyHash> seen;
+#else
     std::unordered_set<CanonicalKey, CanonicalKeyHash> seen;
+#endif
     expect(seen.insert(first).second, "first exact key must insert");
     expect(seen.insert(second).second, "hash collisions must retain distinct exact keys");
     expect(!seen.insert(first).second, "identical full bytes must deduplicate");

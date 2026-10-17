@@ -250,3 +250,44 @@ variation, not added cold-path accounting cost. Add opt-in `--pin-workers` and
 `--cpus` controls for close comparisons; the primary benchmark remains unpinned.
 The native affinity smoke run processed its exact 32-candidate bound and recorded
 CPU 0 correctly. LTO comparisons use the primary benchmark plus pinned repeats.
+
+## Reject: link-time optimization
+
+The full LTO benchmark measured 102,994 / 201,692 / 395,244 / 760,757 /
+1,392,463 candidates/s, but the contemporaneous unpinned control had placement
+noise. Fixed-affinity 1/16-worker comparisons measured control 100,919 / 1,367,300
+versus LTO 102,318 / 1,396,918. Reversed-order repeats measured LTO 102,910 /
+1,350,940 versus control 101,845 / 1,364,940. The ~1% single-worker gain and
+mixed 16-worker result are insufficient. No LTO setting is retained. Native
+tests and the byte differential passed. Reports: `/tmp/sqtopology-lto*.json`.
+
+## Reject: native instruction tuning
+
+`-march=native` passed tests and the byte differential. Its primary rates were
+101,614 / 197,056 / 390,627 / 746,241 / 1,341,328 candidates/s, close to the
+retained generic build. Pinned repeats showed no meaningful single-worker gain
+and no 16-worker advantage. Do not retain host-specific codegen flags without a
+clear benefit. Reports: `/tmp/sqtopology-native*.json`.
+
+The nauty 2.8.8 source was also inspected: its Traces implementation guards the
+same optional `canong` operations as 2.9.3, confirming the label-only API usage
+for the older stock-engine fallback.
+
+## Keep: exact flat-set deduplication
+
+The installed Boost 1.90 flat set uses compact group metadata to filter candidate
+slots, then calls the full-byte equality predicate. Its actual headers were
+inspected. The selected-container test forces equal hash values for different
+keys. Native tests and the 10,000-candidate exact-key differential pass.
+Boost headers are optional; CMake can select the standard-container fallback.
+
+| Workers | Candidates/s | Relative to label-only best | Dedup µs |
+| --- | --- | --- | --- |
+| 1 | 102631.9 | 1.020x | 0.25 |
+| 2 | 204225.5 | 1.033x | 0.28 |
+| 4 | 406505.6 | 1.041x | 0.31 |
+| 8 | 774411.9 | 1.029x | 0.32 |
+| 16 | 1402866.7 | 1.040x | 0.26 |
+
+At 16 workers, summed peak RSS fell from 12,556 to 12,255 MiB for the same
+12,972,556 retained exact keys. Raw measurement: `/tmp/sqtopology-flat-set.json`.
