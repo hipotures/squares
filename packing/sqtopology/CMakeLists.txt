@@ -179,7 +179,7 @@ add_test(
     COMMAND sqtopology_realize corpus --n 3 --weight 3 --count-only
 )
 set_tests_properties(sqtopology_realize_count_n3_w3 PROPERTIES
-    PASS_REGULAR_EXPRESSION "\"class_count\":2979")
+    PASS_REGULAR_EXPRESSION "\"class_count\":2979,\"support_histogram\":\\[116,1295,1568\\]")
 
 # Separate target for the n = 12 low-weight closure: |G_12| ~ 2.6e20 exceeds
 # 64 bits and one live class-aggregated run costs ~14 s, so it is kept out of

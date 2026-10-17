@@ -1588,6 +1588,52 @@ void test_wreath_low_weight_table() {
     expect(columns[6][11] == "443748944", "a_6 stabilizes at n=12");
 }
 
+// Support decomposition theorem (Phase-2d): the number f_d(k) of G_n-orbits
+// (any n >= k) of weight-d event sets with support exactly k equals
+// a_d(k) - a_d(k-1), so a_d(n) = sum_{k<=n} f_d(k), f_d(k) = 0 for k > 2d,
+// and the stabilization increment a_d(2d) - a_d(2d-1) = f_d(2d) = C(d+2, 2).
+// This test checks the arithmetic consequences against the exact table.
+void test_support_decomposition() {
+    const std::string table_json = read_source_file("tests/data/wreath-low-weight.json");
+    const std::array<std::vector<std::string>, 7> columns{
+        extract_string_array(table_json, "a0"),
+        extract_string_array(table_json, "a1"),
+        extract_string_array(table_json, "a2"),
+        extract_string_array(table_json, "a3"),
+        extract_string_array(table_json, "a4"),
+        extract_string_array(table_json, "a5"),
+        extract_string_array(table_json, "a6"),
+    };
+    for (std::size_t d = 1; d <= 6; ++d) {
+        unsigned long long previous = 0;
+        unsigned long long partial = 0;
+        for (std::size_t index = 0; index < 12; ++index) {
+            const unsigned long long a = std::stoull(columns[d][index]);
+            const unsigned long long f = a - previous; // f_d(k), k = index + 1
+            const std::size_t k = index + 1;
+            expect(a >= previous, "support differences are non-negative");
+            partial += f;
+            expect(partial == a, "support partial sums reproduce a_d(n)");
+            if (k > 2 * d) {
+                expect(f == 0, "f_d(k) = 0 for k > 2d");
+            }
+            previous = a;
+        }
+        // The increment at the stabilization point is C(d+2, 2).
+        const unsigned long long stable = std::stoull(columns[d][2 * d - 1]);
+        const unsigned long long before = std::stoull(columns[d][2 * d - 2]);
+        const unsigned long long binomial = (d + 2) * (d + 1) / 2;
+        expect(stable - before == binomial, "f_d(2d) = C(d+2, 2)");
+    }
+    // Explicit slices used by the realizability corpora.
+    expect(std::stoull(columns[2][0]) == 22, "f_2(1) = a_2(1) = 22");
+    expect(std::stoull(columns[2][1]) - std::stoull(columns[2][0]) == 65, "f_2(2) = 65");
+    expect(std::stoull(columns[2][2]) - std::stoull(columns[2][1]) == 32, "f_2(3) = 32");
+    expect(std::stoull(columns[3][0]) == 116, "f_3(1) = a_3(1) = 116");
+    expect(std::stoull(columns[3][1]) - std::stoull(columns[3][0]) == 1295, "f_3(2) = 1295");
+    expect(std::stoull(columns[3][2]) - std::stoull(columns[3][1]) == 1568, "f_3(3) = 1568");
+}
+
 // n = 12 closes the low-weight table: the group order |G_12| ~ 2.6e20 exceeds
 // 64 bits, so the order and class-size sum travel as decimal strings, while
 // a_0..a_6 must reproduce the stabilized a_d(2d) values, including
@@ -1729,6 +1775,7 @@ int main(int argc, char** argv) {
         test_wreath_cross_check();
         test_wreath_golden_and_full_counts();
         test_wreath_low_weight_table();
+        test_support_decomposition();
         test_staged_quotients();
         test_research_matches_burnside_and_accounting();
         test_seed_distances_n2();

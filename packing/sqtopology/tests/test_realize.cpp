@@ -1169,6 +1169,63 @@ void test_support_and_embedding() {
     }
 }
 
+void test_support_histograms_and_crossed_pair() {
+    // Support decomposition theorem: the support-k histogram of the
+    // (n, d) corpus equals a_d(k) - a_d(k-1) (a_d(0) = 0), independent of
+    // n >= k. Exact orbit table values from the wreath note.
+    auto histogram = [](std::uint32_t n, std::uint32_t d) {
+        std::vector<std::size_t> h(n + 1U, 0);
+        for (const auto& entry : corpus_classes(n, d)) {
+            ++h[support_size(entry.topology)];
+        }
+        return h;
+    };
+    // a_1 = (2, 5, 5) -> f_1 = (2, 3, 0); a_2 = (22, 87, 119) -> f_2 = (22, 65, 32);
+    // a_3(1) = 116, a_3(2) = 1411 -> f_3(1) = 116, f_3(2) = 1295.
+    expect(histogram(2, 1) == std::vector<std::size_t>{0, 2, 3}, "support histogram n=2 d=1");
+    expect(histogram(3, 1) == std::vector<std::size_t>{0, 2, 3, 0}, "support histogram n=3 d=1");
+    expect(histogram(2, 2) == std::vector<std::size_t>{0, 22, 65}, "support histogram n=2 d=2");
+    expect(histogram(3, 2) == std::vector<std::size_t>{0, 22, 65, 32}, "support histogram n=3 d=2");
+    expect(histogram(2, 3) == std::vector<std::size_t>{0, 116, 1295}, "support histogram n=2 d=3");
+
+    // Crossed antiparallel CS+CS pair with an SS third square: a feasible
+    // wall-free V+duplicate scene (n = 3 weight-3 class 2587's orbit). Two
+    // contacts between one pair are impossible at exact level (Phase-2d pair
+    // theorem); this scene lives in the tolerance boundary (SAT slack ~ -2e-8)
+    // and the SS absorption convention removes the endpoint events.
+    {
+        Topology topology(3);
+        topology.add_contact(
+            make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(
+            make_square_contact(FeatureRef{1, FeatureKind::Corner, 0},
+                                FeatureRef{0, FeatureKind::Side, 0}));
+        topology.add_contact(
+            make_square_contact(FeatureRef{1, FeatureKind::Side, 2},
+                                FeatureRef{2, FeatureKind::Side, 2}));
+        topology = topology.normalized();
+        expect(support_size(topology) == 3, "crossed-pair V+dup topology has full support");
+        const SquarePose a{2.3581582979287399, 2.2499996613256004, -6.8551619145677926e-07, false};
+        const SquarePose b{1.4488150451537039, 3.24999999059317, 3.1415926353626373, false};
+        const auto e = side_endpoints(b, 2);
+        const Vec2 mid = side_midpoint_position(b, 2);
+        Vec2 nrm{mid.x - b.x, mid.y - b.y};
+        const double nn = norm(nrm);
+        nrm.x /= nn; nrm.y /= nn;
+        Vec2 dvec{e[1].x - e[0].x, e[1].y - e[0].y};
+        const double dd = norm(dvec);
+        dvec.x /= dd; dvec.y /= dd;
+        const Vec2 cm{mid.x + nrm.x * 0.5 + 0.45 * dvec.x, mid.y + nrm.y * 0.5 + 0.45 * dvec.y};
+        Scene scene;
+        scene.container_side = 1000.0;
+        scene.squares = {a, b, SquarePose{cm.x, cm.y, b.theta + 3.14159265358979323846, false}};
+        const WitnessReport report = verify_witness(scene, topology);
+        expect(report.exact_accepted,
+               "the crossed CS+CS pair with an SS third square is an exact witness");
+    }
+}
+
 void test_weight_one_golden() {
     // Committed machine-readable record of one deterministic n = 2 weight-1
     // run. Floating-point digits are not pinned (they are platform dependent);
@@ -1250,6 +1307,7 @@ int main() {
         {"corpus weight one solves", test_corpus_weight_one_solves},
         {"n = 3 weight one", test_n3_weight_one},
         {"support and embedding", test_support_and_embedding},
+        {"support histograms and crossed pair", test_support_histograms_and_crossed_pair},
         {"weight one golden", test_weight_one_golden},
         {"status and JSON shapes", test_status_and_json_shapes},
     };

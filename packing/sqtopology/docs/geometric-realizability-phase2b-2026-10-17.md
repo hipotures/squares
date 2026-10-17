@@ -389,8 +389,16 @@ or verified witnesses; no numerical failure is reported as impossibility.
   tolerance-safe without an additional SAT-coupling proof. (Phase-2c adopted
   the CS case as R14 via a local half-plane proof; the CC case stays open.)
 - The `H_n` branch reduction is exact but requires the per-`n` permutation
-  cache; for very large `n` the cache grows as `4^n * E(n)` and should be
-  built lazily or streamed.
+  cache. Corrected asymptotics (Phase-2d): the cache holds one `E(n)`-length
+  event permutation per parity-consistent element, and
+  `|H_n| = |G_n| / 2^n = n! * 4^n * 8`, so its memory is
+  `O(n! * 4^n * E(n))` - not `O(4^n * E(n))` as first written. Construction
+  is worse still: the current build scans all `|G_n| = n! * 8^n * 8` elements
+  and filters, i.e. `O(n! * 8^n * E(n))` time. Two straightforward fixes are
+  documented but not implemented (no current run needs `n > 3`): enumerate
+  `H_n` directly as `S_n x C4^n x D4_container` (dropping the `8^n` scan to
+  `4^n`), and stream permutations instead of storing them, since
+  `canonical_branch_key` only needs a running minimum.
 - The solver remains a deterministic local optimizer. A class can be
   `NOT_FOUND` because its successful branch was not reached within the
   per-branch budget, not because it is unrealizable.

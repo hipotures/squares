@@ -293,11 +293,23 @@ int corpus_command(int argc, char** argv) {
 
     if (count_only) {
         const auto classes = corpus_classes(square_count, weight);
+        // Support histogram: histogram[k - 1] = classes with support exactly k.
+        // By the support decomposition theorem (Phase-2d), this equals
+        // a_d(k) - a_d(k-1) for every k <= n.
+        std::vector<std::size_t> histogram(square_count + 1U, 0);
+        for (const auto& entry : classes) {
+            ++histogram[support_size(entry.topology)];
+        }
         std::ostringstream out;
         out << "{\"schema\":\"sqtopology.realizability-count.v1\""
             << ",\"n\":" << square_count
             << ",\"weight\":" << weight
-            << ",\"class_count\":" << classes.size() << "}\n";
+            << ",\"class_count\":" << classes.size()
+            << ",\"support_histogram\":[";
+        for (std::size_t k = 1; k <= square_count; ++k) {
+            out << (k == 1 ? "" : ",") << histogram[k];
+        }
+        out << "]}\n";
         if (!json_path.empty()) {
             write_text_file(json_path, out.str());
         }

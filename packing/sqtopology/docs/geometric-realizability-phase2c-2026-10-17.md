@@ -236,6 +236,14 @@ Two structural observations:
   This is the single largest unresolved family (586 classes) and the clearest
   target for the next proof rule. The same pattern with one wall contact
   (`pair + 1 dup`, 72 classes) is also feasible-free.
+
+  **Phase-2d update.** The zero-feasible observation is now explained: at
+  exact level two unit squares can never carry exactly two contact events
+  (pair theorem), so the family is exactly impossible; at production
+  tolerance the crossed antiparallel CS+CS pair evades absorption and four
+  V+dup classes (2585-2588) are verified feasible with explicit witnesses -
+  solver false negatives, not infeasible classes. See
+  `docs/geometric-realizability-phase2d-2026-10-17.md`.
 - Resolvedness rises monotonically with wall-contact count (24.7% -> 79.5%):
   wall events are what the current filter set can reason about; purely
   square-square triples dominate the unknown set.

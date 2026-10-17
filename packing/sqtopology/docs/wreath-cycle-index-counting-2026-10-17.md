@@ -342,6 +342,11 @@ therefore a theorem, not a fitted pattern.
 
 ### 5.3 Support, monotonicity, stabilization (proved)
 
+See also `docs/geometric-realizability-phase2d-2026-10-17.md` section 2, which
+sharpens this into the full support decomposition theorem
+(`f_d(k) = a_d(k) - a_d(k-1)`, with `f_d(k)` the number of canonical classes
+of support exactly `k`, bijected across all `n >= k`).
+
 For a `d`-event configuration, each square-square event touches two squares and
 each wall event one, so its support spans at most `2d` squares.
 

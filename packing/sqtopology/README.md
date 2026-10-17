@@ -397,8 +397,9 @@ subsets), the worker pool is deterministic and scheduling-independent, and a
 per-class `support` field separates genuinely `n`-square contact structures
 from lower-`n` configurations embedded with unused squares. Campaign records:
 `docs/geometric-realizability-phase2-2026-10-17.md`,
-`docs/geometric-realizability-phase2b-2026-10-17.md`, and
-`docs/geometric-realizability-phase2c-2026-10-17.md`.
+`docs/geometric-realizability-phase2b-2026-10-17.md`,
+`docs/geometric-realizability-phase2c-2026-10-17.md`, and
+`docs/geometric-realizability-phase2d-2026-10-17.md`.
 
 ## Process scaling
 
