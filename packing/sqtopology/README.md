@@ -266,8 +266,10 @@ bytes up to 65,536 vertices, and four bytes above that. For the current ~190-ver
 ~350-edge incidence graphs this puts the adjacency payload near 700 bytes, versus about
 2.2 KiB for the earlier packed-triangle SQK3 and roughly 4.6 KiB of dense nauty words.
 
-Sparse nauty and Traces now extract the canonical edge list directly from their canonical
-sparse graph in O(V+E) plus sorting of E edges. They no longer convert the canonical
+Sparse nauty extracts the canonical edge list from its sparse output. Traces returns
+only its canonical labeling; the wrapper applies it to the input CSR, avoiding a
+second sparse graph. For graphs up to 256 vertices, four-word row bitsets order
+forward neighbors; larger graphs sort each forward-neighbor list. They no longer convert the canonical
 result to a dense matrix or scan O(V^2) possible adjacency positions. Dense nauty remains
 available as a comparison backend and extracts its edge list from the dense canonical
 matrix.
@@ -277,8 +279,8 @@ only for bucket selection. Hash collisions do not affect correctness because the
 binary key bytes remain the equality oracle.
 
 The old `CanonicalForm` / `SQT1|...` representation is retained for inspection, JSON,
-debugging, and semantic regression tests. Search does not extract canonical edge vectors
-or run `ostringstream` for every candidate anymore.
+debugging, and semantic regression tests. Search does not build the human-facing `CanonicalForm` or run `ostringstream`
+for every candidate.
 
 Tests compare binary-key equality against textual canonical-form equality across symmetry
 transforms and distinct contact types. Retained search keys are rendered as `SQK4HEX:...`
@@ -418,7 +420,9 @@ Native search summaries separately report:
 - duplicates;
 - local unique states;
 - root rewrites selected by the shard;
-- wall time;
+- wall time and process user/system CPU time;
+- peak process RSS and peak expandable-frontier states;
+- page faults and voluntary/involuntary context switches;
 - rewrite-generation time;
 - semantic-validation time;
 - incidence-graph conversion time;

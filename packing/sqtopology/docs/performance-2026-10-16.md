@@ -227,3 +227,17 @@ byte differential pass.
 
 Engine time falls, while output preparation includes the explicit inverse map.
 The combined canonical block improves. Raw measurement: `/tmp/sqtopology-label-only.json`.
+
+## Reject: inline tiny Traces split-array sorts
+
+A temporary histogram found ~117 sort calls per candidate, mostly lengths 1/2/3.
+An inline sorting-network experiment passed native tests and the byte differential,
+but the primary benchmark improved only ~1% with mixed widths. A repeat at 1/16
+workers remained tiny/noisy and gave no aggregate 16-worker gain; discard it.
+No production source change from this experiment is retained.
+
+The repeats showed slowest-shard variance: shard 3 grew from ~19.5 to 21.5–23 s,
+while most workers stayed near their usual ~18–19 s. The complete workload and
+unique counts were unchanged. Add cold-path process CPU time, page-fault, and
+context-switch accounting to distinguish scheduler/host effects in later runs.
+Raw reports: `/tmp/sqtopology-small-sorts*.json`.

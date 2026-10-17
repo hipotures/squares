@@ -60,6 +60,12 @@ struct SearchStats {
     double canonical_extraction_seconds{};
     double canonical_encoding_seconds{};
     double canonical_hash_seconds{};
+    double user_cpu_seconds{};
+    double system_cpu_seconds{};
+    std::uint64_t minor_page_faults{};
+    std::uint64_t major_page_faults{};
+    std::uint64_t voluntary_context_switches{};
+    std::uint64_t involuntary_context_switches{};
 };
 
 struct SearchResult {

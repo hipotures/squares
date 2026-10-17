@@ -79,6 +79,8 @@ SearchResult run_search(
 
     SearchResult result;
     result.stats.canonical_backend = options.canonical_backend;
+    rusage initial_usage{};
+    const bool have_initial_usage = getrusage(RUSAGE_SELF, &initial_usage) == 0;
     const auto started = Clock::now();
 
     std::unordered_set<CanonicalKey, CanonicalKeyHash> seen;
@@ -224,6 +226,17 @@ SearchResult run_search(
     rusage usage{};
     if (getrusage(RUSAGE_SELF, &usage) == 0) {
         result.stats.peak_rss_kib = static_cast<std::uint64_t>(usage.ru_maxrss);
+        if (have_initial_usage) {
+            const auto cpu_seconds = [](const timeval& time) {
+                return static_cast<double>(time.tv_sec) + 1e-6 * static_cast<double>(time.tv_usec);
+            };
+            result.stats.user_cpu_seconds = cpu_seconds(usage.ru_utime) - cpu_seconds(initial_usage.ru_utime);
+            result.stats.system_cpu_seconds = cpu_seconds(usage.ru_stime) - cpu_seconds(initial_usage.ru_stime);
+            result.stats.minor_page_faults = usage.ru_minflt - initial_usage.ru_minflt;
+            result.stats.major_page_faults = usage.ru_majflt - initial_usage.ru_majflt;
+            result.stats.voluntary_context_switches = usage.ru_nvcsw - initial_usage.ru_nvcsw;
+            result.stats.involuntary_context_switches = usage.ru_nivcsw - initial_usage.ru_nivcsw;
+        }
     }
 
     if (options.retain_keys) {
@@ -266,7 +279,7 @@ std::string search_stats_to_json(
     std::ostringstream out;
     out << std::setprecision(17)
         << '{'
-        << "\"schema\":\"sqtopology.search-summary.v7\","
+        << "\"schema\":\"sqtopology.search-summary.v8\","
         << "\"canonical_backend\":\"" << to_string(stats.canonical_backend) << "\","
         << "\"shard\":{\"index\":" << shard.index
         << ",\"count\":" << shard.count << "},"
@@ -309,6 +322,12 @@ std::string search_stats_to_json(
         << stats.canonical_encoding_seconds << ','
         << "\"canonical_hash_seconds\":"
         << stats.canonical_hash_seconds << ','
+        << "\"user_cpu_seconds\":" << stats.user_cpu_seconds << ','
+        << "\"system_cpu_seconds\":" << stats.system_cpu_seconds << ','
+        << "\"minor_page_faults\":" << stats.minor_page_faults << ','
+        << "\"major_page_faults\":" << stats.major_page_faults << ','
+        << "\"voluntary_context_switches\":" << stats.voluntary_context_switches << ','
+        << "\"involuntary_context_switches\":" << stats.involuntary_context_switches << ','
         << "\"canonical_profile_other_seconds\":"
         << canonical_profile_other_seconds
         << "}\n";

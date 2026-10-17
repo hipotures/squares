@@ -161,7 +161,9 @@ def run_width(
                 "graph_conversion_seconds", "canonicalization_seconds",
                 "dedup_seconds", "unattributed_seconds", "first_level_selected",
                 "total_candidate_contacts", "total_incidence_vertices",
-                "total_incidence_edges",
+                "total_incidence_edges", "user_cpu_seconds", "system_cpu_seconds",
+                "minor_page_faults", "major_page_faults", "voluntary_context_switches",
+                "involuntary_context_switches",
             )
         },
         "canonical_input_build_seconds": summed(
@@ -192,6 +194,11 @@ def run_width(
         "sum_worker_peak_rss_kib": summed(summaries, "peak_rss_kib"),
         "max_worker_peak_rss_kib": max(int(item.get("peak_rss_kib", 0)) for item in summaries),
         "sum_peak_frontier_states": summed(summaries, "peak_frontier_states"),
+        "max_worker_cpu_gap_seconds": max(
+            max(0.0, float(item["wall_seconds"]) - float(item.get("user_cpu_seconds", 0.0))
+                - float(item.get("system_cpu_seconds", 0.0)))
+            for item in summaries
+        ) if any("user_cpu_seconds" in item for item in summaries) else None,
         "worker_summaries": summaries,
     }
 
