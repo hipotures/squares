@@ -377,13 +377,24 @@ stabilization point), the staged compression tables, and the trivial-stabilizer 
 ### Geometric realizability (`sqtopology_realize`)
 
 The core tool above never assigns coordinates. The separate research front end
-`sqtopology_realize` (Phase-2) attaches a square-geometry model, an exact
-contact extractor/verifier, and a deterministic Levenberg-Marquardt solver to
-the canonical `G_n` contact classes counted by `sqtopology_orbit`. Every class
-receives exactly one of three statuses: `VERIFIED_FEASIBLE` (a witness scene
-re-verified from scratch), `PROVED_INFEASIBLE` (a documented, `G_n`-invariant
-necessary-condition proof), or `NOT_FOUND` (solver failure, never
-impossibility).
+`sqtopology_realize` (Phase-2) attaches a square-geometry model, a contact
+extractor/verifier, and a deterministic Levenberg-Marquardt solver to the
+canonical `G_n` contact classes counted by `sqtopology_orbit`.
+
+**Important certification caveat.** The current SAT verifier accepts pairwise
+separation when `slack >= -1e-6`. Therefore the historical software status
+`VERIFIED_FEASIBLE` means "accepted by the configured numerical verifier",
+not automatically "strict square packing with disjoint interiors". Phase-2d
+found explicit accepted scenes with small negative SAT slack, so strict
+geometric realizability and tolerance acceptance must be distinguished. See
+the erratum at the top of
+`docs/geometric-realizability-phase2d-2026-10-17.md`.
+
+The existing three software statuses remain `VERIFIED_FEASIBLE`,
+`PROVED_INFEASIBLE`, and `NOT_FOUND`, but research conclusions should treat
+`VERIFIED_FEASIBLE` as tolerance-verifier output until a strict SAT audit
+confirms non-negative pairwise slack. `NOT_FOUND` remains solver failure,
+never impossibility.
 
 ~~~bash
 ./build/sqtopology_realize fixtures
