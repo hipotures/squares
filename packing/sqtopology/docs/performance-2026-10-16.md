@@ -447,13 +447,14 @@ broadly and is only mildly overfit.
 ### PGO reproducibility
 
 `tools/pgo_train.sh` now trains with a fixed candidate budget per shard instead of wall-clock
-time, so the recorded counters are deterministic; two consecutive clean runs produced
-byte-identical `sqtopology` and `libsqtopology_core.a`. The script deletes any `.gcda`/`.gcno`
-before the generate phase and aborts if the core, executable, or vendored Traces objects
-recorded no profile. The use phase compiles the trained objects with `-Wmissing-profile
--Werror=missing-profile`, so a use build without profiles fails with an explicit diagnostic
-naming the missing file instead of silently degrading to non-PGO code; the untrained test
-binary alone suppresses that warning. A fresh default build contains zero `.gcda`/`.gcno`.
+time, so the recorded counters are deterministic; two consecutive clean runs in the same build
+directory produced byte-identical `sqtopology` and `libsqtopology_core.a`. The script deletes
+any `.gcda`/`.gcno` before the generate phase and aborts if the core, executable, or vendored
+Traces objects recorded no profile. The use phase compiles the trained objects with
+`-Wmissing-profile -Werror=missing-profile`, so a use build without profiles fails with an
+explicit diagnostic naming the missing file instead of silently degrading to non-PGO code; the
+untrained test binary alone suppresses that warning. A fresh default build contains zero
+`.gcda`/`.gcno`.
 
 ### Versioning and validation
 

@@ -99,13 +99,13 @@ intended square-permutation x local-`D4` x container-`D4` relation.
   endpoints would be a duplicate contact, which validation rejects, so an automorphism
   that fixes the ports and walls fixes every event.
 
-Graph isomorphism therefore induces precisely the intended relation. The historical gadget
-adds a square-object vertex adjacent to all eight ports of its cycle and a container-object
-vertex adjacent to all four walls; those anchors are determined by their neighborhoods and
-add no constraint, so both gadgets induce the same equivalence classes. `tests/test_sqtopology.cpp`
-checks that differential as a bijection between the two induced partitions -- not merely
-equal class counts -- over a large deterministic corpus that includes square permutations,
-local `D4`, and container `D4` images, on all three backends.
+Color-preserving graph isomorphism therefore induces precisely the intended relation. The
+historical gadget adds a square-object vertex adjacent to all eight ports of its cycle and a
+container-object vertex adjacent to all four walls; those anchors are determined by their
+neighborhoods and add no constraint, so both gadgets induce the same equivalence classes.
+`tests/test_sqtopology.cpp` checks that differential as a bijection between the two induced
+partitions -- not merely equal class counts -- over a large deterministic corpus that includes
+square permutations, local `D4`, and container `D4` images, on all three backends.
 
 The human-facing canonical form is the full versioned textual encoding (`SQT2|...`). Its
 `SQTn` marker versions the encoding itself: it is bumped whenever the canonical vertex set,
