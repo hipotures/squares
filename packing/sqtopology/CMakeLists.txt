@@ -68,6 +68,7 @@ add_library(
     src/canonical.cpp
     src/export.cpp
     src/fixtures.cpp
+    src/research.cpp
     src/rewrite.cpp
     src/search.cpp
     src/topology.cpp

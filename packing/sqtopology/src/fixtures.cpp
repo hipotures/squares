@@ -105,6 +105,8 @@ std::vector<std::string> fixture_names() {
         "corner-corner-2",
         "corner-side-2",
         "side-side-2",
+        "disjoint-4",
+        "line-4",
         "grid-2x2",
         "grid-3x3",
         "grid-4x4",
@@ -118,6 +120,12 @@ Topology make_fixture(std::string_view name) {
     }
     if (name == "disjoint-2") {
         return Topology(2);
+    }
+    if (name == "disjoint-4") {
+        return Topology(4);
+    }
+    if (name == "line-4") {
+        return make_grid(1, 4);
     }
     if (name == "corner-corner-2") {
         Topology topology(2);

@@ -1,6 +1,7 @@
 #include "sqtopology/canonical.hpp"
 #include "sqtopology/export.hpp"
 #include "sqtopology/fixtures.hpp"
+#include "sqtopology/research.hpp"
 #include "sqtopology/rewrite.hpp"
 #include "sqtopology/search.hpp"
 
@@ -76,7 +77,11 @@ void usage() {
         << "  --json\n"
         << "  --profile-canonical\n"
         << "  --validate-generated    (diagnose rewrite invariants)\n"
-        << "  --emit-keys FILE\n";
+        << "  --emit-keys FILE\n\n"
+        << "Research options:\n"
+        << "  sqtopology research FIXTURE [--max-depth N] [--additions N|uncapped]\n"
+        << "      [--canonical-backend B] [--json FILE] [--emit-keys FILE] [--no-symmetry]\n"
+        << "  --additions uncapped uses the full event neighborhood E(n) (default)\n";
 }
 
 int inspect_command(int argc, char** argv) {
@@ -254,6 +259,73 @@ int search_command(int argc, char** argv) {
     return 0;
 }
 
+int research_command(int argc, char** argv) {
+    if (argc < 3) {
+        throw std::invalid_argument("research requires a fixture name");
+    }
+
+    const std::string fixture = argv[2];
+    sqtopology::ResearchOptions options;
+    options.additions_uncapped = true;
+    options.max_depth = 4;
+    std::string json_path;
+    std::string emit_keys;
+
+    for (int i = 3; i < argc; ++i) {
+        const std::string_view arg = argv[i];
+        if (arg == "--no-symmetry") {
+            options.collect_symmetry = false;
+            continue;
+        }
+        if (arg == "--uncapped") {
+            options.additions_uncapped = true;
+            continue;
+        }
+        if (i + 1 >= argc) {
+            throw std::invalid_argument(std::string(arg) + " requires a value");
+        }
+        const std::string_view value = argv[++i];
+        if (arg == "--max-depth") {
+            options.max_depth = parse_size(value, arg);
+        } else if (arg == "--additions") {
+            if (value == "uncapped") {
+                options.additions_uncapped = true;
+            } else {
+                options.max_additions_per_parent = parse_size(value, arg);
+                options.additions_uncapped = false;
+            }
+        } else if (arg == "--canonical-backend") {
+            options.canonical_backend = sqtopology::canonical_backend_from_string(value);
+        } else if (arg == "--json") {
+            json_path = std::string(value);
+        } else if (arg == "--emit-keys") {
+            emit_keys = std::string(value);
+            options.retain_keys = true;
+        } else {
+            throw std::invalid_argument("unknown research option: " + std::string(arg));
+        }
+    }
+
+    const auto seed = sqtopology::make_fixture(fixture);
+    auto result = sqtopology::run_research_search(seed, options);
+    result.fixture = fixture;
+
+    if (!emit_keys.empty()) {
+        std::ostringstream keys;
+        for (const auto& key : result.unique_keys) {
+            keys << key << '\n';
+        }
+        sqtopology::write_text_file(emit_keys, keys.str());
+    }
+
+    const auto json = sqtopology::research_result_to_json(result);
+    if (!json_path.empty()) {
+        sqtopology::write_text_file(json_path, json);
+    }
+    std::cout << json;
+    return 0;
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -278,6 +350,9 @@ int main(int argc, char** argv) {
         }
         if (command == "search") {
             return search_command(argc, argv);
+        }
+        if (command == "research") {
+            return research_command(argc, argv);
         }
 
         usage();

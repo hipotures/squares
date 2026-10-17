@@ -325,6 +325,7 @@ struct CanonicalBackendResult {
     std::vector<int> lab;
     std::vector<::graph> canonical_dense;
     std::vector<std::pair<std::uint32_t, std::uint32_t>> canonical_edges;
+    CanonicalSymmetry symmetry{};
 };
 
 std::vector<std::pair<std::uint32_t, std::uint32_t>> extract_dense_edges(
@@ -560,6 +561,13 @@ CanonicalBackendResult run_dense_nauty(
         .lab = std::move(partition.lab),
         .canonical_dense = std::move(canonical_dense),
         .canonical_edges = {},
+        .symmetry = CanonicalSymmetry{
+            .available = true,
+            .group_size1 = stats.grpsize1,
+            .group_size2 = stats.grpsize2,
+            .orbit_count = stats.numorbits,
+            .generator_count = 0,
+        },
     };
 }
 
@@ -582,6 +590,8 @@ CanonicalBackendResult run_sparse_backend(
     SparseGraphOwner input;
     SparseGraphOwner canonical;
     fill_sparse_graph(graph, *input.get());
+
+    CanonicalSymmetry canonical_symmetry{};
 
     if (profile != nullptr) {
         profile_add(profile->input_build_seconds, profile, stage_started);
@@ -622,6 +632,14 @@ CanonicalBackendResult run_sparse_backend(
                 + std::to_string(stats.errstatus)
             );
         }
+
+        canonical_symmetry = CanonicalSymmetry{
+            .available = true,
+            .group_size1 = stats.grpsize1,
+            .group_size2 = stats.grpsize2,
+            .orbit_count = stats.numorbits,
+            .generator_count = 0,
+        };
     } else {
         DEFAULTOPTIONS_TRACES(options);
         options.getcanon = TRUE;
@@ -655,6 +673,14 @@ CanonicalBackendResult run_sparse_backend(
                 + std::to_string(stats.errstatus)
             );
         }
+
+        canonical_symmetry = CanonicalSymmetry{
+            .available = true,
+            .group_size1 = stats.grpsize1,
+            .group_size2 = stats.grpsize2,
+            .orbit_count = stats.numorbits,
+            .generator_count = stats.numgenerators,
+        };
     }
 
     // Traces supports returning the canonical labelling without materializing
@@ -674,6 +700,7 @@ CanonicalBackendResult run_sparse_backend(
         .lab = std::move(partition.lab),
         .canonical_dense = {},
         .canonical_edges = std::move(canonical_edges),
+        .symmetry = canonical_symmetry,
     };
 }
 
@@ -871,9 +898,14 @@ ColoredGraph to_incidence_graph_validated(const Topology& topology) {
 CanonicalKey canonical_key_colored_graph(
     const ColoredGraph& graph,
     CanonicalBackend backend,
-    CanonicalProfile* profile
+    CanonicalProfile* profile,
+    CanonicalSymmetry* symmetry
 ) {
     const auto canonical = run_backend(graph, backend, profile);
+
+    if (symmetry != nullptr) {
+        *symmetry = canonical.symmetry;
+    }
 
     Clock::time_point stage_started{};
     if (profile != nullptr) {

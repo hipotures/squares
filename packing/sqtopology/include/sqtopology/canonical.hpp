@@ -81,6 +81,20 @@ struct CanonicalProfile {
     double hash_seconds{};
 };
 
+// Research-only symmetry signal produced as a by-product of canonical labeling.
+// The group is the color-preserving automorphism group of the exact incidence
+// gadget for one canonical topology class, so it is exactly the residual
+// symmetry of that class after quotienting square permutation, local D4, and
+// container D4. group_size is group_size1 * 10^group_size2; orbit_count is the
+// number of vertex orbits. This is never guessed from duplicate counts.
+struct CanonicalSymmetry {
+    bool available{false};
+    double group_size1{1.0};
+    int group_size2{0};
+    int orbit_count{0};
+    int generator_count{0};
+};
+
 [[nodiscard]] ColoredGraph to_incidence_graph(const Topology& topology);
 
 // Hot-path entry point: caller guarantees semantic validation and normalized contact order.
@@ -91,7 +105,8 @@ struct CanonicalProfile {
 [[nodiscard]] CanonicalKey canonical_key_colored_graph(
     const ColoredGraph& graph,
     CanonicalBackend backend = CanonicalBackend::Traces,
-    CanonicalProfile* profile = nullptr
+    CanonicalProfile* profile = nullptr,
+    CanonicalSymmetry* symmetry = nullptr
 );
 [[nodiscard]] std::string canonical_key_hex(const CanonicalKey& key);
 

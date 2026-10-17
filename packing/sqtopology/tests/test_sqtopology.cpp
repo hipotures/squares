@@ -1,6 +1,7 @@
 #include "sqtopology/canonical.hpp"
 #include "sqtopology/export.hpp"
 #include "sqtopology/fixtures.hpp"
+#include "sqtopology/research.hpp"
 #include "sqtopology/rewrite.hpp"
 #include "sqtopology/search.hpp"
 #include "sqtopology/topology.hpp"
@@ -993,6 +994,134 @@ void test_canonical_equality_uses_encoding() {
     expect(lhs.fingerprint == rhs.fingerprint, "equal encodings must have equal fingerprints");
 }
 
+void test_research_event_space_formula() {
+    using namespace sqtopology;
+    expect(full_event_space_size(1) == 32, "E(1) must be 32");
+    expect(full_event_space_size(2) == 128, "E(2) must be 128");
+    expect(full_event_space_size(4) == 512, "E(4) must be 512");
+    expect(full_event_space_size(9) == 2592, "E(9) must be 2592");
+    expect(full_event_space_size(15) == 7200, "E(15) must be 7200");
+}
+
+void test_research_matches_production_keys() {
+    using namespace sqtopology;
+
+    // Same rewrite and canonical semantics: research must discover exactly the
+    // production global key set on a bounded single-worker search.
+    for (const auto& [fixture, depth] : std::vector<std::pair<std::string, std::size_t>>{
+             {"isolated-1", 4},
+             {"disjoint-2", 3},
+             {"grid-2x2", 2},
+         }) {
+        const auto seed = make_fixture(fixture);
+        const std::size_t additions = full_event_space_size(seed.square_count());
+
+        ResearchOptions research_options;
+        research_options.max_depth = depth;
+        research_options.additions_uncapped = false;
+        research_options.max_additions_per_parent = additions;
+        research_options.retain_keys = true;
+        const auto research = run_research_search(seed, research_options);
+
+        SearchOptions search_options;
+        search_options.max_candidates = 0;
+        search_options.max_unique = 0;
+        search_options.max_depth = depth;
+        search_options.max_additions_per_parent = additions;
+        search_options.retain_keys = true;
+        search_options.canonical_backend = CanonicalBackend::Traces;
+        const auto production = run_search(seed, search_options);
+
+        expect(
+            research.unique_keys == production.unique_encodings,
+            fixture + ": research mode must reproduce the production exact key set"
+        );
+        expect(
+            research.convergence.total_candidates == production.stats.raw_candidates,
+            fixture + ": research mode must reproduce the raw candidate count"
+        );
+        expect(
+            research.total_unique == production.stats.unique_states,
+            fixture + ": research mode must reproduce the global unique count"
+        );
+    }
+}
+
+void test_research_interval_consistency() {
+    using namespace sqtopology;
+
+    ResearchOptions options;
+    options.max_depth = 5;
+    options.collect_symmetry = true;
+    const auto result = run_research_search(make_fixture("isolated-1"), options);
+
+    expect(result.depths.front().depth == 0, "the first depth record must be depth 0");
+    expect(result.depths.front().new_unique == 1, "depth 0 must contain exactly the seed");
+    expect(result.depths.front().cumulative_unique == 1, "depth 0 cumulative must be one");
+
+    std::uint64_t cumulative = 0;
+    std::uint64_t candidates = 0;
+    for (const auto& record : result.depths) {
+        cumulative += record.new_unique;
+        candidates += record.raw_candidates;
+        expect(
+            record.cumulative_unique == cumulative,
+            "per-depth cumulative counts must reconcile with the new-unique sum"
+        );
+        std::uint64_t contact_sum = 0;
+        for (const auto& [value, count] : record.state_contacts.exact) {
+            contact_sum += value * count;
+        }
+        std::uint64_t type_total = 0;
+        for (const auto column : record.state_type_totals) {
+            type_total += column;
+        }
+        expect(
+            contact_sum == type_total,
+            "contact-count and contact-type totals must agree for every depth"
+        );
+        std::uint64_t candidate_contact_sum = 0;
+        for (const auto& [value, count] : record.candidate_contacts.exact) {
+            candidate_contact_sum += value * count;
+        }
+        expect(
+            candidate_contact_sum == record.candidate_contact_total,
+            "candidate contact histogram must reconcile with its total"
+        );
+    }
+    expect(cumulative == result.total_unique, "depth records must sum to the global total");
+    expect(
+        candidates == result.convergence.total_candidates,
+        "depth records must sum to the global candidate total"
+    );
+}
+
+void test_research_determinism_and_cap_effect() {
+    using namespace sqtopology;
+
+    ResearchOptions options;
+    options.max_depth = 3;
+    const auto first = run_research_search(make_fixture("corner-side-2"), options);
+    const auto second = run_research_search(make_fixture("corner-side-2"), options);
+    expect(
+        first.total_unique == second.total_unique
+            && first.convergence.total_candidates == second.convergence.total_candidates,
+        "repeated research runs must be deterministic"
+    );
+
+    // A one-addition cap must be strictly smaller than the full neighborhood for
+    // a fixture whose seed does not already saturate every feature.
+    ResearchOptions capped;
+    capped.max_depth = 3;
+    capped.additions_uncapped = false;
+    capped.max_additions_per_parent = 1;
+    const auto capped_result = run_research_search(make_fixture("corner-side-2"), capped);
+    expect(
+        capped_result.total_unique < first.total_unique,
+        "a capped addition neighborhood must not exceed the uncapped one"
+    );
+}
+
 }  // namespace
 
 int main() {
@@ -1024,6 +1153,10 @@ int main() {
         test_traces_workspace_size_changes();
         test_search_key_hash_collisions();
         test_canonical_equality_uses_encoding();
+        test_research_event_space_formula();
+        test_research_matches_production_keys();
+        test_research_interval_consistency();
+        test_research_determinism_and_cap_effect();
         std::cout << "sqtopology_tests: all tests passed\n";
         return 0;
     } catch (const std::exception& error) {
