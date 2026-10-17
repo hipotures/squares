@@ -68,7 +68,9 @@ add_library(
     src/canonical.cpp
     src/export.cpp
     src/fixtures.cpp
+    src/geometry.cpp
     src/orbit.cpp
+    src/realize.cpp
     src/research.cpp
     src/rewrite.cpp
     src/search.cpp
@@ -107,6 +109,12 @@ add_executable(sqtopology_orbit src/orbit_main.cpp)
 target_link_libraries(sqtopology_orbit PRIVATE sqtopology_core)
 target_compile_options(sqtopology_orbit PRIVATE -Wall -Wextra -Wpedantic)
 
+# Phase-2 realizability front end: solver + independent verifier, fixture and
+# negative self-checks, and the machine-readable n = 2 corpus report.
+add_executable(sqtopology_realize src/realize_main.cpp)
+target_link_libraries(sqtopology_realize PRIVATE sqtopology_core)
+target_compile_options(sqtopology_realize PRIVATE -Wall -Wextra -Wpedantic)
+
 enable_testing()
 add_executable(sqtopology_tests tests/test_sqtopology.cpp)
 target_link_libraries(sqtopology_tests PRIVATE sqtopology_core)
@@ -121,6 +129,39 @@ target_compile_options(sqtopology_orbit_tests PRIVATE -Wall -Wextra -Wpedantic)
 target_compile_definitions(sqtopology_orbit_tests PRIVATE
     SQTOPOLOGY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME sqtopology_orbit_tests COMMAND sqtopology_orbit_tests)
+
+# Phase-2 geometry layer: primitives, predicates, and the contact-extraction
+# semantics used by the independent realizability verifier.
+add_executable(sqtopology_geometry_tests tests/test_geometry.cpp)
+target_link_libraries(sqtopology_geometry_tests PRIVATE sqtopology_core)
+target_compile_options(sqtopology_geometry_tests PRIVATE -Wall -Wextra -Wpedantic)
+add_test(NAME sqtopology_geometry_tests COMMAND sqtopology_geometry_tests)
+
+# Phase-2 realizability: verifier fixtures, negative fixtures, solver fixture
+# topologies, psi_g covariance, and the n = 2 corpus enumeration. The corpus
+# solve coverage is limited to weight 1 here; the full weight-2 run is the
+# dedicated target below.
+add_executable(sqtopology_realize_tests tests/test_realize.cpp)
+target_link_libraries(sqtopology_realize_tests PRIVATE sqtopology_core)
+target_compile_options(sqtopology_realize_tests PRIVATE -Wall -Wextra -Wpedantic)
+target_compile_definitions(sqtopology_realize_tests PRIVATE
+    SQTOPOLOGY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(NAME sqtopology_realize_tests COMMAND sqtopology_realize_tests)
+
+# CLI-level self-checks of the Phase-2 front end: fixture extraction and the
+# negative fixtures must agree with their committed expectations.
+add_test(NAME sqtopology_realize_fixtures COMMAND sqtopology_realize fixtures)
+add_test(NAME sqtopology_realize_negative COMMAND sqtopology_realize negative)
+
+# Full n = 2 weight-2 corpus (87 classes, ~15k solves, ~12 s in Release). It
+# writes the machine-readable report next to the build tree. Kept separate from
+# the ordinary suite because of its runtime.
+add_test(
+    NAME sqtopology_realize_corpus_w2
+    COMMAND sqtopology_realize corpus --n 2 --weight 2
+        --json ${CMAKE_CURRENT_BINARY_DIR}/realizability-n2-w2.json
+)
+set_tests_properties(sqtopology_realize_corpus_w2 PROPERTIES TIMEOUT 600)
 
 # Separate target for the n = 12 low-weight closure: |G_12| ~ 2.6e20 exceeds
 # 64 bits and one live class-aggregated run costs ~14 s, so it is kept out of
