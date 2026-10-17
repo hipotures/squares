@@ -363,10 +363,10 @@ bytes up to 65,536 vertices, and four bytes above that. With `S` squares and `C`
 contacts the seed incidence graph has exactly `8S + 4 + C` vertices and
 `8S + 4 + 2C` edges, so the `grid-4x4-minus-one` fixture (15 squares, 50 contacts) is
 174 vertices and 224 edges. Candidates that add or remove contacts are larger or
-smaller: over a depth-3 `grid-4x4-minus-one` search the candidate average is about
-174.5 vertices and 225.0 edges, giving an average exact key of about 638 bytes. That
-is far below about 2.2 KiB for the earlier packed-triangle SQK3 and roughly 4.6 KiB
-of dense nauty words.
+smaller: averaged over the complete depth-3 `grid-4x4-minus-one` space the candidate
+graph is about 176.0 vertices and 228.0 edges with an average exact key of about 646
+bytes. That is far below about 2.2 KiB for the earlier packed-triangle SQK3 and roughly
+4.6 KiB of dense nauty words.
 
 Sparse nauty extracts the canonical edge list from its sparse output. Traces returns
 only its canonical labeling; the wrapper applies it to the input CSR, avoiding a
