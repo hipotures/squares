@@ -29,13 +29,17 @@ A weak (closure-stratum) witness is reported separately through the booleans
 
 ## 2. Geometry and conventions
 
-Unit squares are posed by center `(x_i, y_i)` and orientation `theta_i`
-(radians, counterclockwise). In the body frame
+Unit squares are posed by center `(x_i, y_i)`, orientation `theta_i`
+(radians, counterclockwise), and a boolean `frame_reflected` (the parity of
+the semantic feature frame; see Section 7). In the body frame
 
 - corner `c` sits at angle `135 - 90c` degrees at distance `sqrt(2)/2`;
 - side `s` is the segment from corner `s` to corner `s+1`, so side 0 is the
   top edge, 1 right, 2 bottom, 3 left;
-- `ring r = 2*index + (side ? 1 : 0)`, matching `feature_ring_index`.
+- `ring r = 2*index + (side ? 1 : 0)`, matching `feature_ring_index`;
+- when `frame_reflected` is set, the label offsets are mapped through the
+  body reflection `(x, y) -> (-y, -x)` (ring map `r -> 8 - r`); the occupied
+  point set is unchanged.
 
 The container is the axis-aligned square `[0, L]^2`. Wall 0 is `y = L` (top),
 1 is `x = L` (right), 2 is `y = 0` (bottom), 3 is `x = 0` (left). Side `w`
@@ -71,6 +75,29 @@ Absorption keeps the contact set canonical:
 needed because raw projections of exactly touching segments can differ from
 zero by a few ulps (`1.11e-16`); treating such noise as positive overlap
 wrongly absorbed a genuine corner contact in the 2x2 grid scene.
+
+Formally, let `I(P)` be the set of primitive incidences of a scene (CC, CS,
+SS, wall-corner, wall-side, using the tolerances above) and let
+
+```text
+O(P) = { (i, s, j, t) in SS(P) : overlap(i, s, j, t) > 1e-9 }
+```
+
+be its positive-overlap side pairs. The exact contact set is the *normalized*
+set
+
+```text
+E(P) = I(P) \ A(P),
+A(P) = { CC/CS contacts at a point lying on both segments of a pair in O(P) }
+     ∪ { wall-corner(i, c, w) : side c or side c-1 of square i is on wall w }.
+```
+
+The exact topology is therefore a normalized maximal-stratum description after
+deterministic absorption, not the primitive incidence set. Sections 7.2 and
+7.5 prove and machine-check that `E(psi_g(P)) = g . E(P)` for every `g in
+G_n`; the same holds for the weak normalization, whose only differences are
+the closed CS parameter range and the `overlap >= -1e-9` SS threshold, both of
+which are isometry-invariant.
 
 ### 3.3 Weak stratum
 
@@ -122,9 +149,31 @@ Only these filters may produce `PROVED_INFEASIBLE`:
   wall-side contact. This puts one point on two parallel lines.
 - **R3** — one corner is required on both members of an opposite side pair
   `s`, `s+2` of one square, again putting one point on two parallel lines.
+- **R4** — a wall-side contact and a wall-corner contact of one of its own two
+  endpoints on the same wall. The wall-side event absorbs the corner event in
+  the exact stratum, so the two required events cannot both be exact.
+- **R5** — two adjacent corners of one square required on the same wall. Both
+  endpoints of the connecting side are then on the wall, so that side-wall
+  event is extracted and absorbs both corner events.
+- **R6** — two opposite corners of one square required on the same wall. The
+  other two corners sit at distance `1/sqrt(2)` on either side of the wall
+  line, so one of them is outside `[0, L]^2`. The violation is macroscopic
+  (`1/sqrt(2)`), hence far above the `1e-7` contact tolerance.
+
+R4 and R5 are absorption rules of the exact stratum; R6 is a containment rule.
+All six predicates are invariants of the labelled incidence structure:
+endpoint, adjacency and opposite-pair relations are D4 relations, and wall
+distinctness is preserved by the container D4 element. A proof on the class
+representative therefore lifts to every gauge branch and to the whole orbit.
+The filter suite is tested exhaustively under all `G_n` transforms for `n <= 2`
+and on synthetic positive controls.
 
 The filters are deliberately conservative; many infeasible classes are not
-caught by them and stay `NOT_FOUND`.
+caught by them and stay `NOT_FOUND`. In particular, a *label-sensitive*
+corner/wall assignment is **not** a valid filter: the assignment that looks
+impossible in one feature frame is realized in the reflected frame (Section
+7.2). The two weight-2 classes converted by the symmetry repair are exactly
+this case.
 
 ## 6. Solver
 
@@ -151,7 +200,10 @@ for every CS contact. Residuals (all soft inputs to the optimizer):
 
 Starts are deterministic (splitmix64 seeded from the contact keys): five
 families — required-driven construction, axis-aligned random, diagonal,
-lattice/grid, free random — with 32 starts per container rung. The container
+lattice/grid, free random — with 32 starts per container rung. The optimizer
+searches one *standard-frame* representative at a time; `realize_topology`
+drives it over the `2^n` gauge branches of Section 7.3 and transports the
+witness back with `psi_g`. The container
 ladder is `{1, 2, 2.2, 2.5, 3, 4}` followed by an 8-step bisection inside the
 bracket of the last failed and first successful rung. The default budget is
 400 solves per class; the budget is a deterministic solve count, not wall
@@ -164,46 +216,177 @@ and the verifier alone decides. A class is `VERIFIED_FEASIBLE` only if a
 verified exact witness exists. Otherwise it is `NOT_FOUND`, with the best
 rejected candidate kept for diagnostics.
 
-## 7. Scene action `psi_g`
+## 7. Symmetry contract: from `H_n` to `G_n`
 
-The event action of a group element is a label relabeling: square features use
-the local D4 element, wall labels use the container element. A *geometric*
-scene action exists only on the subgroup where every local element has the
-same reflection parity as the container element:
+### 7.1 Audit: why `(x, y, theta)` cannot carry an independent local reflection
+
+Four objects have to be kept apart.
+
+**A. Physical square.** Square `i` occupies the point set
+`Q_i = C_i + R(theta_i) [-1/2, 1/2]^2`. A square is achiral: every reflection
+of `Q_i` is another square. All contact predicates (coincidence, distance,
+collinearity, containment, separation) are statements about occupied point
+sets and are invariant under rigid motions of the plane.
+
+**B. Feature-label frame.** The extractor assigns corner `c` the point
+`C_i + F_i u_c`, where `u_c` has body angle `135 - 90c` and `F_i` is an
+orthogonal 2x2 matrix. The canonical pose stores `F_i = R(theta_i)`, whose
+determinant is `+1`. This frame is a *convention*: it decides which physical
+corner is called 0, 1, 2, 3. It is not a physical object.
+
+**C. Container isometry.** The container D4 element `(k, b)` acts by
+`Q_g = R(-90k) M_y^b`, with `M_y: (x, y) -> (L - x, y)`. This is a rigid
+motion of `[0, L]^2` and realizes the production wall map
+`w -> (4 - w) mod 4` then `+ k`.
+
+**D. Local frame reflection.** The engine's local reflection (rotation 0,
+reflected) maps ring labels by `r -> (8 - r) mod 8`; on corners this is
+`c -> -c (mod 4)`, so corners 0 and 2 are fixed and corners 1 and 3 swap. Its
+body-direction map is a reflection `L = R(90) M_y` acting on the feature
+frame. It changes `det(F_i)`.
+
+For a mixed-parity group element, the local reflection parity differs from the
+container parity. Starting from `F_i = R(theta_i)`, the new frame required by
+the label action is `Q_g F_i L_i^{-1}`, whose determinant is
+
+```text
+det(Q_g) det(F_i) det(L_i)^{-1} = (-1)^b * (+1) * (-1)^{r_i} = (-1)^(b + r_i).
+```
+
+When the parities differ this is `-1`, and no rotation `R(theta')` has
+determinant `-1`. This is the precise reason for the old `H_n` restriction:
+the scene action existed only on
 
 ```text
 H_n = { g in G_n : local[i].reflected == container.reflected for all i },
-index [G_n : H_n] = 2^n.
 ```
 
-For `g in H_n` with container rotation `k`, container reflection `b`, and
-local rotation `k_tau(i)`, the action on a scene is
+where every determinant is `+1`. It was a representation/gauge limitation, not
+a property of the geometry: a physical square does not know which way its
+labels were reflected.
+
+### 7.2 The missing construction: per-square feature-frame parity
+
+Extend the pose with a boolean `frame_reflected` and set
 
 ```text
-C'_i = R(-90k) ( M_b (C_i - Cc) ) + Cc,      Cc = (L/2, L/2)
-theta'_i = theta_i + 90 (k_tau(i) - k)                if b = 0
-theta'_i = -theta_i + 90 (k_tau(i) - k) - 90          if b = 1
-new_pose[sigma(i)] = pose'_i
+F_i = R(theta_i) M^{b_i},    M: (x, y) -> (-y, -x),
 ```
 
-where `M_b` is the vertical mirror `x -> L - x`. Elements outside `H_n` throw
-`std::invalid_argument`: no standard-labeled scene can carry a mixed-parity
-feature relabeling.
+where `M` is the body reflection with ring map `r -> 8 - r` (it fixes corners
+0 and 2 and swaps 1 and 3). The occupied set is unchanged:
 
-Validation against the production `relabel_square` / `relabel_container` /
-`permute_squares` transformations (tests in `tests/test_realize.cpp`):
+```text
+F_i {u_c} = R(theta_i) M^{b_i} {u_c} = R(theta_i) {u_c},
+```
 
-- `n = 2`, corner-corner scene: all 256 elements of `H_2`
-  (`extraction(psi_g(P)) == g . extraction(P)`), 768 mixed-parity elements
-  rejected;
-- `n = 2`, side-side scene (positive-overlap SS with absorbed endpoint CCs):
-  all 256 elements of `H_2`;
-- `n = 3`, three-square L-scene with wall contacts: all 3072 elements of
-  `H_3`.
+because `{u_c}` is invariant under `M`. Only the labelling changes; this is a
+gauge bit, not a mirror-image square.
 
-The wall-only checks pin the container convention: a pure container rotation
-by `k` quarters maps wall `w` to `w + k`, and the vertical mirror maps wall
-`w` to `4 - w`; the corresponding corner map is `c -> 1 - c` (mod 4).
+For every `g in G_n` with container `(k, b)` and local elements
+`(k_i, r_i)`, define
+
+```text
+Q_g       = R(-90k) M_y^b                      (container isometry)
+L_i       = R(-90 k_i)                if r_i = 0
+L_i       = R(90 - 90 k_i) M_y        if r_i = 1
+F'_sigma(i) = Q_g F_i L_i^{-1}
+C'_sigma(i) = Cc + Q_g (C_i - Cc),             Cc = (L/2, L/2)
+theta'    = atan2(F'.e1_y, F'.e1_x) + (det(F') < 0 ? 90 : 0)
+b'        = det(F') < 0
+new_pose[sigma(i)] = (C'_sigma(i), theta', b')
+```
+
+Then
+
+```text
+extraction(psi_g(P)) = g . extraction(P)
+```
+
+for both the exact and the weak stratum, and for every `g in G_n`.
+
+*Proof sketch.* `L_i` sends body direction `u_r` to `u_{transform_ring(r, local_i)}`.
+Therefore `F' u_{g(r)} = Q_g F_i u_r`: the physical feature that carried label
+`r` is moved by `Q_g` and now carries label `g(r)`. Every contact predicate is
+a distance, collinearity, segment-parameter or containment statement about
+these physical features, so it is preserved by the rigid motion and the label
+map. The absorption triggers are the same predicates (a point lies on both
+segments of a positive-overlap SS pair; both endpoints of a side lie on a
+wall), so absorption commutes as well. `psi_{g^{-1}}` inverts the action, so
+`psi` is a bijection on scenes and realizability is `G_n`-invariant.
+
+Consequences:
+
+- exact and weak realizability are well-defined properties of a full `G_n`
+  orbit; Phase 1's quotient is **not** too coarse for geometry;
+- the old failure was a coordinate/gauge representation problem, exactly the
+  hypothesis stated in the audit brief;
+- a label-sensitive corner/wall assignment that is impossible in the standard
+  frame can be realized in the reflected frame. This actually happens in the
+  `n = 2` corpus (Section 9.2).
+
+### 7.3 Completeness of the `2^n` gauge branches
+
+Let `tau_b` be the group element with container identity and
+`tau_b.local[i] = (0, true)` exactly on the squares selected by the bit vector
+`b`. Changing only the parity of square `i` relabels that square by `tau_i`, so
+for any scene `P`
+
+```text
+extraction(P, b) = tau_b . extraction(P, 0).
+```
+
+Hence a labelling `Sigma` is realizable with some frame parities iff one of
+the `2^n` standard-frame labellings `tau_b Sigma` is realizable with all
+parities zero. The `tau_b` are coset representatives of `H_n`:
+
+```text
+|G_n| = n! 8^(n+1),   |H_n| = n! 8 4^n,   [G_n : H_n] = 2^n.
+```
+
+`realize_topology` enumerates the `2^n` branches in increasing mask order,
+deduplicates branches that coincide as contact sets, stops at the first
+verified exact witness, and transports the witness back with `psi_{tau_b}`.
+The transported scene is re-verified against the input `Sigma`; branch `0`
+reproduces the previous standard-frame solver exactly, so old feasible
+witnesses remain valid. Weak witnesses are transported the same way and are
+reported separately. The per-branch solve budget is `max_solves`; a class may
+therefore spend up to `2^n * max_solves` deterministic solves.
+
+### 7.4 What a corpus row means
+
+For a canonical class `[Sigma]_G` with representative `Sigma`:
+
+- `VERIFIED_FEASIBLE`: some gauge branch `tau_b Sigma` has a verified exact
+  witness. By `G_n` invariance this is equivalent to every representative in
+  the orbit being realizable; the reported witness is the `psi_{tau_b}` image
+  for `Sigma` and verifies against `Sigma` directly.
+- `PROVED_INFEASIBLE`: a `G_n`-invariant filter (Section 5) proves that no
+  exact scene exists. Equivalently, every gauge branch is infeasible.
+- `NOT_FOUND`: no branch produced a witness within budget and at least one
+  branch remains unresolved. It is never a proof of impossibility.
+
+The statuses are therefore statements about the same full canonical `G_n`
+classes that Phase 1 counts.
+
+### 7.5 Covariance evidence
+
+The covariance identity is tested against the production
+`relabel_square` / `relabel_container` / `permute_squares` transformations, on
+both strata:
+
+- `n = 1`: all 64 elements of `G_1` on wall-side, wall-corner and
+  mixed-frame single-square scenes;
+- `n = 2`: all 1024 elements of `G_2` on the corner-corner, corner-side,
+  side-side, wall-side+SS multi-contact and mixed-frame scenes;
+- `n = 3`: all 24,576 elements of `G_3` on a compact three-square L-scene with
+  wall, SS and CC contacts.
+
+Absorption is covered by the side-side and grid scenes, where endpoint corner
+contacts are absorbed by positive-overlap side contacts, and by the multi-
+contact wall scene, where wall-side events absorb endpoint corner-wall events.
+The wall-only checks pin the container convention: container rotation `k` maps
+wall `w` to `w + k`; the vertical mirror maps `w` to `4 - w`.
 
 ## 8. Fixtures
 
@@ -238,7 +421,7 @@ Negative fixtures (`negative_fixtures()`):
 N4 is deliberately a negative fixture that the filters cannot prove; it pins
 the rule that solver failure never becomes a proof.
 
-## 9. The `n = 2` corpus
+## 9. The corpus (`n = 2` weights 1-3, `n = 3` weight 1)
 
 `corpus_classes(n, w)` enumerates canonical classes exactly: start from the
 empty class, expand the previous level by one event, and keep the orbit-minimal
@@ -258,38 +441,137 @@ Each class is then solved with the default budget (`32` starts, `400` solves,
 8 bisection steps) and the seed derived from its contact keys, so the run is
 reproducible.
 
-### 9.1 Results
+### 9.1 Superseded standard-frame results
+
+The first revision of this note reported the following corpus totals, computed
+with the **standard-frame solver only**:
+
+| weight | classes | feasible | not found | proved infeasible |
+| --- | --- | --- | --- | --- |
+| 1 | 5 | 5 | 0 | 0 |
+| 2 | 87 | 23 | 58 | 6 |
+| 3 | 1411 | 15 | 1240 | 156 |
+
+These geometric status tables are **superseded**: they were not valid as
+full-`G_n` class statements, because the solver only tried the canonical
+standard-frame representative. The pure orbit counts (5/87/1411) are
+unaffected and remain exact Burnside coefficients. The corrected results
+follow.
+
+### 9.2 Results under full-`G_n` semantics
+
+Each class is solved with the default budget (`32` starts, `400` solves per
+branch, 8 bisection steps) and a per-class seed derived from its contact keys;
+the solver enumerates the `2^n` gauge branches (Section 7.3).
 
 | weight | classes | feasible | not found | proved infeasible | exact witnesses | weak-only | solves | time |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 5 | 5 | 0 | 0 | 5 | 0 | 921 | 0.54 s |
-| 2 | 87 | 23 | 58 | 6 | 23 | 0 | 15,045 | 11.1 s |
-| 3 | 1411 | 15 | 1240 | 156 | 15 | 0 | 240,654 | 226.5 s |
+| 1 | 5 | 5 | 0 | 0 | 5 | 0 | 921 | 0.68 s |
+| 2 | 87 | 25 | 53 | 9 | 25 | 0 | 33,394 | 28.2 s |
+| 3 | 1411 | 48 | 1128 | 235 | 48 | 0 | 750,464 | 790.5 s |
 
 Host: 16 vCPU Linux guest, Release build, single-threaded. Runtime scales with
 the solve count, not with enumeration (enumeration of 1411 classes takes
-0.12 s).
+0.12 s). The weight-3 solve count and time are from the filtered run; the
+symmetry-only run (before R4-R6) used 787,328 solves in 822.6 s.
 
-Filter breakdown at weight 3: R1 = 45, R2 = 89, R3 = 22 (156 total); at
-weight 2: R1 = 2, R2 = 3, R3 = 1 (6 total).
+Filter attribution order R1, R2, R3, R4, R5, R6 (the first rule that fires):
+weight 3 = 45 / 89 / 22 / 38 / 25 / 16 (235 total); weight 2 = 2 / 3 / 1 /
+1 / 1 / 1 (9 total). Counting overlaps, the 79 classes newly proved at weight
+3 are hit by R4 = 38, R5 = 27 and R6 = 18.
 
-### 9.2 Container sides of feasible classes
+### 9.3 Old -> new status transitions
+
+The transition is reported in two stages so the effect of the symmetry repair
+and of the new filters are not hidden.
+
+**Stage 1: symmetry repair only (frame-parity branches, no R4-R6).**
+
+| weight | old status | new feasible | new not found | new proved |
+| --- | --- | --- | --- | --- |
+| 1 | feasible (5) | 5 | 0 | 0 |
+| 1 | not found (0) | 0 | 0 | 0 |
+| 1 | proved (0) | 0 | 0 | 0 |
+| 2 | feasible (23) | 23 | 0 | 0 |
+| 2 | not found (58) | 2 | 56 | 0 |
+| 2 | proved (6) | 0 | 0 | 6 |
+| 3 | feasible (15) | 15 | 0 | 0 |
+| 3 | not found (1240) | 33 | 1207 | 0 |
+| 3 | proved (156) | 0 | 0 | 156 |
+
+**Stage 2: adding R4-R6.**
+
+| weight | stage-1 not found | -> feasible | -> not found | -> proved |
+| --- | --- | --- | --- | --- |
+| 1 | 0 | 0 | 0 | 0 |
+| 2 | 56 | 0 | 53 | 3 |
+| 3 | 1207 | 0 | 1128 | 79 |
+
+No old `VERIFIED_FEASIBLE` class became unfeasible, and **no old
+`PROVED_INFEASIBLE` class became feasible**. The filters were sound before and
+after the symmetry repair. The 35 classes that changed from `NOT_FOUND` to
+`VERIFIED_FEASIBLE` (2 at weight 2, 33 at weight 3) are the correctness
+finding of this audit: they are realizable only in a reflected feature frame.
+
+### 9.4 The reflected-frame classes
+
+The two weight-2 classes are exactly the "label-sensitive" cases that the
+first campaign misclassified as impossible:
+
+```text
+3:0:0:0|w:1  +  3:0:0:1|w:0     corner 0 on the right wall, corner 1 on the top wall
+3:0:1:0|w:1  +  3:0:1:1|w:0     side 0 on the right wall, side 1 on the top wall
+```
+
+Both are realized with `frame_reflected = true` on square 0 and a rotation
+that makes the labelled interior point into the container. For example, the
+first witness has `L = 2.00703125` and square 0 at
+`(1.48526, 1.48526)`, `theta = 4.66784` with the reflected frame; its corner 0
+lies on `x = L` and its corner 1 on `y = L`, with the other two corners
+inside and no side-wall contacts. The standard-frame representative of the
+same class cannot realize it, which is why the old run reported `NOT_FOUND`.
+
+The general lesson is that a corner/wall assignment that forces the labelled
+interior outside the container in one feature frame is **not** a proof of
+infeasibility: the reflected frame relabels the square and can make the same
+physical assignment valid. A rule of type C from the review brief therefore
+must not be added as a filter.
+
+At weight 3 the 33 newly feasible classes split into 20 branch 1 and 13
+branch 2 witnesses (bit masks over two squares); with three squares, the
+third square's parity is not needed for any of them. All 48 feasible weight-3
+classes now verify against their canonical representatives.
+
+The three weight-2 classes that R4-R6 convert from `NOT_FOUND` to
+`PROVED_INFEASIBLE` are:
+
+| rule | contacts |
+| --- | --- |
+| R4 | `3:0:0:0|w:0` + `3:0:1:0|w:0` |
+| R5 | `3:0:0:0|w:0` + `3:0:0:1|w:0` |
+| R6 | `3:0:0:0|w:0` + `3:0:0:2|w:0` |
+
+### 9.5 Container sides of feasible classes
 
 | weight | feasible | smallest `L` | largest `L` | notes |
 | --- | --- | --- | --- | --- |
-| 1 | 5 | 2.0023 | 2.0133 | all five single-contact classes |
-| 2 | 23 | 2.0008 | 3.0859 | 21 of 23 below 2.03; two outliers at 2.10 and 3.09 |
-| 3 | 15 | 2.0000 | 2.2012 | 14 below 2.02 |
+| 1 | 5 | 2.0023 | 2.0133 | all five single-contact classes, branch 0 |
+| 2 | 25 | 2.0008 | 3.0859 | 23 of 25 below 2.03; two outliers at 2.10 and 3.09 |
+| 3 | 48 | 2.0000 | 2.2012 | 44 below 2.02 |
 
-The gap above 2 is not numerical noise: the two-square minimum-`L` problem has
-infimum 2, but at `L = 2` two unit squares fill the container exactly, so any
-placement that uses the whole side length forces extra wall contacts. The
-bisection therefore converges to a slightly larger `L` where the required
-contact set is exact and no extra contact appears. The reported value is a heuristic
-infimum bracketed between `bisection_lower` and `container_side`; it is not a
-proof that no witness exists inside the bracket.
+The gap above 2 is **not** an area-filling argument: two unit squares have
+total area 2 while a `2 x 2` container has area 4, so they do not fill the box.
+What is true is the classical packing bound `s(2) = 2`: the container cannot be
+smaller than 2 for two disjoint unit squares, and `L = 2` is the infimum of the
+ladder. The solver finds sides slightly above 2 for many minimal-contact
+classes because at `L = 2` the required contact set and the no-extra-contact
+condition were not met by a verified witness; this campaign has **not** proved
+a topology-specific minimum-`L` theorem. The reported value is a heuristic
+infimum bracketed between `bisection_lower` and `container_side`, and it
+depends on the start budget (Section 9.6).
 
-A concrete tight example from weight 3 is exactly realizable at `L = 2`:
+A concrete tight example from weight 3 is exactly realizable at `L = 2`
+(branch 0, so it was already feasible before the symmetry repair):
 
 ```text
 contacts: 2:0:1:0|1:1:0    (SS, side 0 of square 0 and square 1)
@@ -304,44 +586,67 @@ The two squares touch along the line `y = 1` with an overlap of about `0.40`
 and rest on opposite walls; the exact contact set is exactly the three listed
 events.
 
-### 9.3 Reading the `NOT_FOUND` set
-
-`NOT_FOUND` is not evidence of impossibility, but several families in the
-corpus *are* infeasible by local reasoning that the current filters do not
-implement. Three examples:
-
-- a corner that is an endpoint of a side required on a wall cannot also carry
-  a required corner-only wall contact on the same wall: the wall-side
-  absorption removes it (e.g. `3:0:0:0|w:0` + `3:0:1:0|w:0`);
-- two corners of one square on the same wall force the whole side onto the
-  wall, again by absorption;
-- label-sensitive corner/wall assignments: corner 0 on the right wall and
-  corner 1 on the top wall is impossible for the standard labeling, because
-  the interior side of the labeled side would fall outside the container.
-
-These are the natural home of a future `R4`/`R5` filter family (Section 11).
-
-### 9.4 Determinism and robustness
+### 9.6 Determinism and robustness
 
 - Two independent runs at weight 1 produce byte-identical JSON.
-- Doubling the weight-2 budget (`--starts 64 --max-solves 1500`) changes no
-  status (still 23/58/6) and costs 29,190 solves instead of 15,045, but 9 of
-  the 23 feasible classes report a different `L`, always smaller or within the
-  bisection resolution: for example 3.0859 -> 2.1133 and 2.1016 -> 2.0086.
-  The statuses are budget-stable; the reported `L` is an upper bound from the
-  heuristic search, not a certified infimum.
+- The weight-2 status totals are stable under a double budget: no status
+  changes, but 9 of the feasible classes report a different `L`, always
+  smaller or within the bisection resolution (for example 3.0859 -> 2.1133 and
+  2.1016 -> 2.0086). The statuses are budget-stable; the reported `L` is an
+  upper bound from the heuristic search, not a certified infimum.
+- The branch enumeration is deterministic: branch order and per-class seeds
+  are fixed, and the transported witnesses re-verify against the canonical
+  representatives.
 - No weak-only certificate occurs in any of the three corpora. The weak
   stratum is exercised by the fixtures, not by the corpus.
 
+### 9.7 `n = 3` weight 1
+
+After the symmetry repair, the cheap generalization requested by the review
+brief:
+
+| class (canonical keys) | status | branch | `L` |
+| --- | --- | --- | --- |
+| `3:2:0:0|w:0` (corner-wall) | feasible | 0 | 2.1070 |
+| `3:2:1:0|w:0` (side-wall) | feasible | 0 | 2.0617 |
+| `0:1:0:0|2:0:0` (CC) | feasible | 0 | 2.0508 |
+| `1:1:0:0|2:1:0` (CS) | feasible | 0 | 2.2035 |
+| `2:1:1:0|2:1:0` (SS) | feasible | 0 | 2.1773 |
+
+All five single-contact classes are exactly realizable, matching the `n = 2`
+pattern. The extra free square does not introduce unavoidable extra contacts
+at these witnesses; it does raise the reported container sides above the
+`n = 2` values (2.05-2.20 instead of 2.00-2.01), because the third square has
+to fit without creating new contacts. All witnesses use the standard frame;
+the branch machinery is still exercised at `n = 3` because the solver
+enumerates up to eight branches before settling on branch 0.
+
+### 9.8 What remains in `NOT_FOUND`
+
+`NOT_FOUND` is not evidence of impossibility. After the symmetry repair and
+R4-R6, the remaining families include:
+
+- `NOT_FOUND` classes whose reflected-frame branches were not reached within
+  the per-branch budget (the solver tries all `2^n` branches but each branch is
+  budget-limited);
+- three-or-more-contact patterns whose infeasibility is macroscopic but not
+  covered by R1-R6 (for example combinations of wall distances that force a
+  diagonal longer than the container);
+- classes that are genuinely realizable but missed by every start family.
+
+The weight-3 corpus leaves 1128 of 1411 classes unresolved; the number of
+solved statuses is 283 (48 feasible + 235 proved), up from 171 before the
+symmetry repair. This is the honest state of the classifier.
+
 ## 10. Machine-readable schema
 
-Schema `sqtopology.realizability.v1` (`sqtopology_realize corpus --json FILE`):
+Schema `sqtopology.realizability.v2` (`sqtopology_realize corpus --json FILE`):
 
 ```json
 {
-  "schema": "sqtopology.realizability.v1",
+  "schema": "sqtopology.realizability.v2",
   "tool": "sqtopology_realize",
-  "n": 2, "weight": 1, "class_count": 5,
+  "n": 2, "weight": 1, "class_count": 5, "gauge_branches": 4,
   "group_size": 1024, "event_count": 128,
   "config": { "ladder": [1, 2, 2.2, 2.5, 3, 4], "starts_per_rung": 32,
               "lm_max_iterations": 120, "max_solves": 400,
@@ -354,104 +659,129 @@ Schema `sqtopology.realizability.v1` (`sqtopology_realize corpus --json FILE`):
     { "weight": 1, "events": [0], "contacts": ["0:0:0:0|1:0:0"],
       "status": "VERIFIED_FEASIBLE", "exact_witness": true,
       "weak_witness": false, "filter_reason": "",
+      "frame_branch": 0, "weak_frame_branch": 0, "branches_tried": 1,
       "container_side": 2.0046875, "bisection_lower": 2.00390625, "solves": 191,
       "witness": { "container_side": 2.0046875,
                    "squares": [
-                     { "x": 1.502344, "y": 1.502687, "theta": 6.379e-07 },
-                     { "x": 0.502344, "y": 1.502687, "theta": -1.570797 } ] } }
+                     { "x": 1.502344, "y": 1.502687, "theta": 6.379e-07,
+                       "frame_reflected": false },
+                     { "x": 0.502344, "y": 1.502687, "theta": -1.570797,
+                       "frame_reflected": false } ] } }
   ]
 }
 ```
 
 `events` are the canonical orbit-minimal event IDs (`EventSetLayout`),
-`contacts` are the normalized `contact_key` strings, and `witness` /
-`weak_scene` are present only when the corresponding flag is set.
-Fixture and negative reports use
+`contacts` are the normalized `contact_key` strings, `frame_branch` is the
+gauge-branch bitmask used by the exact witness (bit `i` = reflected feature
+frame of square `i`), `weak_frame_branch` is the same for a weak-only witness,
+and `branches_tried` counts distinct branches actually solved. `witness` /
+`weak_scene` are present only when the corresponding flag is set. Every scene
+square carries `frame_reflected`; older v1 reports lacked both the field and
+the branch accounting and are superseded (Section 9).
+
+Fixture and negative reports keep
 `sqtopology.realizability-fixtures.v1` and
 `sqtopology.realizability-negatives.v1`.
 
 `tests/data/realizability-n2-w1.json` is a committed weight-1 record. The test
-suite pins its schema, class accounting and status distribution; floating
-point digits are not pinned because they depend on the host's math library.
+suite pins its schema, class accounting, status distribution, branch metadata
+and that all five witnesses use branch 0; floating-point digits are not pinned
+because they depend on the host's math library.
 
 ## 11. Reproducing
 
 ```bash
 cmake -S packing/sqtopology -B packing/sqtopology/build -DCMAKE_BUILD_TYPE=Release
 cmake --build packing/sqtopology/build -j
-ctest --test-dir packing/sqtopology/build          # 10 targets; unit tests ~2.5 s,
+ctest --test-dir packing/sqtopology/build          # 10 targets; realize unit tests ~9 s,
                                                    # plus the n=12 and corpus targets
 ./packing/sqtopology/build/sqtopology_realize fixtures
 ./packing/sqtopology/build/sqtopology_realize negative
 ./packing/sqtopology/build/sqtopology_realize corpus --n 2 --weight 1
 ./packing/sqtopology/build/sqtopology_realize corpus --n 2 --weight 2 --json w2.json
 ./packing/sqtopology/build/sqtopology_realize corpus --n 2 --weight 3 --json w3.json
+./packing/sqtopology/build/sqtopology_realize corpus --n 3 --weight 1 --json n3w1.json
 ```
 
-`sqtopology_realize_tests` runs in about 2.4 s; `sqtopology_realize_corpus_w2`
-is the dedicated full weight-2 CTest target (~11 s). The weight-3 run is not
-part of the default suite (~4 min).
+`sqtopology_realize_tests` runs in about 9 s (it includes all 24,576 elements
+of `G_3` on a compact scene). `sqtopology_realize_corpus_w2` is the dedicated
+full weight-2 CTest target (~30 s). The weight-3 run is not part of the
+default suite (~13 min); the `n = 3` weight-1 run takes about 2 s.
 
 ## 12. Limitations
 
-- `NOT_FOUND` means the fixed budget found no witness; it is never reported as
-  impossibility. The weight-3 corpus leaves 1240 of 1411 classes unresolved.
-- The filters R1–R3 are sound but incomplete; no completeness claim is made.
+- `NOT_FOUND` means the per-branch budget found no witness; it is never
+  reported as impossibility. The weight-3 corpus leaves 1128 of 1411 classes
+  unresolved.
+- The filters R1-R6 are sound but incomplete; no completeness claim is made.
+  In particular, distance/containment rules that depend on `L` are not
+  implemented, and the tolerance-scale status of some local arguments is
+  delicate: a rule such as "one corner on two adjacent walls is impossible"
+  is exact in the continuum picture but is not obviously sound for the
+  `1e-7` extraction tolerance, so it is deliberately not a filter.
+- Gauge branches multiply the solve budget by up to `2^n`. A class can be
+  `NOT_FOUND` because the successful branch was not reached within its
+  400-solve budget, even though another branch is easy.
 - `L` minimization is a deterministic heuristic bisection between a failed and
   a successful rung, and the returned witness is re-verified, but the reported
   infimum is not certified: feasibility may be non-monotone in `L`, and the
-  bracket is only sampled at 8 points.
+  bracket is only sampled at 8 points. It is also branch- and
+  budget-dependent; no topology-specific minimum-`L` theorem is claimed.
 - Local minima are real: the solver's ability to find a witness depends on the
   start families (the lattice family was added after the 2x2 grid topology
   exposed a tight-packing failure). Doubling the budget at weight 2 changed no
   status, but this is evidence of stability, not completeness.
-- The corpus is `n = 2` only. Weight 3 is the practical limit of the current
-  per-class solver on this host; higher weights need a different dispatch
-  strategy (see Section 13).
+- The corpus is `n = 2` for weights 2 and 3; `n = 3` is covered at weight 1
+  only. Higher weights need a different dispatch strategy for the per-class
+  solver (see Section 13).
 - The weak stratum is a relaxed containment relation, not a certified
   topological closure of the exact stratum.
 - The line-4 fixture (a 1x4 strip) is still not realizable as an exact scene
   in a square container: each square would need side 0 on wall 0 and side 2 on
   wall 2 simultaneously, forcing `L = 1` for a chain of length 4. This is
   recorded as a candidate finding, not used as a test.
-- The `psi_g` action is validated for `n <= 3` and for parity-consistent
-  elements only; mixed-parity elements have no scene action by construction.
+- The `psi_g` covariance is machine-checked for all `G_1`, `G_2` and `G_3`
+  elements on representative scenes, not symbolically for all `n`; the proof
+  in Section 7.2 is the general argument.
+- The frame parity is a gauge bit. It must not be read as a physical chirality
+  of the square (squares are achiral); it only records how the semantic corner
+  and side labels are attached to the physical square.
 
 ## 13. Recommended next direction
 
-Five options, grounded in what the experiments actually showed:
+The symmetry contract is now sound: geometric realizability is a property of
+the same canonical `G_n` classes that Phase 1 counts, and the corpus statuses
+are full-class statements. The next decisions are therefore about coverage and
+proof strength, not about correctness of the quotient.
 
-- **A. Corpus widening at `n = 2`, all weights.** Weight 3 already runs in
-  226 s, so weights 4–6 are feasible as one-off runs (the class counts grow as
-  roughly `a_3 = 1411`, `a_4 = 26620`, ...). Cheap to execute, but the
-  scientific return per class drops: most of the weight-3 mass is
-  `NOT_FOUND`, and without new filters more classes do not become theorems.
-- **B. Filter completeness (recommended).** The three local infeasibility
-  arguments in Section 9.3, plus absorption-aware corner/wall conflicts,
-  appear to cover large parts of the weight-3 `NOT_FOUND` set without any
-  continuous search. This is the highest ratio of proved statements to compute
-  in the entire campaign, and it composes with every later corpus run.
-- **C. Solver hardening.** Improve the LM (analytic Jacobian, start
-  diversification per contact pattern, a final polishing stage) and measure the
-  conversion rate of a fixed `NOT_FOUND` sample. The weight-2 budget-doubling
-  experiment suggests the current solver is stable, so the remaining gains are
-  likely in the tight-packing and wall-alignment regimes rather than in more
-  random starts.
-- **D. `n = 3` corpus at low weight.** Enumerating `n = 3` weight-1 classes is
-  cheap (288 events, `|G_3| = 24576`); solving them tests whether the `n = 2`
-  picture (most single contacts feasible, most mixed sets infeasible) persists
-  with a third square. It also exercises `psi_g` at the cube level.
-- **E. Report layer only.** Freeze the current geometry + verifier as the
-  Phase-2 reference, publish the corpus JSON, and defer further geometric work.
-  This is the lowest-effort option and would leave the strong results
-  (independent verification, `psi_g`, exact fixture agreement) documented and
-  the open questions explicitly labelled.
+- **A. `n = 3` corpus at weight 2 (recommended next measurement).** The
+  weight-1 run is cheap (5 classes, ~2 s, all feasible, `L` in
+  `[2.0508, 2.2035]`). Weight 2 has `a_2(3) = 119` Burnside classes and would
+  test whether the `n = 2` picture (most single contacts feasible, most mixed
+  sets infeasible, frame branches matter) persists with a third square. It
+  also stresses the `2^3 = 8` branch enumeration.
+- **B. More `G_n`-invariant filters.** The R4-R6 family converted 79 classes
+  in the weight-3 corpus with three local arguments. Distance-based rules
+  (a chain of wall contacts longer than the container diagonal, two contacts
+  whose required distance exceeds `sqrt(2)` or the diagonal of the wall
+  rectangle) are the natural continuation; they must be stated in physical,
+  frame-gauge terms and checked against the extraction tolerance.
+- **C. Solver and branch-budget hardening.** A class may be `NOT_FOUND`
+  because the successful branch was not reached within the per-branch budget.
+  Analytic Jacobians, branch-specific starts, and a shared budget scheduler
+  would raise the solved fraction without changing the geometry.
+- **D. Weak-stratum study.** No weak-only certificate occurs in the corpus, so
+  the weak stratum is currently untested as a classification tool. A targeted
+  study of nearly-touching families (zero-overlap SS, endpoint CS) would
+  decide whether it adds information or should be retired from the status
+  story.
+- **E. Freeze and publish.** The geometry, verifier, symmetry contract and
+  corrected corpus are a coherent Phase-2 reference. This is the lowest-effort
+  option and would leave the open questions explicitly labelled.
 
-**Recommendation: B, with D as the next measurement.** The largest concrete
-gap exposed by these experiments is not solver throughput but the absence of
-absorption-aware impossibility filters: 156 classes are proved by three rules,
-and 1240 remain unresolved, many for reasons that are local and provable. B
-turns those into `PROVED_INFEASIBLE` without touching the geometry, and D then
-tests whether the resulting picture generalizes to `n = 3`. A is a run, not a
-direction; C is worth doing only if B leaves a large residuum; E is the
-fallback if Phase 2 is to be closed here.
+**Recommendation: A, with B as the parallel proof lane.** The symmetry repair
+changed 35 corpus classes from `NOT_FOUND` to feasible and the absorption
+filters proved 79 more; the natural next test is whether the three-square
+corpus reproduces the same structural picture. B is the cheapest way to keep
+raising the solved fraction while A runs.

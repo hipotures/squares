@@ -259,7 +259,7 @@ int corpus_command(int argc, char** argv) {
         }
         const std::string_view value = argv[++i];
         if (arg == "--n") {
-            square_count = parse_positive(value, "--n", 2);
+            square_count = parse_positive(value, "--n", 3);
         } else if (arg == "--weight") {
             weight = parse_positive(value, "--weight", 6);
         } else if (arg == "--json") {

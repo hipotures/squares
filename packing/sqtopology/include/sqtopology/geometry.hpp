@@ -15,12 +15,16 @@ namespace sqtopology {
 // Conventions are fixed by the engine's fixture set and the ring indexing in
 // topology.hpp:
 //
-//  - squares have unit side and are posed by their center (x, y) and an
-//    orientation theta (radians, counterclockwise). In the body frame,
-//    corner c sits at angle 135 - 90 c degrees (corner 0 top-left, 1 top-right,
-//    2 bottom-right, 3 bottom-left) at distance sqrt(2)/2, and side s is the
-//    segment from corner s to corner s+1 (mod 4), so side 0 is the top side,
-//    1 right, 2 bottom, 3 left.
+//  - squares have unit side and are posed by their center (x, y), an
+//    orientation theta (radians, counterclockwise), and a boolean
+//    frame_reflected. In the body frame, corner c sits at angle
+//    135 - 90 c degrees (corner 0 top-left, 1 top-right, 2 bottom-right,
+//    3 bottom-left) at distance sqrt(2)/2, and side s is the segment from
+//    corner s to corner s+1 (mod 4), so side 0 is the top side, 1 right,
+//    2 bottom, 3 left. When frame_reflected is set, the corner/side indices
+//    are mapped through the body reflection (x, y) -> (-y, -x) first (the
+//    reflection with ring map r -> 8 - r, fixing corners 0 and 2); the
+//    occupied point set is unchanged, only the labeling changes.
 //  - ring index r = 2 * index + (side ? 1 : 0), matching feature_ring_index.
 //  - the container is the axis-aligned square [0, L]^2; wall 0 is the line
 //    y = L (top), 1 is x = L (right), 2 is y = 0 (bottom), 3 is x = 0 (left),
@@ -45,10 +49,21 @@ struct Vec2 {
 [[nodiscard]] double cross(Vec2 a, Vec2 b) noexcept;
 [[nodiscard]] double norm(Vec2 v) noexcept;
 
+// Pose of a unit square. `frame_reflected` is the chirality of the semantic
+// feature frame: it says whether corner/side indices are mapped to the physical
+// square through the body frame (false) or through its mirror (true).
+//
+// The physical square is the same set of points for both values (a square is
+// achiral and the corner set is invariant under the mirror), so the flag is a
+// pure label gauge. It is what lets the scene action cover mixed-parity
+// elements of G_n, where one square's feature labels are reflected while the
+// container is not (or vice versa). Without it, (x, y, theta) represents only
+// orientation-preserving feature frames.
 struct SquarePose {
     double x{0.0};
     double y{0.0};
     double theta{0.0};
+    bool frame_reflected{false};
 };
 
 struct Scene {
@@ -60,6 +75,10 @@ struct Scene {
 [[nodiscard]] Vec2 corner_offset(std::uint8_t corner) noexcept;
 [[nodiscard]] Vec2 side_midpoint_offset(std::uint8_t side) noexcept;
 [[nodiscard]] Vec2 corner_position(const SquarePose& pose, std::uint8_t corner) noexcept;
+[[nodiscard]] Vec2 side_midpoint_position(
+    const SquarePose& pose,
+    std::uint8_t side
+) noexcept;
 [[nodiscard]] std::array<Vec2, 2> side_endpoints(
     const SquarePose& pose,
     std::uint8_t side

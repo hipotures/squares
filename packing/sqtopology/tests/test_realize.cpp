@@ -6,8 +6,9 @@
 //  2. the solver's statuses agree with the static filters / negative fixtures,
 //     and every VERIFIED_FEASIBLE witness is re-verified from scratch;
 //  3. the scene action psi_g commutes with the production relabel/permute
-//     transformations on exactly the parity-consistent subgroup, and the
-//     n = 2 corpus enumeration reproduces the Burnside coefficients.
+//     transformations for every element of G_n (exact and weak strata, with
+//     the per-square feature-frame parity), and the n = 2/3 corpus
+//     enumeration reproduces the Burnside coefficients.
 //
 // The corpus solve tests deliberately use a small budget; the full corpus run
 // is a separate CTest target (`sqtopology_realize_corpus_w2`).
@@ -247,7 +248,7 @@ void test_grid_topology_is_tight() {
 }
 
 // ---------------------------------------------------------------------------
-// psi_g: scene action versus the production label transformations
+// psi_g: full G_n scene action versus the production label transformations
 // ---------------------------------------------------------------------------
 
 Scene two_square_corner_scene() {
@@ -257,54 +258,138 @@ Scene two_square_corner_scene() {
     return scene;
 }
 
-bool parity_consistent(const GroupElement& element) {
-    for (SquareId square = 0; square < element.square_count; ++square) {
-        if (element.local[square].reflected != element.container.reflected) {
-            return false;
-        }
-    }
-    return true;
+Scene two_square_corner_side_scene() {
+    const double radius = std::sqrt(2.0) / 2.0;
+    Scene scene;
+    scene.container_side = 3.0;
+    scene.squares = {
+        SquarePose{1.5 - radius, 2.0, -3.14159265358979323846 / 4.0},
+        SquarePose{2.0, 2.0, 0.0},
+    };
+    return scene;
 }
 
-void test_scene_action_commutes_with_relabeling() {
-    const Scene scene = two_square_corner_scene();
-    const std::uint32_t n = 2;
-    const Topology base = topology_of(extract_contacts(scene).exact, n);
-    expect(keys_of(base) == keys_of(make_fixture("corner-corner-2")),
-           "two-square scene extracts the corner-corner fixture");
+Scene two_square_side_side_scene() {
+    Scene scene;
+    scene.container_side = 3.0;
+    scene.squares = {SquarePose{1.0, 2.0, 0.0}, SquarePose{2.0, 2.0, 0.0}};
+    return scene;
+}
 
-    std::uint64_t consistent = 0;
-    std::uint64_t inconsistent = 0;
+// Multi-contact scene: SS along the bottom wall plus two wall-side contacts.
+Scene two_square_wall_scene() {
+    Scene scene;
+    scene.container_side = 3.0;
+    scene.squares = {SquarePose{1.0, 0.5, 0.0}, SquarePose{2.0, 0.5, 0.0}};
+    return scene;
+}
+
+// Check extraction(psi_g(P)) == g . extraction(P) for every element of G_n,
+// on both the exact and the weak stratum, and that the moved scene stays
+// contained and interior-disjoint. This is the central symmetry invariant.
+void expect_full_group_covariance(const Scene& scene, const std::string& name) {
+    const std::uint32_t n = static_cast<std::uint32_t>(scene.squares.size());
+    const ExtractionResult base = extract_contacts(scene);
+    const Topology base_exact = topology_of(base.exact, n);
+    const Topology base_weak = topology_of(base.weak, n);
     for (std::uint64_t index = 0; index < group_element_count(n); ++index) {
         const GroupElement element = decode_group_element(n, index);
-        if (!parity_consistent(element)) {
-            ++inconsistent;
-            bool threw = false;
-            try {
-                (void)apply_group_element_to_scene(element, scene);
-            } catch (const std::invalid_argument&) {
-                threw = true;
-            }
-            expect(threw, "mixed-parity elements must be rejected by the scene action");
-            continue;
-        }
-        ++consistent;
         const Scene moved = apply_group_element_to_scene(element, scene);
-        expect(std::abs(moved.container_side - scene.container_side) <= 1e-12,
-               "scene action preserves the container side");
-        const Topology moved_topology = topology_of(extract_contacts(moved).exact, n);
-        const Topology expected = apply_group_element_to_topology(base, element);
         expect(
-            keys_of(moved_topology) == keys_of(expected),
-            "psi_g must commute with relabel_square/relabel_container/permute_squares"
+            std::abs(moved.container_side - scene.container_side) <= 1e-12,
+            "psi_g preserves the container side: " + name
         );
-        const WitnessReport report = verify_witness(moved, expected);
-        expect(report.contained && report.separated,
-               "transformed scene stays inside the container and separated");
+        const ExtractionResult got = extract_contacts(moved);
+        const Topology expected_exact = apply_group_element_to_topology(base_exact, element);
+        const Topology expected_weak = apply_group_element_to_topology(base_weak, element);
+        expect(
+            keys_of(topology_of(got.exact, n)) == keys_of(expected_exact),
+            "exact extraction covariance under full G_n: " + name
+        );
+        expect(
+            keys_of(topology_of(got.weak, n)) == keys_of(expected_weak),
+            "weak extraction covariance under full G_n: " + name
+        );
+        const WitnessReport report = verify_witness(moved, expected_exact);
+        expect(
+            report.contained && report.separated,
+            "psi_g preserves containment and separation: " + name
+        );
     }
-    expect(consistent == 256, "G_2 has 256 parity-consistent elements");
-    expect(inconsistent == group_element_count(n) - consistent,
-           "the remaining elements are mixed parity");
+}
+
+void test_full_group_covariance_n1() {
+    Scene wall_side;
+    wall_side.container_side = 3.0;
+    wall_side.squares = {SquarePose{1.5, 2.5, 0.0}};
+    expect_full_group_covariance(wall_side, "wall-side-1");
+
+    Scene wall_corner;
+    wall_corner.container_side = 3.0;
+    wall_corner.squares = {
+        SquarePose{1.5, 3.0 - std::sqrt(2.0) / 2.0, -3.14159265358979323846 / 4.0}};
+    expect_full_group_covariance(wall_corner, "wall-corner-1");
+
+    Scene mirrored;
+    mirrored.container_side = 2.0;
+    mirrored.squares = {SquarePose{1.0, 1.0, 0.0, true}};
+    expect_full_group_covariance(mirrored, "single-mirrored-1");
+    expect(extract_contacts(mirrored).exact.size() == 0, "free mirrored square has no contacts");
+}
+
+void test_full_group_covariance_n2() {
+    expect_full_group_covariance(two_square_corner_scene(), "corner-corner-2");
+    expect_full_group_covariance(two_square_corner_side_scene(), "corner-side-2");
+    expect_full_group_covariance(two_square_side_side_scene(), "side-side-2");
+    expect_full_group_covariance(two_square_wall_scene(), "wall-ss-2");
+
+    // Mixed frame parity: the same physical squares with one frame reflected.
+    Scene mixed = two_square_side_side_scene();
+    mixed.squares[0].frame_reflected = true;
+    expect_full_group_covariance(mixed, "side-side-2-mixed-frame");
+}
+
+void test_full_group_covariance_n3() {
+    Scene scene;
+    scene.container_side = 2.0;
+    scene.squares = {
+        SquarePose{0.5, 1.5, 0.0},
+        SquarePose{1.5, 1.5, 0.0},
+        SquarePose{0.5, 0.5, 0.0},
+    };
+    expect_full_group_covariance(scene, "grid-3squares");
+}
+
+void test_frame_parity_is_gauge() {
+    // Changing only frame_reflected keeps the occupied point set identical and
+    // relabels corner c as corner (-c) mod 4, the engine's local reflection
+    // (rotation 0, reflected): corners 0 and 2 are fixed, 1 and 3 swap.
+    Scene plain = two_square_corner_scene();
+    Scene reflected = plain;
+    reflected.squares[0].frame_reflected = true;
+
+    const auto plain_corners = square_corners(plain.squares[0]);
+    const auto reflected_corners = square_corners(reflected.squares[0]);
+    for (std::uint8_t corner = 0; corner < 4; ++corner) {
+        const Vec2 a = plain_corners[corner];
+        const Vec2 b = reflected_corners[static_cast<std::uint8_t>((4U - corner) % 4U)];
+        expect(norm(a - b) <= 1e-12, "frame parity maps corner c to -c");
+    }
+    // The extracted sets differ exactly by the local reflection element.
+    GroupElement tau = identity_group_element(2);
+    tau.local[0] = D4Element{0, true};
+    const Topology plain_topology = topology_of(extract_contacts(plain).exact, 2);
+    const Topology reflected_topology = topology_of(extract_contacts(reflected).exact, 2);
+    expect(
+        keys_of(reflected_topology) == keys_of(apply_group_element_to_topology(plain_topology, tau)),
+        "frame parity acts as the local reflection on extracted contacts"
+    );
+    expect(
+        keys_of(topology_of(extract_contacts(reflected).weak, 2))
+            == keys_of(apply_group_element_to_topology(
+                   topology_of(extract_contacts(plain).weak, 2), tau)),
+        "frame parity acts as the local reflection on weak contacts"
+    );
 }
 
 void test_scene_action_on_wall_contacts() {
@@ -329,26 +414,30 @@ void test_scene_action_on_wall_contacts() {
         expect(moved_topology.contacts().front().wall.has_value(), "wall contact survives");
     }
 
-    // Vertical mirror x -> L - x: corner c maps to (1 - c) mod 4, and walls map
-    // through (4 - w) mod 4.
+    // Vertical mirror x -> L - x: corner c maps to (1 - c) mod 4 and wall w to
+    // (4 - w) mod 4. Test both the parity-consistent and the mixed-parity
+    // case; the latter is only representable with the frame gauge.
     Scene corners;
     corners.container_side = 3.0;
-    corners.squares = {SquarePose{1.5, 3.0 - std::sqrt(2.0) / 2.0, -3.14159265358979323846 / 4.0}};
+    corners.squares = {
+        SquarePose{1.5, 3.0 - std::sqrt(2.0) / 2.0, -3.14159265358979323846 / 4.0}};
     const Topology corner_base = topology_of(extract_contacts(corners).exact, 1);
-    GroupElement mirror = identity_group_element(1);
-    mirror.container = D4Element{0, true};
-    mirror.local[0] = D4Element{0, true};
-    const Scene mirrored = apply_group_element_to_scene(mirror, corners);
-    const Topology mirrored_topology = topology_of(extract_contacts(mirrored).exact, 1);
-    const Topology expected = apply_group_element_to_topology(corner_base, mirror);
-    expect(keys_of(mirrored_topology) == keys_of(expected),
-           "vertical mirror commutes with relabeling");
+    for (const bool local_reflected : {true, false}) {
+        GroupElement mirror = identity_group_element(1);
+        mirror.container = D4Element{0, true};
+        mirror.local[0] = D4Element{0, local_reflected};
+        const Scene mirrored = apply_group_element_to_scene(mirror, corners);
+        const Topology moved = topology_of(extract_contacts(mirrored).exact, 1);
+        const Topology expected = apply_group_element_to_topology(corner_base, mirror);
+        expect(keys_of(moved) == keys_of(expected),
+               "vertical mirror commutes with relabeling for either frame parity");
+    }
 }
 
 void test_scene_action_transfers_witnesses() {
     // Realize the corner-corner topology, then push both the topology and the
-    // witness through a nontrivial parity-consistent element; the moved scene
-    // must verify against the moved topology.
+    // witness through mixed-parity elements; the moved scene must verify
+    // against the moved topology. This is what makes psi_g total.
     const Topology sigma = make_fixture("corner-corner-2");
     const SolveResult result = realize_topology(sigma);
     expect(result.status == RealizabilityStatus::VerifiedFeasible, "corner-corner realized");
@@ -366,6 +455,12 @@ void test_scene_action_transfers_witnesses() {
             {D4Element{0, true}, D4Element{2, true}},
             D4Element{0, true},
         },
+        GroupElement{
+            2,
+            {1, 0},
+            {D4Element{0, true}, D4Element{0, false}},
+            D4Element{0, false},
+        },
     };
     for (const auto& element : elements) {
         expect(is_permutation(element), "test element is a valid group element");
@@ -374,6 +469,193 @@ void test_scene_action_transfers_witnesses() {
         const WitnessReport report = verify_witness(moved_scene, moved_sigma);
         expect(report.exact_accepted,
                "psi_g transfers the exact witness to the relabeled topology");
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Filters: full-group invariance and the absorption-aware rules
+// ---------------------------------------------------------------------------
+
+void expect_filter_invariance(const Topology& sigma, const std::string& name, bool proved) {
+    const std::uint32_t n = sigma.square_count();
+    for (std::uint64_t index = 0; index < group_element_count(n); ++index) {
+        const GroupElement element = decode_group_element(n, index);
+        const Topology moved = apply_group_element_to_topology(sigma, element);
+        const InfeasibilityFilter filter = static_infeasibility_filters(moved);
+        expect(
+            filter.proved == proved,
+            "filter invariance under full G_n for " + name
+        );
+    }
+}
+
+void test_filter_group_invariance() {
+    for (const auto& fixture : negative_fixtures()) {
+        if (fixture.expected_status == RealizabilityStatus::ProvedInfeasible) {
+            expect_filter_invariance(fixture.topology, fixture.name, true);
+        }
+    }
+    // Positive controls: feasible single-contact topologies.
+    Topology corner_wall(1);
+    corner_wall.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+    expect_filter_invariance(corner_wall.normalized(), "corner-wall", false);
+
+    Topology wall_side(1);
+    wall_side.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 0}, 0));
+    expect_filter_invariance(wall_side.normalized(), "wall-side", false);
+
+    Topology adjacent_walls(1);
+    adjacent_walls.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+    adjacent_walls.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 1}, 1));
+    expect_filter_invariance(adjacent_walls.normalized(), "adjacent-walls", false);
+}
+
+void test_absorption_filters() {
+    const auto filter_of = [](const Topology& topology) {
+        return static_infeasibility_filters(topology);
+    };
+    const auto expect_rule = [&](const Topology& topology, const std::string& rule,
+                                 const std::string& name) {
+        const InfeasibilityFilter filter = filter_of(topology);
+        expect(filter.proved, "rule must fire for " + name);
+        expect(filter.reason.rfind(rule, 0) == 0, "expected " + rule + " for " + name);
+        const SolveResult result = realize_topology(topology);
+        expect(
+            result.status == RealizabilityStatus::ProvedInfeasible,
+            "filtered topology is proved infeasible: " + name
+        );
+        expect_filter_invariance(topology, name, true);
+    };
+
+    {
+        // R4: side 0 on wall 0 plus its endpoint corner 0 on wall 0.
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        expect_rule(topology.normalized(), "R4", "R4-side-endpoint");
+    }
+    {
+        // R4 also covers the other endpoint (corner 1 of side 0).
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 1}, 0));
+        expect_rule(topology.normalized(), "R4", "R4-side-endpoint-2");
+    }
+    {
+        // R5: adjacent corners 0 and 1 on wall 0 force side 0 onto the wall.
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 1}, 0));
+        expect_rule(topology.normalized(), "R5", "R5-adjacent-corners");
+    }
+    {
+        // R6: opposite corners 0 and 2 on wall 0 put a third corner outside.
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 2}, 0));
+        expect_rule(topology.normalized(), "R6", "R6-opposite-corners");
+    }
+
+    // Positive controls that are close to the rules but not covered by them.
+    const auto expect_feasible = [](const Topology& topology, const std::string& name) {
+        const InfeasibilityFilter filter = static_infeasibility_filters(topology);
+        expect(!filter.proved, "positive control must not be filtered: " + name);
+        const SolveResult result = realize_topology(topology);
+        expect(
+            result.status == RealizabilityStatus::VerifiedFeasible,
+            "positive control must be realizable: " + name
+        );
+        expect(
+            verify_witness(result.witness, topology).exact_accepted,
+            "positive control witness re-verifies: " + name
+        );
+    };
+    {
+        // Side of square 0 on wall 0, corner of *another* square on wall 0.
+        Topology topology(2);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{1, FeatureKind::Corner, 0}, 0));
+        expect_feasible(topology.normalized(), "R4-positive-other-square");
+    }
+    {
+        // Adjacent corners of two different squares on the same wall.
+        Topology topology(2);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{1, FeatureKind::Corner, 1}, 0));
+        expect_feasible(topology.normalized(), "R5-positive-other-square");
+    }
+    {
+        // Opposite corners of two different squares on the same wall.
+        Topology topology(2);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{1, FeatureKind::Corner, 2}, 0));
+        expect_feasible(topology.normalized(), "R6-positive-other-square");
+    }
+    {
+        // Adjacent corners of one square on adjacent walls: realizable, and
+        // the old standard-frame "wrong order" is also realizable through the
+        // frame gauge (the class appears in the weight-2 corpus).
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 1}, 1));
+        expect_feasible(topology.normalized(), "adjacent-walls-positive");
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Gauge-branch lifting: the two weight-2 classes that the standard frame
+// cannot realize but a reflected local frame can.
+// ---------------------------------------------------------------------------
+
+void test_branch_lifting() {
+    struct Case {
+        Topology topology;
+        std::uint8_t reflected_square;
+    };
+    std::vector<Case> cases;
+    {
+        Topology topology(2);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 1));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 1}, 0));
+        cases.push_back(Case{topology.normalized(), 0});
+    }
+    {
+        Topology topology(2);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 0}, 1));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 1}, 0));
+        cases.push_back(Case{topology.normalized(), 0});
+    }
+    for (const auto& item : cases) {
+        const SolveResult result = realize_topology(item.topology);
+        expect(
+            result.status == RealizabilityStatus::VerifiedFeasible,
+            "mixed-frame branch class is feasible: "
+                + topology_contact_keys_json(item.topology)
+        );
+        expect(result.frame_branch != 0U, "witness uses a reflected frame branch");
+        expect(
+            (result.frame_branch & (1U << item.reflected_square)) != 0U,
+            "expected square carries the reflected frame"
+        );
+        expect(
+            result.witness.squares[item.reflected_square].frame_reflected,
+            "witness scene records the reflected frame"
+        );
+        expect(
+            verify_witness(result.witness, item.topology).exact_accepted,
+            "branch-lifted witness verifies against the canonical topology"
+        );
+
+        // The lifted witness is psi_tau of the branch witness, so applying the
+        // same tau to the topology must give the branch that was solved.
+        GroupElement tau = identity_group_element(2);
+        tau.local[item.reflected_square] = D4Element{0, true};
+        const Scene branch_scene = apply_group_element_to_scene(tau, result.witness);
+        const Topology branch_topology = apply_group_element_to_topology(item.topology, tau);
+        expect(
+            verify_witness(branch_scene, branch_topology).exact_accepted,
+            "applying tau maps the lifted witness to a standard-frame witness"
+        );
     }
 }
 
@@ -435,10 +717,36 @@ void test_corpus_weight_one_solves() {
         expect(recheck.exact_accepted, "weight-1 witness re-verifies");
     }
     const std::string json = corpus_report_to_json(report);
-    expect(json.find("\"schema\":\"sqtopology.realizability.v1\"") != std::string::npos,
+    expect(json.find("\"schema\":\"sqtopology.realizability.v2\"") != std::string::npos,
            "corpus report schema");
     expect(json.find("\"class_count\":5") != std::string::npos, "corpus report class count");
     expect(json.find("\"weak_only\":0") != std::string::npos, "corpus report weak count");
+}
+
+void test_n3_weight_one() {
+    const auto classes = corpus_classes(3, 1);
+    expect(classes.size() == 5, "n = 3 weight 1 has 5 Burnside classes");
+    SolveConfig config;
+    config.starts_per_rung = 24;
+    config.max_solves = 600;
+    config.ladder = {2.0, 2.5, 3.0};
+    const CorpusReport report = run_corpus(3, 1, config);
+    expect(report.classes.size() == 5, "n = 3 weight-1 corpus covers 5 classes");
+    for (const auto& entry : report.classes) {
+        expect(
+            entry.solve.status == RealizabilityStatus::VerifiedFeasible,
+            "every n = 3 single-contact class is realizable: "
+                + topology_contact_keys_json(entry.corpus.topology)
+        );
+        expect(entry.solve.exact_witness, "n = 3 weight-1 witnesses are exact");
+        expect(
+            verify_witness(entry.solve.witness, entry.corpus.topology).exact_accepted,
+            "n = 3 weight-1 witness re-verifies"
+        );
+        // The third (free) square cannot make the container tighter than the
+        // n = 2 lower bound, and the solver must stay above it.
+        expect(entry.solve.container_side > 2.0, "n = 3 container side above 2");
+    }
 }
 
 void test_weight_one_golden() {
@@ -446,7 +754,7 @@ void test_weight_one_golden() {
     // run. Floating-point digits are not pinned (they are platform dependent);
     // the schema, the class accounting, and the status distribution are.
     const std::string json = read_source_file("tests/data/realizability-n2-w1.json");
-    expect(extract_string(json, "schema") == "sqtopology.realizability.v1",
+    expect(extract_string(json, "schema") == "sqtopology.realizability.v2",
            "golden schema");
     expect(extract_uint(json, "n") == 2, "golden n");
     expect(extract_uint(json, "weight") == 1, "golden weight");
@@ -462,6 +770,14 @@ void test_weight_one_golden() {
     expect(
         count_occurrences(json, "\"status\":\"NOT_FOUND\"") == 0,
         "golden has no not-found classes"
+    );
+    expect(
+        count_occurrences(json, "\"frame_branch\":0") == 5,
+        "weight-1 golden witnesses use the standard frame"
+    );
+    expect(
+        count_occurrences(json, "\"branches_tried\":1") == 5,
+        "weight-1 golden solves one gauge branch per class"
     );
     expect(json.find("\"witness\":{\"container_side\"") != std::string::npos,
            "golden witnesses are embedded");
@@ -498,11 +814,18 @@ int main() {
         {"negative fixtures", test_negative_fixtures},
         {"solver on fixture topologies", test_solver_on_fixture_topologies},
         {"grid topology is tight", test_grid_topology_is_tight},
-        {"scene action commutes", test_scene_action_commutes_with_relabeling},
+        {"full G1 covariance", test_full_group_covariance_n1},
+        {"full G2 covariance", test_full_group_covariance_n2},
+        {"full G3 covariance", test_full_group_covariance_n3},
+        {"frame parity is gauge", test_frame_parity_is_gauge},
         {"scene action on wall contacts", test_scene_action_on_wall_contacts},
         {"scene action transfers witnesses", test_scene_action_transfers_witnesses},
         {"corpus enumeration counts", test_corpus_enumeration_counts},
+        {"filter group invariance", test_filter_group_invariance},
+        {"absorption filters", test_absorption_filters},
+        {"branch lifting", test_branch_lifting},
         {"corpus weight one solves", test_corpus_weight_one_solves},
+        {"n = 3 weight one", test_n3_weight_one},
         {"weight one golden", test_weight_one_golden},
         {"status and JSON shapes", test_status_and_json_shapes},
     };

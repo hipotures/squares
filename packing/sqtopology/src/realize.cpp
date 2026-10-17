@@ -199,6 +199,100 @@ InfeasibilityFilter static_infeasibility_filters(const Topology& sigma) {
         }
     }
 
+    // R4-R6: exact-stratum absorption rules. These use only the required
+    // wall events, so they are independent of the solver and invariant under
+    // the full G_n action (endpoint adjacency and opposite pairs are D4
+    // relations). They are stated for the tolerance-based extraction actually
+    // implemented in geometry.cpp, not only for the exact continuum picture.
+    std::map<std::uint64_t, std::set<std::uint8_t>> side_walls_required;
+    std::map<std::uint64_t, std::set<std::uint8_t>> corner_walls_required;
+    for (const auto& contact : sigma.contacts()) {
+        if (contact.kind != ContactKind::Wall || !contact.wall.has_value()) {
+            continue;
+        }
+        if (contact.a.kind == FeatureKind::Side) {
+            side_walls_required[side_node(contact.a.square, contact.a.index)]
+                .insert(*contact.wall);
+        } else {
+            corner_walls_required[corner_node(contact.a.square, contact.a.index)]
+                .insert(*contact.wall);
+        }
+    }
+    const auto has_corner_wall = [&corner_walls_required](
+        SquareId square, std::uint8_t corner, std::uint8_t wall
+    ) {
+        const auto found = corner_walls_required.find(corner_node(square, corner % 4U));
+        return found != corner_walls_required.end()
+            && found->second.count(wall) != 0U;
+    };
+
+    // R4: a wall-side contact absorbs the wall-corner contacts of its own two
+    // endpoints on that wall. Requiring both the side and an endpoint corner
+    // as separate exact events is therefore contradictory.
+    for (const auto& [node, walls] : side_walls_required) {
+        const SquareId square = static_cast<SquareId>(node / 4U);
+        const std::uint8_t side = static_cast<std::uint8_t>(node % 4U);
+        for (const std::uint8_t wall : walls) {
+            for (const std::uint8_t corner : {
+                     side, static_cast<std::uint8_t>((side + 1U) % 4U)}) {
+                if (has_corner_wall(square, corner, wall)) {
+                    std::ostringstream message;
+                    message << "R4: corner " << static_cast<int>(corner)
+                            << " of square " << square
+                            << " is an endpoint of side " << static_cast<int>(side)
+                            << " required on wall " << static_cast<int>(wall)
+                            << ", so the corner-wall event is absorbed";
+                    result.proved = true;
+                    result.reason = message.str();
+                    return result;
+                }
+            }
+        }
+    }
+
+    // R5: two adjacent corners of one square on the same wall put the whole
+    // side between them on the wall, and its side-wall event absorbs both
+    // corner-wall events.
+    for (const auto& [node, walls] : corner_walls_required) {
+        const SquareId square = static_cast<SquareId>(node / 4U);
+        const std::uint8_t corner = static_cast<std::uint8_t>(node % 4U);
+        for (const std::uint8_t wall : walls) {
+            if (has_corner_wall(square, static_cast<std::uint8_t>((corner + 1U) % 4U), wall)) {
+                std::ostringstream message;
+                message << "R5: adjacent corners " << static_cast<int>(corner)
+                        << " and " << static_cast<int>((corner + 1U) % 4U)
+                        << " of square " << square
+                        << " are required on wall " << static_cast<int>(wall)
+                        << ", so the connecting side-wall event absorbs both";
+                result.proved = true;
+                result.reason = message.str();
+                return result;
+            }
+        }
+    }
+
+    // R6: two opposite corners of one square on the same wall force the other
+    // two corners to distance 1/sqrt(2) on either side of that wall line; one
+    // of them is outside [0, L]^2. This is a containment violation far larger
+    // than every extraction tolerance (1e-7), so it is tolerance-safe.
+    for (const auto& [node, walls] : corner_walls_required) {
+        const SquareId square = static_cast<SquareId>(node / 4U);
+        const std::uint8_t corner = static_cast<std::uint8_t>(node % 4U);
+        for (const std::uint8_t wall : walls) {
+            if (has_corner_wall(square, static_cast<std::uint8_t>((corner + 2U) % 4U), wall)) {
+                std::ostringstream message;
+                message << "R6: opposite corners " << static_cast<int>(corner)
+                        << " and " << static_cast<int>((corner + 2U) % 4U)
+                        << " of square " << square
+                        << " are required on wall " << static_cast<int>(wall)
+                        << ", forcing another corner outside the container";
+                result.proved = true;
+                result.reason = message.str();
+                return result;
+            }
+        }
+    }
+
     return result;
 }
 
@@ -289,7 +383,9 @@ std::string scene_to_json(const Scene& scene) {
         }
         const auto& pose = scene.squares[index];
         out << "{\"x\":" << pose.x << ",\"y\":" << pose.y
-            << ",\"theta\":" << pose.theta << '}';
+            << ",\"theta\":" << pose.theta
+            << ",\"frame_reflected\":" << (pose.frame_reflected ? "true" : "false")
+            << '}';
     }
     out << "]}";
     return out.str();
@@ -462,12 +558,22 @@ double wall_free_coordinate(Vec2 point, std::uint8_t wall) noexcept {
     return (wall % 4U == 0U || wall % 4U == 2U) ? point.x : point.y;
 }
 
+// Side direction (from corner s to corner s+1) and midpoint, both computed
+// from parity-aware corner positions so the frame gauge is respected.
+Vec2 side_direction(const SquarePose& pose, std::uint8_t side) {
+    const auto endpoints = side_endpoints(pose, side);
+    const Vec2 direction = endpoints[1] - endpoints[0];
+    const double length = norm(direction);
+    return length > 0.0 ? (1.0 / length) * direction : Vec2{1.0, 0.0};
+}
+
 double side_direction_angle(const SquarePose& pose, std::uint8_t side) {
-    return pose.theta - 0.5 * kPi * static_cast<double>(side);
+    const Vec2 direction = side_direction(pose, side);
+    return std::atan2(direction.y, direction.x);
 }
 
 Vec2 side_midpoint(const SquarePose& pose, std::uint8_t side) {
-    return Vec2{pose.x, pose.y} + rotate(side_midpoint_offset(side), pose.theta);
+    return side_midpoint_position(pose, side);
 }
 
 void evaluate_residuals(
@@ -519,10 +625,8 @@ void evaluate_residuals(
                 const SquarePose second_pose = pose(contact.b->square);
                 const std::uint8_t first_side = contact.a.index;
                 const std::uint8_t second_side = contact.b->index;
-                const double first_angle = side_direction_angle(first_pose, first_side);
-                const double second_angle = side_direction_angle(second_pose, second_side);
-                const Vec2 first_direction{std::cos(first_angle), std::sin(first_angle)};
-                const Vec2 second_direction{std::cos(second_angle), std::sin(second_angle)};
+                const Vec2 first_direction = side_direction(first_pose, first_side);
+                const Vec2 second_direction = side_direction(second_pose, second_side);
                 const Vec2 first_mid = side_midpoint(first_pose, first_side);
                 const Vec2 second_mid = side_midpoint(second_pose, second_side);
                 push(cross(first_direction, second_direction));
@@ -1441,6 +1545,115 @@ ContainerAttempt attempt_container(
 
 }  // namespace
 
+namespace {
+
+// Outcome of solving one G_n-orbit representative in the standard feature
+// frame. The 2^n gauge branches of a class are solved independently; a witness
+// is transported back to the class representative with psi_g afterwards.
+struct RepresentativeOutcome {
+    bool exact{false};
+    double exact_l{-1.0};
+    Scene exact_scene;
+    WitnessReport exact_report;
+    bool weak{false};
+    double weak_l{0.0};
+    Scene weak_scene;
+    WitnessReport weak_report;
+    bool has_best{false};
+    double best_hard{std::numeric_limits<double>::infinity()};
+    Scene best_scene;
+    WitnessReport best_report;
+    double best_l{0.0};
+    double bisection_lower{0.0};
+};
+
+RepresentativeOutcome solve_representative(
+    const Topology& sigma,
+    const SolveConfig& config,
+    const std::vector<double>& ladder,
+    SplitMix64& rng,
+    std::uint64_t& total_solves
+) {
+    RepresentativeOutcome outcome;
+    std::uint64_t branch_solves = 0;
+    ContainerAttempt best;
+    for (const double container_side : ladder) {
+        if (branch_solves >= config.max_solves) {
+            break;
+        }
+        ContainerAttempt attempt =
+            attempt_container(sigma, container_side, config, rng, branch_solves);
+        if (attempt.exact) {
+            outcome.exact = true;
+            outcome.exact_l = container_side;
+            outcome.exact_scene = attempt.exact_scene;
+            outcome.exact_report = attempt.exact_report;
+            break;
+        }
+        if (attempt.weak && !outcome.weak) {
+            outcome.weak = true;
+            outcome.weak_l = container_side;
+            outcome.weak_scene = attempt.weak_scene;
+            outcome.weak_report = attempt.weak_report;
+        }
+        if (attempt.has_best && (!best.has_best || attempt.best_hard < best.best_hard)) {
+            best = attempt;
+        }
+    }
+
+    if (outcome.exact) {
+        double lower = 0.0;
+        double upper = outcome.exact_l;
+        for (const double container_side : ladder) {
+            if (container_side < outcome.exact_l) {
+                lower = container_side;
+            }
+        }
+        if (config.minimize_container) {
+            for (std::uint32_t step = 0; step < config.minimization_steps; ++step) {
+                if (branch_solves >= config.max_solves) {
+                    break;
+                }
+                const double middle = 0.5 * (lower + upper);
+                if (!(middle > lower) || !(middle < upper)) {
+                    break;
+                }
+                ContainerAttempt attempt =
+                    attempt_container(sigma, middle, config, rng, branch_solves);
+                if (attempt.exact) {
+                    upper = middle;
+                    outcome.exact_scene = attempt.exact_scene;
+                    outcome.exact_report = attempt.exact_report;
+                    outcome.exact_l = middle;
+                } else {
+                    lower = middle;
+                }
+            }
+        }
+        outcome.bisection_lower = lower;
+    } else if (best.has_best) {
+        outcome.has_best = true;
+        outcome.best_hard = best.best_hard;
+        outcome.best_scene = best.best_scene;
+        outcome.best_report = best.best_report;
+        outcome.best_l = best.container_side;
+    }
+    total_solves += branch_solves;
+    return outcome;
+}
+
+GroupElement frame_branch_element(std::uint32_t square_count, std::uint32_t mask) {
+    GroupElement element = identity_group_element(square_count);
+    for (SquareId square = 0; square < square_count; ++square) {
+        if ((mask & (1U << square)) != 0U) {
+            element.local[square] = D4Element{0, true};
+        }
+    }
+    return element;
+}
+
+}  // namespace
+
 SolveResult realize_topology(const Topology& sigma, const SolveConfig& config) {
     SolveResult result;
     const auto validation = sigma.validate();
@@ -1448,7 +1661,13 @@ SolveResult realize_topology(const Topology& sigma, const SolveConfig& config) {
         throw std::invalid_argument("realize_topology requires a valid topology");
     }
     const Topology normalized = sigma.normalized();
+    if (normalized.square_count() == 0 || normalized.square_count() > kMaxOrbitSquares) {
+        throw std::invalid_argument("realize_topology supports 1 <= square_count <= kMaxOrbitSquares");
+    }
 
+    // R1-R6 are invariants of the labelled incidence structure, hence of the
+    // full G_n orbit (see static_infeasibility_filters). They are applied once
+    // to the class representative and lifted to every gauge branch.
     const InfeasibilityFilter filter = static_infeasibility_filters(normalized);
     if (filter.proved) {
         result.status = RealizabilityStatus::ProvedInfeasible;
@@ -1471,88 +1690,206 @@ SolveResult realize_topology(const Topology& sigma, const SolveConfig& config) {
         throw std::invalid_argument("realize_topology requires a non-empty container ladder");
     }
 
-    const std::uint64_t seed =
+    const std::uint64_t base_seed =
         sampled_seed(config.seed, sorted_contact_keys(normalized.contacts()));
-    SplitMix64 rng{seed};
+    SplitMix64 rng{base_seed};
 
-    double exact_l = -1.0;
+    // Gauge branches: tau_b applies the local frame reflection on the squares
+    // selected by b. Every labelling realizable by a physical scene with frame
+    // vector b is tau_b applied to a standard-frame labelling, so these 2^n
+    // representatives cover exactly the G_n orbit (proof in the Phase-2 doc).
+    const std::uint32_t branch_count = 1U << normalized.square_count();
+    std::set<std::vector<std::string>> tried;
     bool weak_found = false;
     double weak_l = 0.0;
     Scene weak_scene;
-    ContainerAttempt best;
-    for (const double container_side : ladder) {
-        if (result.solves >= config.max_solves) {
-            break;
+    std::uint32_t weak_branch = 0;
+    bool have_best = false;
+    double best_hard = std::numeric_limits<double>::infinity();
+    Scene best_scene;
+    WitnessReport best_report;
+    double best_l = 0.0;
+    std::uint32_t best_branch = 0;
+
+    for (std::uint32_t mask = 0; mask < branch_count; ++mask) {
+        const GroupElement tau = frame_branch_element(normalized.square_count(), mask);
+        const Topology branch = mask == 0U
+            ? normalized
+            : apply_group_element_to_topology(normalized, tau);
+        if (!tried.insert(sorted_contact_keys(branch.contacts())).second) {
+            continue;
         }
-        ContainerAttempt attempt =
-            attempt_container(normalized, container_side, config, rng, result.solves);
-        if (attempt.exact) {
-            exact_l = container_side;
-            result.exact_witness = true;
-            result.witness = attempt.exact_scene;
-            result.report = attempt.exact_report;
-            result.container_side = container_side;
-            break;
+        ++result.branches_tried;
+        RepresentativeOutcome outcome =
+            solve_representative(branch, config, ladder, rng, result.solves);
+
+        if (outcome.exact) {
+            const Scene transferred = mask == 0U
+                ? outcome.exact_scene
+                : apply_group_element_to_scene(tau, outcome.exact_scene);
+            const WitnessReport report = verify_witness(transferred, normalized);
+            if (report.exact_accepted) {
+                result.status = RealizabilityStatus::VerifiedFeasible;
+                result.exact_witness = true;
+                result.witness = transferred;
+                result.report = report;
+                result.container_side = outcome.exact_l;
+                result.bisection_lower = outcome.bisection_lower;
+                result.frame_branch = mask;
+                return result;
+            }
+            if (!have_best || outcome.best_hard < best_hard) {
+                have_best = true;
+                best_hard = outcome.best_hard;
+                best_scene = transferred;
+                best_report = report;
+                best_l = outcome.exact_l;
+                best_branch = mask;
+            }
         }
-        if (attempt.weak && !weak_found) {
-            weak_found = true;
-            weak_l = container_side;
-            weak_scene = attempt.weak_scene;
+
+        if (outcome.weak && !weak_found) {
+            const Scene transferred = mask == 0U
+                ? outcome.weak_scene
+                : apply_group_element_to_scene(tau, outcome.weak_scene);
+            const WitnessReport report = verify_witness(transferred, normalized);
+            if (report.weak_accepted) {
+                weak_found = true;
+                weak_l = outcome.weak_l;
+                weak_scene = transferred;
+                weak_branch = mask;
+            }
         }
-        if (attempt.has_best && (!best.has_best || attempt.best_hard < best.best_hard)) {
-            best = attempt;
+        if (outcome.has_best && (!have_best || outcome.best_hard < best_hard)) {
+            const Scene transferred = mask == 0U
+                ? outcome.best_scene
+                : apply_group_element_to_scene(tau, outcome.best_scene);
+            have_best = true;
+            best_hard = outcome.best_hard;
+            best_scene = transferred;
+            best_report = verify_witness(transferred, normalized);
+            best_l = outcome.best_l;
+            best_branch = mask;
         }
     }
 
-    if (exact_l < 0.0) {
-        result.status = RealizabilityStatus::NotFound;
-        result.weak_witness = weak_found;
-        result.weak_container_side = weak_l;
-        result.weak_scene = weak_scene;
-        if (best.has_best) {
-            result.witness = best.best_scene;
-            result.report = best.best_report;
-            result.container_side = best.container_side;
-        }
-        return result;
+    // No branch produced a verified witness. The best rejected candidate is
+    // kept for diagnostics only; NOT_FOUND is never a proof of impossibility.
+    result.status = RealizabilityStatus::NotFound;
+    result.weak_witness = weak_found;
+    result.weak_container_side = weak_l;
+    result.weak_scene = weak_scene;
+    result.weak_frame_branch = weak_branch;
+    if (have_best) {
+        result.witness = best_scene;
+        result.report = best_report;
+        result.container_side = best_l;
+        result.frame_branch = best_branch;
     }
-
-    result.status = RealizabilityStatus::VerifiedFeasible;
-    // Bracketed heuristic minimization: `lower` is the largest ladder value
-    // whose attempt failed, `upper` the smallest with an exact witness. The
-    // bisection only refines within the bracket, so the reported L is a
-    // heuristic infimum (feasibility need not be monotone in L).
-    double lower = 0.0;
-    for (const double container_side : ladder) {
-        if (container_side < exact_l) {
-            lower = container_side;
-        }
-    }
-    double upper = exact_l;
-    if (config.minimize_container) {
-        for (std::uint32_t step = 0; step < config.minimization_steps; ++step) {
-            if (result.solves >= config.max_solves) {
-                break;
-            }
-            const double middle = 0.5 * (lower + upper);
-            if (!(middle > lower) || !(middle < upper)) {
-                break;
-            }
-            ContainerAttempt attempt =
-                attempt_container(normalized, middle, config, rng, result.solves);
-            if (attempt.exact) {
-                upper = middle;
-                result.witness = attempt.exact_scene;
-                result.report = attempt.exact_report;
-                result.container_side = middle;
-            } else {
-                lower = middle;
-            }
-        }
-    }
-    result.bisection_lower = lower;
     return result;
 }
+
+namespace {
+
+// 2x2 matrices for the scene action. Frames are products of a rotation and a
+// possible mirror. Two different mirrors occur: the world vertical mirror
+// (x -> -x), which is the container reflection, and the body feature-frame
+// mirror (x, y) -> (-y, -x), which is the engine's local reflection.
+struct Mat2 {
+    double m00{1.0};
+    double m01{0.0};
+    double m10{0.0};
+    double m11{1.0};
+};
+
+Mat2 mat_mul(const Mat2& a, const Mat2& b) {
+    return Mat2{
+        a.m00 * b.m00 + a.m01 * b.m10,
+        a.m00 * b.m01 + a.m01 * b.m11,
+        a.m10 * b.m00 + a.m11 * b.m10,
+        a.m10 * b.m01 + a.m11 * b.m11,
+    };
+}
+
+Mat2 mat_transpose(const Mat2& a) {
+    return Mat2{a.m00, a.m10, a.m01, a.m11};
+}
+
+Vec2 mat_apply(const Mat2& a, Vec2 v) {
+    return Vec2{a.m00 * v.x + a.m01 * v.y, a.m10 * v.x + a.m11 * v.y};
+}
+
+Mat2 mat_rotation(double angle) {
+    const double c = std::cos(angle);
+    const double s = std::sin(angle);
+    return Mat2{c, -s, s, c};
+}
+
+// World vertical mirror (x -> -x): it maps wall w to 4 - w, so it is the
+// container reflection Q_g. It is also the mirror used by the ring-direction
+// map of a local reflection.
+Mat2 mat_world_mirror() {
+    return Mat2{-1.0, 0.0, 0.0, 1.0};
+}
+
+// Body feature-frame mirror (x, y) -> (-y, -x): the reflection with ring map
+// r -> 8 - r. This is exactly the engine's local D4 element (rotation 0,
+// reflected), so flipping the pose parity is the same relabeling.
+Mat2 mat_body_mirror() {
+    return Mat2{0.0, -1.0, -1.0, 0.0};
+}
+
+Mat2 mat_power(const Mat2& matrix, bool reflected) {
+    return reflected ? matrix : Mat2{};
+}
+
+double mat_determinant(const Mat2& a) {
+    return a.m00 * a.m11 - a.m01 * a.m10;
+}
+
+// Feature-frame matrix of a pose: world = center + F * body_offset.
+Mat2 pose_frame(const SquarePose& pose) {
+    return mat_mul(mat_rotation(pose.theta), mat_power(mat_body_mirror(), pose.frame_reflected));
+}
+
+// Container isometry Q_g: content rotates by -90k (so wall w maps to w + k)
+// and, if requested, is mirrored about the vertical centre line (w -> 4 - w).
+Mat2 container_frame(const D4Element& container) {
+    return mat_mul(
+        mat_rotation(-0.5 * kPi * static_cast<double>(container.rotation)),
+        mat_power(mat_world_mirror(), container.reflected)
+    );
+}
+
+// Direction map induced by a local D4 element on the eight ring directions:
+// L v_r = v_{transform_ring(r, local)}. With v_r at angle 135 - 45r this is
+// R(-90 k) for a rotation and R(90 - 90 k) * M for a reflection.
+Mat2 local_direction_frame(const D4Element& local) {
+    const double rotation =
+        -0.5 * kPi * static_cast<double>(local.rotation % 4U);
+    if (!local.reflected) {
+        return mat_rotation(rotation);
+    }
+    return mat_mul(
+        mat_rotation(0.5 * kPi + rotation),
+        mat_world_mirror()
+    );
+}
+
+SquarePose pose_from_frame(const Mat2& frame, Vec2 center) {
+    const bool reflected = mat_determinant(frame) < 0.0;
+    // F e1 = R(theta) M^b e1 is (cos, sin) for b = 0 and (sin, -cos) for b = 1.
+    const double theta = std::atan2(frame.m10, frame.m00)
+        + (reflected ? 0.5 * kPi : 0.0);
+    return SquarePose{
+        center.x,
+        center.y,
+        theta,
+        reflected,
+    };
+}
+
+}  // namespace
 
 Scene apply_group_element_to_scene(const GroupElement& element, const Scene& scene) {
     if (element.square_count == 0 || scene.squares.size() != element.square_count) {
@@ -1561,45 +1898,34 @@ Scene apply_group_element_to_scene(const GroupElement& element, const Scene& sce
     if (!is_permutation(element)) {
         throw std::invalid_argument("group element is not a valid permutation/D4 record");
     }
-    for (SquareId square = 0; square < element.square_count; ++square) {
-        if (element.local[square].reflected != element.container.reflected) {
-            throw std::invalid_argument(
-                "scene action requires every local reflection parity to match the "
-                "container element"
-            );
-        }
-    }
 
     const double side = scene.container_side;
     const Vec2 centre{0.5 * side, 0.5 * side};
-    const double quarter = 0.5 * kPi;
-    const double container_rotation = static_cast<double>(element.container.rotation);
+    const Mat2 container = container_frame(element.container);
 
     Scene result;
     result.container_side = side;
     result.squares.resize(element.square_count);
     for (SquareId square = 0; square < element.square_count; ++square) {
         const SquarePose pose = scene.squares[square];
-        Vec2 centred{pose.x - centre.x, pose.y - centre.y};
-        if (element.container.reflected) {
-            centred.x = -centred.x;  // mirror x -> side - x about the centre
-        }
-        const Vec2 placed = centre + rotate(centred, -quarter * container_rotation);
-        const double local_rotation = static_cast<double>(element.local[square].rotation);
-        double theta = 0.0;
-        if (!element.container.reflected) {
-            theta = pose.theta + quarter * (local_rotation - container_rotation);
-        } else {
-            theta = -pose.theta + quarter * (local_rotation - container_rotation) - quarter;
-        }
-        result.squares[element.square_map[square]] = SquarePose{placed.x, placed.y, theta};
+        const Vec2 centered{pose.x - centre.x, pose.y - centre.y};
+        const Vec2 placed = centre + mat_apply(container, centered);
+
+        // The label map must send feature r to transform_ring(r, local).
+        // Physical directions transform by the container isometry, so the new
+        // feature frame is F' = Q F L^{-1}; the pose parity is det(F').
+        const Mat2 frame = mat_mul(
+            mat_mul(container, pose_frame(pose)),
+            mat_transpose(local_direction_frame(element.local[square]))
+        );
+        result.squares[element.square_map[square]] = pose_from_frame(frame, placed);
     }
     return result;
 }
 
 std::vector<CorpusClass> corpus_classes(std::uint32_t square_count, std::uint32_t weight) {
-    if (square_count == 0 || square_count > 2) {
-        throw std::invalid_argument("corpus enumeration currently supports n = 1 and n = 2");
+    if (square_count == 0 || square_count > 3) {
+        throw std::invalid_argument("corpus enumeration currently supports n <= 3");
     }
     if (weight == 0) {
         throw std::invalid_argument("corpus weight must be positive");
@@ -1761,11 +2087,12 @@ std::string corpus_report_to_json(const CorpusReport& report) {
     }
 
     std::ostringstream out;
-    out << "{\"schema\":\"sqtopology.realizability.v1\""
+    out << "{\"schema\":\"sqtopology.realizability.v2\""
         << ",\"tool\":\"sqtopology_realize\""
         << ",\"n\":" << report.square_count
         << ",\"weight\":" << report.weight
         << ",\"class_count\":" << report.classes.size()
+        << ",\"gauge_branches\":" << (1U << report.square_count)
         << ",\"group_size\":" << group_element_count(report.square_count)
         << ",\"event_count\":" << event_count_for_squares(report.square_count)
         << ",\"config\":{\"ladder\":[";
@@ -1807,6 +2134,9 @@ std::string corpus_report_to_json(const CorpusReport& report) {
             << ",\"exact_witness\":" << (entry.solve.exact_witness ? "true" : "false")
             << ",\"weak_witness\":" << (entry.solve.weak_witness ? "true" : "false")
             << ",\"filter_reason\":\"" << json_escape(entry.solve.filter_reason) << '"'
+            << ",\"frame_branch\":" << entry.solve.frame_branch
+            << ",\"weak_frame_branch\":" << entry.solve.weak_frame_branch
+            << ",\"branches_tried\":" << entry.solve.branches_tried
             << ",\"container_side\":";
         write_double(out, entry.solve.container_side);
         out << ",\"bisection_lower\":";

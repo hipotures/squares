@@ -86,8 +86,31 @@ Vec2 side_midpoint_offset(std::uint8_t side) noexcept {
     return 0.5 * (a + b);
 }
 
+namespace {
+
+// Body-frame mirror of the feature frame. This is the reflection whose induced
+// ring map is r -> (8 - r) mod 8, i.e. the engine's local D4 reflection
+// (rotation 0, reflected). It is the reflection about the 135/315 degree axis,
+// (x, y) -> (-y, -x), and it fixes corners 0 and 2 while swapping 1 and 3.
+// A square is achiral, so applying it only relabels corners and sides; the
+// occupied physical square is unchanged.
+Vec2 frame_offset(Vec2 offset, bool frame_reflected) noexcept {
+    if (frame_reflected) {
+        return Vec2{-offset.y, -offset.x};
+    }
+    return offset;
+}
+
+}  // namespace
+
 Vec2 corner_position(const SquarePose& pose, std::uint8_t corner) noexcept {
-    return Vec2{pose.x, pose.y} + rotate(corner_offset(corner), pose.theta);
+    return Vec2{pose.x, pose.y}
+        + rotate(frame_offset(corner_offset(corner), pose.frame_reflected), pose.theta);
+}
+
+Vec2 side_midpoint_position(const SquarePose& pose, std::uint8_t side) noexcept {
+    return Vec2{pose.x, pose.y}
+        + rotate(frame_offset(side_midpoint_offset(side), pose.frame_reflected), pose.theta);
 }
 
 std::array<Vec2, 2> side_endpoints(const SquarePose& pose, std::uint8_t side) noexcept {

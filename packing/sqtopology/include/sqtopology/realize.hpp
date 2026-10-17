@@ -45,7 +45,23 @@ enum class RealizabilityStatus : std::uint8_t {
 //   R2: coincident corners (via corner-corner chains) are required on opposite
 //       walls (w and w+2), which forces a point onto two parallel lines;
 //   R3: one corner is required on both members of a pair of opposite sides of
-//       one square, which forces a point onto two parallel lines.
+//       one square, which forces a point onto two parallel lines;
+//   R4: a wall-side contact and a wall-corner contact of one of its own
+//       endpoints on the same wall cannot both be exact, because the side
+//       absorbs the corner;
+//   R5: two adjacent corners of one square on the same wall put the connecting
+//       side on that wall, which absorbs both corner contacts;
+//   R6: two opposite corners of one square on the same wall force the other
+//       two corners to distance 1/sqrt(2) on either side of the wall line, so
+//       one is outside the container.
+//
+// All six predicates depend only on incidences between features and walls, so
+// they are invariant under the full G_n action (endpoint, adjacency and
+// opposite-pair relations are D4 relations). A proof therefore lifts from the
+// class representative to every gauge branch and to the whole canonical orbit.
+// R1-R5 are statements about the exact-stratum absorption rules; R6 is a
+// containment statement. R6 is tolerance-safe because the violation is
+// 1/sqrt(2), far above the 1e-7 extraction tolerance.
 struct InfeasibilityFilter {
     bool proved{false};
     std::string reason;
@@ -83,6 +99,8 @@ struct SolveConfig {
     std::vector<double> ladder{1.0, 2.0, 2.2, 2.5, 3.0, 4.0};
     std::uint32_t starts_per_rung{32};
     std::uint32_t lm_max_iterations{120};
+    // Deterministic solve budget per gauge branch. A full class search may use
+    // up to 2^n times this value (see realize_topology).
     std::uint64_t max_solves{400};
     // Heuristic bisection for the smallest container side with a witness.
     bool minimize_container{true};
@@ -105,22 +123,43 @@ struct SolveResult {
     // Largest rung below container_side whose solve attempt failed; the exact
     // bracketed interval for the heuristic container minimization.
     double bisection_lower{0.0};
+    // Bit i is set when the witness uses the reflected feature frame of square
+    // i. Branch 0 is the standard-frame representative; other branches are the
+    // 2^n cosets of H_n inside the G_n orbit (see realize.cpp). The witness is
+    // always stated for the input Sigma, so it verifies against Sigma directly.
+    std::uint32_t frame_branch{0};
+    std::uint32_t weak_frame_branch{0};
+    std::uint32_t branches_tried{0};
     std::uint64_t solves{0};
 };
 
 // Solves the realizability problem for Sigma. Requires a normalized topology
 // with no duplicate contacts; square counts of 1..4 keep the enumeration-free
-// solver paths fast. The returned witness is the last verified-accepted scene
-// for feasible statuses (or the best rejected candidate otherwise).
+// solver paths fast.
+//
+// The search enumerates the 2^n gauge branches of Sigma: the cosets of the
+// standard-frame subgroup H_n inside its full G_n orbit. Realizability is
+// G_n-invariant (see the symmetry-contract notes in the Phase-2 document), so
+// the class is feasible iff some branch is; a witness found for branch b is
+// transported back to Sigma with psi_{tau_b} and re-verified against Sigma.
+// The returned witness therefore verifies against the input topology, with
+// per-square frame parity when a mixed-parity branch was used.
 [[nodiscard]] SolveResult realize_topology(const Topology& sigma, const SolveConfig& config = {});
 
-// Scene action psi_g for the subgroup of G_n whose per-square local D4
-// elements have the same reflection parity as the container element. For those
-// elements extraction(psi_g(P)) == g . extraction(P) holds exactly, which the
-// test suite checks against the production relabel_square / relabel_container /
-// permute_squares transformations. Elements outside the subgroup throw
-// std::invalid_argument: no standard-labeled scene can carry a mixed-parity
-// feature relabeling.
+// Scene action psi_g for EVERY element of G_n. The semantic feature frame of a
+// square carries a discrete parity, and psi_g updates it together with the
+// center and orientation:
+//
+//   F'_sigma(i) = Q_g F_i L_i^{-1},   Q_g = R(-90k) M^b,
+//
+// where F_i = R(theta_i) M^{b_i} is the pose frame, L_i is the ring-direction
+// map of the local D4 element, and Q_g is the container isometry (wall
+// w -> transform_wall(w, container)). The resulting pose has
+// theta' = atan2(-F'[0][1], F'[1][1]) and frame_reflected = det(F') < 0.
+// Then extraction(psi_g(P)) == g . extraction(P) holds for both the exact and
+// weak strata; the test suite checks this against the production
+// relabel_square / relabel_container / permute_squares transformations for all
+// of G_1, G_2 and G_3.
 [[nodiscard]] Scene apply_group_element_to_scene(const GroupElement& element, const Scene& scene);
 
 // ---------------------------------------------------------------------------
