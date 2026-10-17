@@ -346,3 +346,23 @@ the 16-worker throughput is makespan-limited and varies by roughly 10% with sche
 placement; the fixed-work candidate total is the stable cross-version signal. Raw
 measurements: `/tmp/sqtopo-dropcenter.json`, `/tmp/sqtopo-ab-base.json`,
 `/tmp/sqtopo-ab-new.json`.
+
+## Keep: profile-guided optimization build
+
+`-fprofile-use` is now an opt-in build mode (`-DSQTOPOLOGY_PGO=use`, driven by
+`tools/pgo_train.sh`). It only adjusts inlining and block layout and keeps the default
+target ISA, so the produced binary is portable; the profile lives in the build tree and is
+never committed. The default build is unchanged so a fresh clone stays reproducible.
+
+Clean interleaved A/B on the target host, 25 s per width, Traces, unpinned:
+
+| Workers | Default cand/s | PGO cand/s | Relative |
+| --- | --- | --- | --- |
+| 1 | 128988.8 / 130673.7 | 138296.6 / 137667.7 | 1.072x / 1.054x |
+| 16 | 1738119.3 / 1755302.5 | 1831075.2 / 1815978.9 | 1.053x / 1.046x |
+
+A fixed 2,000,000-candidate run pinned to one core shows the mechanism directly: 266.7e9
+to 239.4e9 retired instructions (-10.2%) and 82.95e9 to 77.99e9 cycles (-6.0%), with wall
+time 15.46 s to 14.51 s. An identical build with `-g` added is within 0.1%, confirming the
+gain is the profile and not debug information. Raw perf data: `/tmp/stat-default.txt`,
+`/tmp/stat-pgo2.txt`; reports `/tmp/fin2-default-*.json`, `/tmp/fin2-pgo2-*.json`.

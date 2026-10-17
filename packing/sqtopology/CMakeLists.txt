@@ -6,6 +6,23 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Optional profile-guided optimization.  The profile is produced by a two-phase
+# build driven by tools/pgo_train.sh: configure with SQTOPOLOGY_PGO=generate,
+# build, run a training search, then configure with SQTOPOLOGY_PGO=use and
+# rebuild in the same build tree.  The .gcda data therefore lives only in the
+# build directory and is never committed.  PGO changes inlining and block
+# layout but keeps the compiler's default target ISA, so the resulting binary
+# still runs on any x86-64 host; only the tuning is host-specific.
+set(SQTOPOLOGY_PGO "" CACHE STRING "Profile-guided optimization: empty, generate, or use")
+if(SQTOPOLOGY_PGO STREQUAL "generate")
+    add_compile_options(-fprofile-generate)
+    add_link_options(-fprofile-generate)
+elseif(SQTOPOLOGY_PGO STREQUAL "use")
+    add_compile_options(-fprofile-use -fprofile-correction -Wno-missing-profile)
+elseif(NOT SQTOPOLOGY_PGO STREQUAL "")
+    message(FATAL_ERROR "SQTOPOLOGY_PGO must be empty, generate, or use")
+endif()
+
 # Ubuntu 26.04 ships libnauty.pc, while Ubuntu 24.04's libnauty-dev does not.
 # Prefer pkg-config when present, but keep a direct header/library fallback so the
 # native experiment builds on both supported development hosts.

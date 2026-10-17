@@ -135,6 +135,23 @@ The tests cover semantic validation, free-square representation, square permutat
 local square `D4`, container `D4`, distinct coarse contact types, deterministic rewrite
 generation, shard reproducibility, and inspection export.
 
+### Profile-guided optimization
+
+The default build is portable and uses no profile. The retained throughput
+measurement uses PGO, produced by a self-contained two-phase build:
+
+~~~bash
+tools/pgo_train.sh build   # configure generate, build, train, rebuild with profile
+~~~
+
+The script compiles an instrumented binary, runs a short deterministic training
+search across several shards, then rebuilds the same build tree with
+`-fprofile-use`. The `.gcda` data stays in the build directory and is never
+committed; re-run the script after changing the hot path. PGO only changes
+inlining and block layout and keeps GCC's default target ISA, so the binary still
+runs on any x86-64 host. On the target host it removes about 10% of retired
+instructions and about 6% of the per-candidate wall time.
+
 ## Inspect fixtures
 
 ~~~bash
