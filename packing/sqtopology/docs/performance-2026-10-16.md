@@ -323,8 +323,9 @@ exact isomorphism classes while shrinking the canonical graph.
 
 The proof obligation is tested directly: a new native test builds a reference, center-based
 gadget and verifies that the production gadget's exact-key partition is a bijection of the
-reference gadget's partition over a ~3000-state rewrite corpus spanning the fixtures and two
-depths. All symmetry-invariance, backend-agreement, and key-layout tests pass. At 16 workers
+reference gadget's partition over a ~44,000-state rewrite corpus spanning the fixtures, four
+depths, and explicit square-permutation, local `D4`, and container `D4` images, on all three
+backends. All symmetry-invariance, backend-agreement, and key-layout tests pass. At 16 workers
 the fixed-work search now yields the identical 26,689,273 raw candidates and 12,972,556 local
 unique states as the previous encoding, which is exactly what equivalence-preserving dedup
 implies.
@@ -350,9 +351,12 @@ measurements: `/tmp/sqtopo-dropcenter.json`, `/tmp/sqtopo-ab-base.json`,
 ## Keep: profile-guided optimization build
 
 `-fprofile-use` is now an opt-in build mode (`-DSQTOPOLOGY_PGO=use`, driven by
-`tools/pgo_train.sh`). It only adjusts inlining and block layout and keeps the default
-target ISA, so the produced binary is portable; the profile lives in the build tree and is
-never committed. The default build is unchanged so a fresh clone stays reproducible.
+`tools/pgo_train.sh`). It only adjusts inlining and block layout: it does not introduce
+a host-specific ISA beyond the compiler and toolchain's normal target configuration.
+The trained optimization is still workload-specific. The profile lives in the build tree
+and is never committed; the script wipes stale `.gcda`/`.gcno` before training and fails
+if the instrumented objects recorded no profile. The default build is unchanged so a
+fresh clone stays reproducible.
 
 Clean interleaved A/B on the target host, 25 s per width, Traces, unpinned:
 
@@ -401,3 +405,64 @@ Raw reports: `/tmp/sqtopo-best-full.json`, `/tmp/sqtopo-best-full2.json`,
 The 16-worker width finishes the whole depth-3 space in about 15 s, so that column
 is makespan-limited and varies by up to ~10% with host load; run-to-run repeats of
 the 1-worker width on the same binary landed at 134-136k candidates/s.
+
+## Audit follow-up, 2026-10-17
+
+### Benchmark purposes separated
+
+The retained 30 s sweep above mixes two regimes: at 16 workers the depth-3 space finishes in
+about 15 s, so its rate is a makespan, while the low-worker columns are 30-second sustained
+runs. Two explicit benchmarks are now documented in the README.
+
+A, fixed-work completion (`--max-depth 3 --seconds 400`), PGO build, pinned: every width
+exhausts the space. 1 worker: 12,120,816 raw / 4,392,083 unique in 89.4 s. 16 workers:
+26,689,273 raw / 12,972,556 local unique in 14.7 s. Raw counts grow with the worker count
+because states shared across shard boundaries are re-expanded once per shard; the width-1
+unique count is the true global count.
+
+B, sustained 30 s throughput (`--max-depth 4 --seconds 30`), PGO build, pinned: every width
+runs the full 30 s. Rates 124,004 / 251,588 / 498,409 / 976,678 / 1,850,992 candidates/s at
+1/2/4/8/16 workers (efficiency 100 / 101 / 100 / 98.5 / 93.3 %). 16 workers processed
+57,786,048 raw candidates with 28,179,352 local unique states and a 39.3 GiB summed peak RSS.
+
+Reports `/tmp/audit-fixedwork.json`, `/tmp/audit-sustained.json`.
+
+### PGO generalization across workloads
+
+PGO is broadly beneficial rather than overfit to `grid-4x4-minus-one`. Fixed 1.5M-candidate
+single-core A/B (default vs PGO, best of two, pinned):
+
+| Workload | Default cand/s | PGO cand/s | Relative |
+| --- | --- | --- | --- |
+| grid-4x4-minus-one d3 (trained) | 131280.0 | 140992.0 | 1.074x |
+| grid-4x4 d3 (untrained, denser) | 119249.0 | 125670.0 | 1.054x |
+| grid-3x3 d4 (different depth) | 184190.0 | 192901.0 | 1.047x |
+| grid-2x2 d6 | 352225.0 | 364346.0 | 1.034x |
+| corner-side-2 d5 | 528229.0 | 554133.0 | 1.049x |
+| side-side-2 d5 | 525477.0 | 560016.0 | 1.066x |
+
+The gain is 3-7% on every workload, largest on the trained fixture, so the profile helps
+broadly and is only mildly overfit.
+
+### PGO reproducibility
+
+`tools/pgo_train.sh` now trains with a fixed candidate budget per shard instead of wall-clock
+time, so the recorded counters are deterministic; two consecutive clean runs produced
+byte-identical `sqtopology` and `libsqtopology_core.a`. The script deletes any `.gcda`/`.gcno`
+before the generate phase and aborts if the core, executable, or vendored Traces objects
+recorded no profile. The use phase compiles the trained objects with `-Wmissing-profile
+-Werror=missing-profile`, so a use build without profiles fails with an explicit diagnostic
+naming the missing file instead of silently degrading to non-PGO code; the untrained test
+binary alone suppresses that warning. A fresh default build contains zero `.gcda`/`.gcno`.
+
+### Versioning and validation
+
+The human-facing textual encoding changed with the gadget, so its marker was bumped `SQT1` to
+`SQT2`. The header records the contract: `SQTn` versions the encoding and is not a
+cross-version byte-stable interchange format; the exact key `SQK5` is the equality namespace.
+A stale test message still naming `SQK2HEX` was corrected.
+
+`Topology::validate` now rejects an out-of-range `ContactKind` explicitly instead of relying on
+a downstream consistency check to reject it; `FeatureKind`, feature index, and
+`feature_ring_index` validation were already explicit and are covered by direct tests.
+

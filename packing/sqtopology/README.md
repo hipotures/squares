@@ -79,7 +79,39 @@ feature ports. A wall contact connects a square feature port to a container-wall
 Packed squares remain interchangeable: nauty may permute eight-cycle components that
 are not anchored by distinct contacts, so square IDs are quotiented out.
 
-The human-facing canonical form remains the full versioned textual encoding (`SQT1|...`).
+### Why the centerless gadget is equivalent
+
+The exact-key relation is color-preserving isomorphism of the incidence graph, so the
+gadget is faithful exactly when its color-preserving automorphism group quotients the
+intended square-permutation x local-`D4` x container-`D4` relation.
+
+- The induced subgraph on the corner-port and side-port colors is a disjoint union of
+  the per-square alternating eight-cycles. Contacts connect ports only to event vertices,
+  never port-to-port, so no automorphism can splice ports from different squares; it
+  permutes whole cycles, which is exactly a square permutation.
+- Within one eight-cycle the color-preserving automorphisms are the rotations by an even
+  offset and the reflections through an even axis. Those eight maps form a group
+  isomorphic to `D4`, which is exactly the local feature relabeling group.
+- The induced subgraph on the container-wall color is the four-cycle, whose
+  color-preserving automorphism group is the container `D4`.
+- Wall vertices and the four contact-event colors are disjoint from the port colors, so no
+  automorphism mixes ports, walls, and events. Two same-colored events with equal
+  endpoints would be a duplicate contact, which validation rejects, so an automorphism
+  that fixes the ports and walls fixes every event.
+
+Graph isomorphism therefore induces precisely the intended relation. The historical gadget
+adds a square-object vertex adjacent to all eight ports of its cycle and a container-object
+vertex adjacent to all four walls; those anchors are determined by their neighborhoods and
+add no constraint, so both gadgets induce the same equivalence classes. `tests/test_sqtopology.cpp`
+checks that differential as a bijection between the two induced partitions -- not merely
+equal class counts -- over a large deterministic corpus that includes square permutations,
+local `D4`, and container `D4` images, on all three backends.
+
+The human-facing canonical form is the full versioned textual encoding (`SQT2|...`). Its
+`SQTn` marker versions the encoding itself: it is bumped whenever the canonical vertex set,
+vertex colors, or edge semantics change, so forms with different markers are not comparable.
+It is a per-build inspection and export artifact, not a cross-version byte-stable interchange
+format; no consumer parses the marker or assumes byte stability across versions.
 Search uses a separate exact binary key (`SQK5`) containing the canonical color sequence
 and an exact sorted canonical edge list. Its cached standard-library string fingerprint is only the
 unordered-set bucket hash: equality is always decided by the complete binary bytes.
@@ -146,11 +178,15 @@ tools/pgo_train.sh build   # configure generate, build, train, rebuild with prof
 
 The script compiles an instrumented binary, runs a short deterministic training
 search across several shards, then rebuilds the same build tree with
-`-fprofile-use`. The `.gcda` data stays in the build directory and is never
+`-fprofile-use`. It deletes any previous `.gcda`/`.gcno` before the generate phase,
+so a repeated invocation is deterministic and stale counts cannot contaminate the
+profile, and it fails loudly if the instrumented library or vendored Traces object
+recorded no profile. The `.gcda` data stays in the build directory and is never
 committed; re-run the script after changing the hot path. PGO only changes
-inlining and block layout and keeps GCC's default target ISA, so the binary still
-runs on any x86-64 host. On the target host it removes about 10% of retired
-instructions and about 6% of the per-candidate wall time.
+inlining and block layout: it does not introduce a host-specific ISA beyond the
+compiler and toolchain's normal target configuration, though the trained
+optimization is still tuned to the training workload. On the target host it removes
+about 10% of retired instructions and about 6% of the per-candidate wall time.
 
 ## Inspect fixtures
 
@@ -240,6 +276,42 @@ For controlled comparisons on a fixed CPU set, add `--pin-workers`, or specify
 an ordered CPU list with `--cpus 0,1,2,3`. The report records each shard's CPU
 affinity, aggregate CPU/wall ratio, and the largest worker CPU/wall gap.
 
+### Two distinct benchmark purposes
+
+Run A and B below as separate measurements; they answer different questions and must not be
+compared as if they were one series.
+
+**A. Fixed-work completion / semantic regression.** `grid-4x4-minus-one`, Traces, depth 3,
+unlimited candidates and unique states, a generous per-width time cap. Every width exhausts
+the whole depth-3 space, so the total candidate and unique counts are a deterministic
+semantic fingerprint: any refactor of the equivalence classes, the local dedup, or the shard
+partition changes them. The reference is the 16-worker result, `26,689,273` raw candidates
+and `12,972,556` local unique states. Raw counts grow with the worker count because states
+shared across shard boundaries are re-expanded once per shard; the width-1 result
+(`12,120,816` raw, `4,392,083` unique) is the sharding-independent fingerprint and its unique
+count is the true global count. Completion wall time here is a makespan, not a
+sustained-throughput number.
+
+~~~bash
+python3 tools/bench_scaling.py --binary ./build/sqtopology \
+  --fixture grid-4x4-minus-one --workers 1,2,4,8,16 --seconds 400 \
+  --max-candidates 0 --max-unique 0 --max-depth 3 --max-additions 256 \
+  --pin-workers --json-report /tmp/sqtopology-fixedwork.json
+~~~
+
+**B. Sustained 30-second throughput.** The same fixture and backend at depth 4 with
+unlimited candidates and unique states. The depth-4 space is large enough that every width
+keeps all workers busy for the full 30 s, so `candidates_per_second` is a genuine sustained
+throughput and the efficiency column measures parallel efficiency rather than makespan
+behaviour.
+
+~~~bash
+python3 tools/bench_scaling.py --binary ./build/sqtopology \
+  --fixture grid-4x4-minus-one --workers 1,2,4,8,16 --seconds 30 \
+  --max-candidates 0 --max-unique 0 --max-depth 4 --max-additions 256 \
+  --pin-workers --json-report /tmp/sqtopology-sustained.json
+~~~
+
 ## Hot-path baseline cleanup
 
 The first measured 16-process run showed that rewrite generation and incidence-graph
@@ -287,9 +359,14 @@ binary key directly from:
 - the sorted canonical undirected edge list.
 
 Endpoint indices use one byte while the canonical graph has at most 256 vertices, two
-bytes up to 65,536 vertices, and four bytes above that. For the current ~176-vertex,
-~227-edge incidence graphs the whole key is near 650 bytes, versus about
-2.2 KiB for the earlier packed-triangle SQK3 and roughly 4.6 KiB of dense nauty words.
+bytes up to 65,536 vertices, and four bytes above that. With `S` squares and `C`
+contacts the seed incidence graph has exactly `8S + 4 + C` vertices and
+`8S + 4 + 2C` edges, so the `grid-4x4-minus-one` fixture (15 squares, 50 contacts) is
+174 vertices and 224 edges. Candidates that add or remove contacts are larger or
+smaller: over a depth-3 `grid-4x4-minus-one` search the candidate average is about
+174.5 vertices and 225.0 edges, giving an average exact key of about 638 bytes. That
+is far below about 2.2 KiB for the earlier packed-triangle SQK3 and roughly 4.6 KiB
+of dense nauty words.
 
 Sparse nauty extracts the canonical edge list from its sparse output. Traces returns
 only its canonical labeling; the wrapper applies it to the input CSR, avoiding a
@@ -305,7 +382,7 @@ are available, with `std::unordered_set` as a fallback. Set
 `-DSQTOPOLOGY_BOOST_FLAT_SET=OFF` for the standard-container comparison. Hash collisions do not affect correctness because the full
 binary key bytes remain the equality oracle.
 
-The old `CanonicalForm` / `SQT1|...` representation is retained for inspection, JSON,
+The old `CanonicalForm` / `SQT2|...` representation is retained for inspection, JSON,
 debugging, and semantic regression tests. Search does not build the human-facing `CanonicalForm` or run `ostringstream`
 for every candidate.
 
@@ -388,8 +465,9 @@ symmetry-transformed fixtures and agree on duplicate/unique counts in a bounded 
 The first SQK3 packed-triangle implementation reduced retained key memory but scanned
 the full O(V^2) canonical adjacency triangle. On the target host that raised Traces
 key-build cost to about 12 us/candidate and reduced 16-worker throughput from about
-396k to 348k candidates/s. SQK4 replaces that scan with the sparse canonical edge-list
-path above.
+396k to 348k candidates/s. SQK4 replaced that scan with the sparse canonical edge-list
+path above, and SQK5 kept that layout while changing the payload after the
+square/container object vertices were dropped from the incidence gadget.
 
 Search summaries report both total candidate-key bytes and the exact payload bytes retained
 for unique states. The scaling harness prints an `exact canonical-key footprint` table
