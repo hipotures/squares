@@ -8,6 +8,11 @@ negative fixtures, and an `n = 2` class corpus at contact weights 1, 2 and 3.
 All code, data and prose are in English. Nothing here is merged to `main`, and
 no unrelated working-tree state is touched.
 
+> **Follow-up.** The parallel corpus execution, the R7-R13 filters, the
+> frame-branch orbit reduction and the complete `n = 3` weight-2 results are in
+> `geometric-realizability-phase2b-2026-10-17.md`. This note remains the
+> `d1c8e89d` record for the symmetry repair and the R1-R6 baseline.
+
 ## 1. Question and answer format
 
 For a fixed square count `n` a *contact topology* is a set `Sigma` of semantic
@@ -422,6 +427,13 @@ N4 is deliberately a negative fixture that the filters cannot prove; it pins
 the rule that solver failure never becomes a proof.
 
 ## 9. The corpus (`n = 2` weights 1-3, `n = 3` weight 1)
+
+> **Historical record.** The geometric status tables in this section are the
+> `d1c8e89d` full-`G_n` results (serial solver, R1-R6 filters). They are
+> superseded by `geometric-realizability-phase2b-2026-10-17.md`, which adds
+> deterministic 16-worker execution, the R7-R13 filters, the `H_n`
+> frame-branch reduction and the complete `n = 3` weight-2 corpus. The pure
+> orbit counts 5/87/1411 remain valid in both notes.
 
 `corpus_classes(n, w)` enumerates canonical classes exactly: start from the
 empty class, expand the previous level by one event, and keep the orbit-minimal
