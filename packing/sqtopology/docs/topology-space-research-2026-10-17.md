@@ -225,9 +225,11 @@ exponential in `E`. The correct next question is the exact orbit-layer count und
 
 ## Result 3: canonical quotienting and residual symmetry
 
-The number of canonical classes is far below the labeled ball, and the
-compression deepens with depth. Table 3 gives the cumulative unique count at the
-final depth against the labeled ball at that depth.
+The number of canonical classes can be far below the labeled Hamming ball because many
+labeled event subsets lie in the same symmetry orbit. Table 3 reports the cumulative unique
+count at the final measured depth against the corresponding labeled ball. These rows show
+substantial compression, especially for highly symmetric seeds, but this table alone does
+not establish that the compression factor is monotone in depth.
 
 Table 3: canonical compression (uncapped, final depth).
 
@@ -419,8 +421,10 @@ runs; the PGO build kept runtime predictable (canonicalization dominates).
   fits memory; the largest uncapped run here is `grid-4x4-minus-one` depth 2
   (`E = 7200`, 12.96M classes, 8.90 GiB). Uncapped depth 3 there is out of reach
   (frontier ~12.9M parents, ~`9.3e10` raw candidates).
-- The growth-law comparison is strongest where `d` is large relative to the
-  residual symmetry; low-depth ratios are upper-bounded but not tight.
+- The binomial formula is exact for the labeled hypercube layers, while the measured
+  canonical-layer ratios depend on a depth-varying orbit-compression factor. A labeled
+  layer count is an upper bound on the corresponding canonical layer count, but the ratio
+  of successive canonical layers is not generally upper-bounded by the labeled ratio.
 - Symmetry is reported from nauty per class and is exact; the "trivial group"
   tallies are exact counts, but no group-theoretic classification of the residual
   symmetry is attempted here.
