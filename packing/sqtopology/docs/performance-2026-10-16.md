@@ -138,3 +138,35 @@ confirms the executable has no dynamic nauty dependency; native tests pass.
 | 16 | 1081407.7 | 1.059x |
 
 Raw measurement: `/tmp/sqtopology-static-integrated.json`.
+
+## Keep: bounded Traces scratch retention
+
+A private, version-gated Traces 2.9.3 source copy skips only the final scratch
+array cleanup for graphs up to 4096 vertices. Explicit cleanup and thread-exit
+cleanup release the arrays; larger graphs follow stock cleanup. All labeling
+operations are unchanged. Other versions fall back to their installed engine.
+
+Before integration, matched `-O3 -fPIC` stock/reuse objects were compared using
+the primary benchmark, with both shared and static helper-library linking.
+Scratch retention improved the source-built stock control independently of
+linking. A 12,000-graph random differential test (each with a vertex permutation)
+produced byte-identical keys. The integrated version also passes that differential,
+native tests, and changing-size tests crossing the cache limit.
+
+| Workers | Candidates/s | Relative to static stock | Engine µs |
+| --- | --- | --- | --- |
+| 1 | 85562.3 | 1.050x | 6.16 |
+| 2 | 178177.8 | 1.113x | 5.64 |
+| 4 | 350232.1 | 1.105x | 5.68 |
+| 8 | 674670.1 | 1.101x | 5.90 |
+| 16 | 1209272.6 | 1.118x | 6.25 |
+
+The integrated 1-worker engine timer was slower than the first source-cache
+control (6.16 vs 5.61–5.69 µs); repeat measurements remain useful. Other widths
+agree closely. Source-cache shared/static runs had almost identical summed worker
+time at 16 workers (325.60 vs 325.05 s), with a 3% difference in slowest-shard
+finish time. Do not infer a linking-policy improvement from that difference.
+
+Raw measurements: `/tmp/sqtopology-traces-stock.json`,
+`/tmp/sqtopology-traces-reuse.json`, `/tmp/sqtopology-static-stock.json`,
+`/tmp/sqtopology-static-reuse.json`, `/tmp/sqtopology-cache-integrated.json`.

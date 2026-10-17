@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
+#include <numeric>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
@@ -591,6 +593,31 @@ void test_search_backends_agree() {
     );
 }
 
+void test_traces_workspace_size_changes() {
+    using namespace sqtopology;
+    std::mt19937 random(0x437a1);
+    for (const std::size_t n : {31U, 4095U, 7U, 4097U, 1024U, 4096U, 13U}) {
+        ColoredGraph graph;
+        for (std::size_t i = 0; i < n; ++i) graph.colors.push_back(random() % 17);
+        for (std::uint32_t i = 1; i < n; ++i) {
+            graph.edges.emplace_back(i - 1, i);
+            const auto neighbor = random() % n;
+            if (neighbor != i) graph.edges.emplace_back(i, neighbor);
+        }
+        graph.normalize_edges();
+        const auto key = canonical_key_colored_graph(graph, CanonicalBackend::Traces);
+        auto transformed = graph;
+        for (std::size_t i = 0; i < n; ++i) transformed.colors[n - 1 - i] = graph.colors[i];
+        for (auto& [a, b] : transformed.edges) {
+            a = static_cast<std::uint32_t>(n - 1 - a);
+            b = static_cast<std::uint32_t>(n - 1 - b);
+        }
+        std::shuffle(transformed.edges.begin(), transformed.edges.end(), random);
+        expect(canonical_key_colored_graph(transformed, CanonicalBackend::Traces) == key,
+               "Traces scratch growth, bounded-cache cleanup, and input permutation must preserve exact keys");
+    }
+}
+
 void test_search_key_hash_collisions() {
     using namespace sqtopology;
     auto first = canonical_key(make_fixture("corner-corner-2"), CanonicalBackend::Traces);
@@ -643,6 +670,7 @@ int main() {
         test_canonical_microprofile_preserves_semantics();
         test_search_canonical_microprofile();
         test_search_backends_agree();
+        test_traces_workspace_size_changes();
         test_search_key_hash_collisions();
         test_canonical_equality_uses_encoding();
         std::cout << "sqtopology_tests: all tests passed\n";

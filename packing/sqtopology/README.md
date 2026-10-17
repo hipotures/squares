@@ -284,6 +284,23 @@ Tests compare binary-key equality against textual canonical-form equality across
 transforms and distinct contact types. Retained search keys are rendered as `SQK4HEX:...`
 only at the end of a run when `--emit-keys` is requested.
 
+### nauty/Traces integration
+
+CMake prefers the installed static nauty archive when available, avoiding shared
+library TLS lookup overhead. Set `-DSQTOPOLOGY_STATIC_NAUTY=OFF` to compare shared
+linking.
+
+With nauty 2.9.3, the default build uses a private Traces copy with bounded scratch
+reuse. The labeling algorithm is unchanged: only the end-of-call scratch-array
+cleanup is deferred. Arrays are retained for graphs up to 4096 vertices and freed
+at thread exit; larger graphs use stock cleanup. Other per-call Traces allocations
+are still released normally. Set `-DSQTOPOLOGY_CACHED_TRACES=OFF` to use the stock
+engine. Other nauty versions automatically use the installed engine.
+
+See [the dependency notes](third_party/nauty/README.md) for provenance and the
+small source change, and [the session measurements](docs/performance-2026-10-16.md)
+for comparisons. Dense nauty and sparse nauty remain stock implementations.
+
 ## Canonical backend comparison
 
 Search defaults to `traces`. The target-host 30-second benchmark on

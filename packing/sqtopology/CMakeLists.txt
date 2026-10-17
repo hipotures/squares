@@ -55,6 +55,23 @@ target_include_directories(sqtopology_core PUBLIC include)
 target_link_libraries(sqtopology_core PUBLIC ${SQTOPOLOGY_NAUTY_TARGET})
 target_compile_options(sqtopology_core PRIVATE -Wall -Wextra -Wpedantic)
 
+option(SQTOPOLOGY_CACHED_TRACES "Reuse bounded Traces 2.9.3 TLS scratch arrays" ON)
+if(SQTOPOLOGY_CACHED_TRACES AND NAUTY_VERSION VERSION_EQUAL "2.9.3")
+    enable_language(C)
+    add_library(sqtopology_cached_traces OBJECT third_party/nauty/traces.c)
+    set_target_properties(sqtopology_cached_traces PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    target_link_libraries(sqtopology_cached_traces PRIVATE ${SQTOPOLOGY_NAUTY_TARGET})
+    target_compile_definitions(sqtopology_cached_traces PRIVATE
+        Traces=sqtopology_Traces
+        refine_tr=sqtopology_refine_tr
+        traces_freedyn=sqtopology_traces_freedyn
+        SQTOPOLOGY_TRACES_CACHE_LIMIT=4096)
+    target_sources(sqtopology_core PRIVATE $<TARGET_OBJECTS:sqtopology_cached_traces>)
+    target_compile_definitions(sqtopology_core PRIVATE SQTOPOLOGY_CACHED_TRACES=1)
+elseif(SQTOPOLOGY_CACHED_TRACES)
+    message(STATUS "Cached Traces requires nauty 2.9.3; using the installed engine")
+endif()
+
 add_executable(sqtopology src/main.cpp)
 target_link_libraries(sqtopology PRIVATE sqtopology_core)
 target_compile_options(sqtopology PRIVATE -Wall -Wextra -Wpedantic)

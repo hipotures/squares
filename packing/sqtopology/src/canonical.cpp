@@ -29,9 +29,18 @@ extern "C" {
 #endif
 #define NORET_ATTR
 #endif
+#ifdef SQTOPOLOGY_CACHED_TRACES
+#define Traces sqtopology_Traces
+#endif
 extern "C" {
 #include <nauty/traces.h>
+#ifdef SQTOPOLOGY_CACHED_TRACES
+void sqtopology_traces_freedyn(void);
+#endif
 }
+#ifdef SQTOPOLOGY_CACHED_TRACES
+#undef Traces
+#endif
 #ifdef __cplusplus
 #undef NORET_ATTR
 #undef _Thread_local
@@ -39,6 +48,15 @@ extern "C" {
 
 namespace sqtopology {
 namespace {
+
+#ifdef SQTOPOLOGY_CACHED_TRACES
+constexpr auto traces_engine = &sqtopology_Traces;
+struct TracesScratchCleanup {
+    ~TracesScratchCleanup() { sqtopology_traces_freedyn(); }
+};
+#else
+constexpr auto traces_engine = &Traces;
+#endif
 
 using Clock = std::chrono::steady_clock;
 
@@ -543,7 +561,13 @@ CanonicalBackendResult run_sparse_backend(
         options.defaultptn = FALSE;
         TracesStats stats{};
 
-        Traces(
+#ifdef SQTOPOLOGY_CACHED_TRACES
+        // The private engine retains bounded scratch, never canonical results.
+        // TLS ownership follows the library's thread model and ends with this thread.
+        thread_local TracesScratchCleanup scratch_cleanup;
+        (void)scratch_cleanup;
+#endif
+        traces_engine(
             input.get(),
             partition.lab.data(),
             partition.ptn.data(),
