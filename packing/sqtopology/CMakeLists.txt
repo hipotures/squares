@@ -172,6 +172,15 @@ add_test(
 )
 set_tests_properties(sqtopology_realize_corpus_n3_w2 PROPERTIES TIMEOUT 600)
 
+# Enumeration-only regression: C(288,3) = 3,939,936 labelled subsets reduce to
+# exactly 2,979 canonical G_3 classes. The full solve is a research run, not CI.
+add_test(
+    NAME sqtopology_realize_count_n3_w3
+    COMMAND sqtopology_realize corpus --n 3 --weight 3 --count-only
+)
+set_tests_properties(sqtopology_realize_count_n3_w3 PROPERTIES
+    PASS_REGULAR_EXPRESSION "\"class_count\":2979")
+
 # Separate target for the n = 12 low-weight closure: |G_12| ~ 2.6e20 exceeds
 # 64 bits and one live class-aggregated run costs ~14 s, so it is kept out of
 # the ordinary suite while still running by default under ctest.

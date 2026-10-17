@@ -608,6 +608,42 @@ InfeasibilityFilter static_infeasibility_filters(const Topology& sigma) {
         }
     }
 
+    // R14: a corner-side contact on a side that is itself a wall-side contact
+    // is impossible. The CS point is in the relative interior of the side, so
+    // locally the side's square B occupies the inward half-neighbourhood of the
+    // wall. A's 90-degree corner wedge at that point cannot be disjoint from B's
+    // interior: inward means overlap, outward means A crosses the container
+    // wall (unit sides are far larger than the contact tolerance), and tangent
+    // puts both interiors on the same side of the wall with a shared boundary
+    // segment, again an interior overlap. This is a local, tolerance-safe
+    // argument; no accumulated chain of tolerances is used.
+    for (const auto& contact : sigma.contacts()) {
+        if (contact.kind != ContactKind::CornerSide || !contact.b.has_value()) {
+            continue;
+        }
+        const FeatureRef side = contact.a.kind == FeatureKind::Side
+            ? contact.a
+            : *contact.b;
+        const auto found = side_walls_required.find(side_node(side.square, side.index));
+        if (found == side_walls_required.end() || found->second.empty()) {
+            continue;
+        }
+        const FeatureRef corner = contact.a.kind == FeatureKind::Corner
+            ? contact.a
+            : *contact.b;
+        std::ostringstream message;
+        message << "R14: corner " << static_cast<int>(corner.index)
+                << " of square " << corner.square
+                << " is required on side " << static_cast<int>(side.index)
+                << " of square " << side.square
+                << ", which is required on wall "
+                << static_cast<int>(*found->second.begin())
+                << "; the two interiors cannot both stay inside the container";
+        result.proved = true;
+        result.reason = message.str();
+        return result;
+    }
+
     return result;
 }
 
@@ -2283,6 +2319,17 @@ Scene apply_group_element_to_scene(const GroupElement& element, const Scene& sce
     return result;
 }
 
+std::uint32_t support_size(const Topology& topology) {
+    std::set<SquareId> squares;
+    for (const auto& contact : topology.contacts()) {
+        squares.insert(contact.a.square);
+        if (contact.b.has_value()) {
+            squares.insert(contact.b->square);
+        }
+    }
+    return static_cast<std::uint32_t>(squares.size());
+}
+
 std::vector<CorpusClass> corpus_classes(std::uint32_t square_count, std::uint32_t weight) {
     if (square_count == 0 || square_count > 3) {
         throw std::invalid_argument("corpus enumeration currently supports n <= 3");
@@ -2540,7 +2587,9 @@ std::string corpus_report_to_json(const CorpusReport& report) {
             out << ',';
         }
         const auto& entry = report.classes[index];
-        out << "{\"weight\":" << entry.corpus.weight << ",\"events\":[";
+        out << "{\"weight\":" << entry.corpus.weight
+            << ",\"support\":" << support_size(entry.corpus.topology)
+            << ",\"events\":[";
         for (std::size_t event = 0; event < entry.corpus.events.size(); ++event) {
             if (event != 0U) {
                 out << ',';

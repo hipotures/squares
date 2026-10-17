@@ -248,10 +248,15 @@ int corpus_command(int argc, char** argv) {
     std::uint32_t weight = 0;
     std::string json_path;
     SolveConfig config;
+    bool count_only = false;
     for (int i = 2; i < argc; ++i) {
         const std::string_view arg = argv[i];
         if (arg == "--no-minimize") {
             config.minimize_container = false;
+            continue;
+        }
+        if (arg == "--count-only") {
+            count_only = true;
             continue;
         }
         if (i + 1 >= argc) {
@@ -284,6 +289,20 @@ int corpus_command(int argc, char** argv) {
     }
     if (square_count == 0 || weight == 0) {
         throw std::invalid_argument("corpus requires --n and --weight");
+    }
+
+    if (count_only) {
+        const auto classes = corpus_classes(square_count, weight);
+        std::ostringstream out;
+        out << "{\"schema\":\"sqtopology.realizability-count.v1\""
+            << ",\"n\":" << square_count
+            << ",\"weight\":" << weight
+            << ",\"class_count\":" << classes.size() << "}\n";
+        if (!json_path.empty()) {
+            write_text_file(json_path, out.str());
+        }
+        std::cout << out.str();
+        return 0;
     }
 
     const auto started = std::chrono::steady_clock::now();
@@ -333,7 +352,8 @@ void usage() {
         << "  sqtopology_realize negative [--json FILE] [--max-solves N]\n"
         << "  sqtopology_realize corpus --n N --weight W [--json FILE]\n"
         << "      [--max-solves N] [--starts M] [--iterations I] [--steps S]\n"
-        << "      [--no-minimize] [--ladder a,b,c] [--seed S] [--workers N]\n";
+        << "      [--no-minimize] [--ladder a,b,c] [--seed S] [--workers N]\n"
+        << "      [--count-only]\n";
 }
 
 }  // namespace

@@ -8,7 +8,12 @@
 //  3. the scene action psi_g commutes with the production relabel/permute
 //     transformations for every element of G_n (exact and weak strata, with
 //     the per-square feature-frame parity), and the n = 2/3 corpus
-//     enumeration reproduces the Burnside coefficients.
+//     enumeration reproduces the Burnside coefficients;
+//  4. the support classification is G_n-invariant, the n = 2 corpus embeds
+//     bijectively into the support <= 2 part of the n = 3 corpus, witnesses
+//     transfer in both directions (delete a free square / add a free square),
+//     and the n = 3 weight-3 class count is pinned by a dedicated
+//     enumeration-only CTest target.
 //
 // The corpus solve tests deliberately use a small budget; the full corpus run
 // is a separate CTest target (`sqtopology_realize_corpus_w2`).
@@ -24,6 +29,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <random>
 #include <set>
 #include <sstream>
@@ -800,6 +806,14 @@ void test_new_geometric_filters() {
                                                   FeatureRef{1, FeatureKind::Corner, 2}));
         expect_new_rule(topology.normalized(), "R13", "R13-cc-on-side");
     }
+    {
+        // R14: a CS point on a side that is itself on a wall.
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(make_wall_contact(FeatureRef{1, FeatureKind::Side, 0}, 0));
+        expect_new_rule(topology.normalized(), "R14", "R14-cs-on-wall-side");
+    }
 
     // Positive controls: close to the rules but realizable.
     const auto expect_feasible = [](const Topology& topology, const std::string& name) {
@@ -848,6 +862,23 @@ void test_new_geometric_filters() {
         topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
                                                   FeatureRef{1, FeatureKind::Side, 0}));
         expect_feasible(topology.normalized(), "R12-positive-single-cs");
+    }
+    {
+        // R14 positive: the wall-side is on a different side of the same
+        // square, so the CS side is not on the wall.
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(make_wall_contact(FeatureRef{1, FeatureKind::Side, 1}, 0));
+        expect_feasible(topology.normalized(), "R14-positive-other-side");
+    }
+    {
+        // R14 positive: the wall-side belongs to another square.
+        Topology topology(3);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(make_wall_contact(FeatureRef{2, FeatureKind::Side, 0}, 0));
+        expect_feasible(topology.normalized(), "R14-positive-other-square");
     }
 }
 
@@ -995,6 +1026,149 @@ void test_n3_weight_one() {
     }
 }
 
+void test_support_and_embedding() {
+    // --- support_size basics ------------------------------------------------
+    {
+        Topology topology(3);
+        topology.add_contact(make_wall_contact(FeatureRef{2, FeatureKind::Corner, 1}, 3));
+        expect(support_size(topology.normalized()) == 1,
+               "a single wall contact supports one square");
+    }
+    {
+        Topology topology(3);
+        topology.add_contact(
+            make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                FeatureRef{2, FeatureKind::Side, 1}));
+        expect(support_size(topology.normalized()) == 2,
+               "a square-square contact supports two squares");
+    }
+
+    // --- support is G_n-invariant --------------------------------------------
+    {
+        Topology topology(3);
+        topology.add_contact(
+            make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                FeatureRef{2, FeatureKind::Side, 1}));
+        topology.add_contact(make_wall_contact(FeatureRef{1, FeatureKind::Side, 2}, 0));
+        topology = topology.normalized();
+        const std::uint32_t base = support_size(topology);
+        expect(base == 3, "mixed topology has full support");
+        for (std::uint64_t index = 0; index < group_element_count(3); ++index) {
+            const GroupElement element = decode_group_element(3, index);
+            const Topology moved = apply_group_element_to_topology(topology, element);
+            expect(support_size(moved) == base, "support is invariant under G_3");
+        }
+    }
+
+    // --- every n = 2 weight-2 class embeds into the n = 3 corpus -------------
+    // Adding an untouched square and canonicalizing under G_3 must land on a
+    // distinct n = 3 weight-2 class with the same support (the embedding is a
+    // bijection onto the support <= 2 part of the n = 3 corpus).
+    {
+        const auto classes2 = corpus_classes(2, 2);
+        const auto classes3 = corpus_classes(3, 2);
+        expect(classes2.size() == 87, "n = 2 weight 2 has 87 classes");
+        expect(classes3.size() == 119, "n = 3 weight 2 has 119 classes");
+        std::map<std::vector<std::uint64_t>, std::size_t> lookup;
+        for (std::size_t i = 0; i < classes3.size(); ++i) {
+            lookup[topology_to_event_bitset(classes3[i].topology)] = i;
+        }
+        std::vector<std::vector<EventId>> perms;
+        for (std::uint64_t index = 0; index < group_element_count(3); ++index) {
+            perms.push_back(event_permutation(decode_group_element(3, index)));
+        }
+        const auto canonical3 = [&perms](const EventBitset& bits) {
+            std::vector<std::uint64_t> best;
+            for (const auto& perm : perms) {
+                EventBitset moved = permute_event_bitset(perm, bits);
+                if (best.empty() || moved < best) best = std::move(moved);
+            }
+            return best;
+        };
+        std::set<std::size_t> hits;
+        for (const auto& entry : classes2) {
+            Topology embedded(3);
+            for (const auto& contact : entry.topology.contacts()) {
+                embedded.add_contact(contact);
+            }
+            embedded = embedded.normalized();
+            const auto found = lookup.find(canonical3(topology_to_event_bitset(embedded)));
+            expect(found != lookup.end(),
+                   "embedded n = 2 class is an n = 3 class: "
+                       + topology_contact_keys_json(entry.topology));
+            expect(support_size(embedded) == support_size(classes3[found->second].topology),
+                   "embedding preserves support");
+            expect(hits.insert(found->second).second, "embedding is injective");
+        }
+        expect(hits.size() == 87, "all 87 embedded classes are distinct");
+    }
+
+    // --- deleting an unsupported square from a verified n = 3 witness --------
+    // CS(sq1 corner0, sq2 side0) + CS(sq2 corner0, sq1 side0) +
+    // wall-side(sq2 side2, wall 0): square 0 is untouched, support = 2.
+    {
+        Topology topology(3);
+        topology.add_contact(
+            make_square_contact(FeatureRef{1, FeatureKind::Corner, 0},
+                                FeatureRef{2, FeatureKind::Side, 0}));
+        topology.add_contact(
+            make_square_contact(FeatureRef{2, FeatureKind::Corner, 0},
+                                FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(make_wall_contact(FeatureRef{2, FeatureKind::Side, 2}, 0));
+        topology = topology.normalized();
+        expect(support_size(topology) == 2, "two-contact V topology has support 2");
+        const SolveResult result = realize_topology(topology);
+        expect(result.status == RealizabilityStatus::VerifiedFeasible,
+               "the support-2 V topology is realizable");
+        // Delete the untouched square 0 and relabel 1 -> 0, 2 -> 1.
+        Scene scene;
+        scene.container_side = result.witness.container_side;
+        scene.squares.push_back(result.witness.squares[1]);
+        scene.squares.push_back(result.witness.squares[2]);
+        Topology reduced(2);
+        for (auto contact : topology.contacts()) {
+            contact.a.square = static_cast<SquareId>(contact.a.square - 1U);
+            if (contact.b.has_value()) {
+                contact.b->square = static_cast<SquareId>(contact.b->square - 1U);
+            }
+            reduced.add_contact(contact);
+        }
+        reduced = reduced.normalized();
+        expect(support_size(reduced) == 2, "reduced topology has support 2");
+        const WitnessReport report = verify_witness(scene, reduced);
+        expect(report.exact_accepted,
+               "deleting the unsupported square leaves an exact n = 2 witness");
+    }
+
+    // --- embedding a verified n = 2 witness with a free square ---------------
+    // A wall-contact-free witness embeds into a larger container by placing
+    // the free square strictly inside the new margin.
+    {
+        Topology topology(2);
+        topology.add_contact(
+            make_square_contact(FeatureRef{0, FeatureKind::Side, 0},
+                                FeatureRef{1, FeatureKind::Side, 0}));
+        topology = topology.normalized();
+        const SolveResult result = realize_topology(topology);
+        expect(result.status == RealizabilityStatus::VerifiedFeasible,
+               "the n = 2 side-side class is realizable");
+        const double l = result.witness.container_side;
+        Topology embedded(3);
+        for (const auto& contact : topology.contacts()) {
+            embedded.add_contact(contact);
+        }
+        embedded = embedded.normalized();
+        expect(support_size(embedded) == 2, "embedded topology keeps support 2");
+        Scene scene;
+        scene.container_side = l + 2.0;
+        scene.squares = result.witness.squares;
+        scene.squares.push_back(SquarePose{l + 0.6, l + 0.6, 0.0, false});
+        const WitnessReport report = verify_witness(scene, embedded);
+        expect(report.exact_accepted,
+               "the n = 2 witness embeds into n = 3 with a free square");
+    }
+}
+
 void test_weight_one_golden() {
     // Committed machine-readable record of one deterministic n = 2 weight-1
     // run. Floating-point digits are not pinned (they are platform dependent);
@@ -1075,6 +1249,7 @@ int main() {
         {"branch lifting", test_branch_lifting},
         {"corpus weight one solves", test_corpus_weight_one_solves},
         {"n = 3 weight one", test_n3_weight_one},
+        {"support and embedding", test_support_and_embedding},
         {"weight one golden", test_weight_one_golden},
         {"status and JSON shapes", test_status_and_json_shapes},
     };

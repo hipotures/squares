@@ -67,7 +67,12 @@ enum class RealizabilityStatus : std::uint8_t {
 //   R12: two corners of one square on the interior of the same side feature
 //       (open side length 1 - 2e-6, corner distance at least 1);
 //   R13: a CC class containing a non-endpoint corner of a square and a corner
-//       required on one of that square's sides (distance 1).
+//       required on one of that square's sides (distance 1);
+//   R14: a corner-side contact on a side feature that is also a wall-side
+//       contact is impossible: locally the corner square would have to be on
+//       the inward side of the wall (overlap), the outward side (outside the
+//       container), or tangent (shared boundary segment and overlap). The
+//       violation is macroscopic, so the rule is tolerance-safe.
 //
 // All predicates depend only on incidences and fixed unit-square feature
 // distances, so they are invariant under the full G_n action (endpoint,
@@ -200,6 +205,13 @@ struct CorpusClass {
     std::uint32_t square_count,
     std::uint32_t weight
 );
+
+// Number of square IDs that appear in at least one contact event of the
+// topology. A wall contact supports its square; an untouched square does not.
+// Support is invariant under G_n (a permutation of squares preserves the
+// number of used squares) and separates genuinely n-square contact structures
+// from lower-n configurations embedded with unused squares.
+[[nodiscard]] std::uint32_t support_size(const Topology& topology);
 
 struct SceneFixture {
     std::string name;
