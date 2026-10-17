@@ -344,6 +344,33 @@ the raw multi-parent fraction as a quotient-convergence statistic. Search remain
 an independent empirical validator and for quotient-graph structure that orbit counting
 alone does not expose.
 
+### Exact cycle-index counting (`wreath`)
+
+Direct enumeration of `|G_n| = n! * 8^n * 8` elements is comfortable only through
+`n = 4`. The class-aggregated counter replaces it with a sum over the
+`5 * T(n)` conjugacy classes of the wreath product and extends exact counts to
+`n = 11`:
+
+~~~bash
+./build/sqtopology_orbit wreath --n 5 --json /tmp/wreath-n5.json
+./build/sqtopology_orbit wreath --n 11 --low-weight 6
+./build/sqtopology_orbit wreath-cross --n 4
+./build/sqtopology_orbit staged --n 6 --weight 4
+~~~
+
+`wreath` evaluates the exact orbit polynomial (or a low-weight `a_0..a_D` prefix) with
+exact big-integer arithmetic and six internal checks; at `n = 5` it is about 400x faster
+and 56x smaller than the direct element oracle while producing the same 801 coefficients.
+`wreath-cross` re-derives class sizes and induced cycle types by enumerating every element
+for `n <= 4`, and `staged` gives low-weight counts under the nested symmetry stages
+(local `D4^n`, `S_n x D4_container`, `D4 wr S_n`, full `G_n`).
+`tests/data/wreath-count-n5.json` and `tests/data/wreath-low-weight.json` hold the
+committed `n = 5` polynomial and the `a_0..a_6` table for `n <= 11`;
+`tools/wreath_reference.py` is an independent stdlib-only differential wired into CTest.
+See `docs/wreath-cycle-index-counting-2026-10-17.md` for the derivation, the low-weight
+stabilization theorem (`a_d` is constant for `n >= 2d` with increment `C(d+2, 2)` at the
+stabilization point), the staged compression tables, and the trivial-stabilizer spectra.
+
 ## Process scaling
 
 The Python harness is orchestration only. It launches long-running native shards and waits

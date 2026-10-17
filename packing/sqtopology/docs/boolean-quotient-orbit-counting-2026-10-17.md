@@ -490,3 +490,12 @@ method, and settles how the orbit counts scale before any further large
 enumeration work. `B` is a natural small side study if quotient-local structure
 matters for the traversal; `C` becomes the main Phase-2 program once the
 discrete orbit structure is understood; `D` should wait.
+
+**Follow-up (October 2026, third note).** Recommendation A has been executed;
+the results are in `docs/wreath-cycle-index-counting-2026-10-17.md`: exact
+`n = 5` and `n = 6` polynomials (plus one-off `n = 7, 8` runs), the low-weight
+table with its `n >= 2d` stabilization and `C(d+2, 2)` increment theorem,
+staged symmetry compression, and trivial-stabilizer spectra. That note also
+corrects the `|G_5|` value quoted in section 5 above: the group order is
+`5! * 8^5 * 8 = 31,457,280`, not `39,321,600`, which is what both the formula
+and direct enumeration give.
