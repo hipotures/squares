@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="520" viewBox="0 0 820 520">
+<style>text{font-family:ui-sans-serif,system-ui,sans-serif;font-size:12px;fill:#222} .t{font-size:14px;font-weight:600}</style>
+<text x="410.0" y="26.0" text-anchor="middle" class="t">Contact-count distribution by depth: corner-side-2</text>
+<rect x="90.0" y="46.0" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="206.7" y="46.0" width="116.7" height="57.7" fill="rgb(233,238,247)" stroke="#fff"/>
+<rect x="323.3" y="46.0" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="440.0" y="46.0" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="46.0" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="673.3" y="46.0" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="90.0" y="103.7" width="116.7" height="57.7" fill="rgb(233,238,247)" stroke="#fff"/>
+<rect x="206.7" y="103.7" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="103.7" width="116.7" height="57.7" fill="rgb(225,235,238)" stroke="#fff"/>
+<rect x="440.0" y="103.7" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="103.7" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="673.3" y="103.7" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="90.0" y="161.4" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="206.7" y="161.4" width="116.7" height="57.7" fill="rgb(208,231,219)" stroke="#fff"/>
+<rect x="323.3" y="161.4" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="440.0" y="161.4" width="116.7" height="57.7" fill="rgb(204,229,214)" stroke="#fff"/>
+<rect x="556.7" y="161.4" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="673.3" y="161.4" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="90.0" y="219.1" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="206.7" y="219.1" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="219.1" width="116.7" height="57.7" fill="rgb(180,222,186)" stroke="#fff"/>
+<rect x="440.0" y="219.1" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="219.1" width="116.7" height="57.7" fill="rgb(183,223,190)" stroke="#fff"/>
+<rect x="673.3" y="219.1" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="90.0" y="276.9" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="206.7" y="276.9" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="276.9" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="440.0" y="276.9" width="116.7" height="57.7" fill="rgb(152,215,155)" stroke="#fff"/>
+<rect x="556.7" y="276.9" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="673.3" y="276.9" width="116.7" height="57.7" fill="rgb(160,217,163)" stroke="#fff"/>
+<rect x="90.0" y="334.6" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="206.7" y="334.6" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="334.6" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="440.0" y="334.6" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="334.6" width="116.7" height="57.7" fill="rgb(125,207,124)" stroke="#fff"/>
+<rect x="673.3" y="334.6" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="90.0" y="392.3" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="206.7" y="392.3" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="392.3" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="440.0" y="392.3" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="392.3" width="116.7" height="57.7" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="673.3" y="392.3" width="116.7" height="57.7" fill="rgb(100,200,95)" stroke="#fff"/>
+<text x="82.0" y="86.4" text-anchor="end">0</text>
+<text x="82.0" y="144.1" text-anchor="end">1</text>
+<text x="82.0" y="201.8" text-anchor="end">2</text>
+<text x="82.0" y="259.5" text-anchor="end">3</text>
+<text x="82.0" y="317.3" text-anchor="end">4</text>
+<text x="82.0" y="375.0" text-anchor="end">5</text>
+<text x="82.0" y="432.7" text-anchor="end">6</text>
+<text x="148.3" y="468.0" text-anchor="middle">0</text>
+<text x="265.0" y="468.0" text-anchor="middle">1</text>
+<text x="381.7" y="468.0" text-anchor="middle">2</text>
+<text x="498.3" y="468.0" text-anchor="middle">3</text>
+<text x="615.0" y="468.0" text-anchor="middle">4</text>
+<text x="731.7" y="468.0" text-anchor="middle">5</text>
+<text x="440.0" y="502.0" text-anchor="middle">discovery depth</text>
+<text x="16.0" y="248.0" text-anchor="middle">contact count</text>
+<text x="796.0" y="248.0" text-anchor="start">max 6877040</text>
+</svg>

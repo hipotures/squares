@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="480" viewBox="0 0 760 480">
+<style>text{font-family:ui-sans-serif,system-ui,sans-serif;font-size:12px;fill:#222} .t{font-size:14px;font-weight:600}</style>
+<text x="380.0" y="26.0" text-anchor="middle" class="t">Per-depth growth ratio new(d) / new(d-1)</text>
+<line x1="10.0" y1="46.0" x2="10.0" y2="420.0" stroke="#eee" stroke-width="1.0"/>
+<text x="10.0" y="436.0" text-anchor="middle">0</text>
+<line x1="154.0" y1="46.0" x2="154.0" y2="420.0" stroke="#eee" stroke-width="1.0"/>
+<text x="154.0" y="436.0" text-anchor="middle">2</text>
+<line x1="298.0" y1="46.0" x2="298.0" y2="420.0" stroke="#eee" stroke-width="1.0"/>
+<text x="298.0" y="436.0" text-anchor="middle">4</text>
+<line x1="442.0" y1="46.0" x2="442.0" y2="420.0" stroke="#eee" stroke-width="1.0"/>
+<text x="442.0" y="436.0" text-anchor="middle">6</text>
+<line x1="586.0" y1="46.0" x2="586.0" y2="420.0" stroke="#eee" stroke-width="1.0"/>
+<text x="586.0" y="436.0" text-anchor="middle">8</text>
+<line x1="730.0" y1="46.0" x2="730.0" y2="420.0" stroke="#eee" stroke-width="1.0"/>
+<text x="730.0" y="436.0" text-anchor="middle">10</text>
+<line x1="82.0" y1="454.5" x2="730.0" y2="454.5" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="458.5" text-anchor="end">1</text>
+<line x1="82.0" y1="397.2" x2="730.0" y2="397.2" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="401.2" text-anchor="end">3</text>
+<line x1="82.0" y1="339.8" x2="730.0" y2="339.8" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="343.8" text-anchor="end">10</text>
+<line x1="82.0" y1="282.4" x2="730.0" y2="282.4" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="286.4" text-anchor="end">32</text>
+<line x1="82.0" y1="225.0" x2="730.0" y2="225.0" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="229.0" text-anchor="end">100</text>
+<line x1="82.0" y1="167.6" x2="730.0" y2="167.6" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="171.6" text-anchor="end">316</text>
+<line x1="82.0" y1="110.3" x2="730.0" y2="110.3" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="114.3" text-anchor="end">1k</text>
+<line x1="82.0" y1="52.9" x2="730.0" y2="52.9" stroke="#eee" stroke-width="1.0"/>
+<text x="74.0" y="56.9" text-anchor="end">3.2k</text>
+<line x1="82.0" y1="46.0" x2="82.0" y2="420.0" stroke="#333" stroke-width="1.0"/>
+<line x1="82.0" y1="420.0" x2="730.0" y2="420.0" stroke="#333" stroke-width="1.0"/>
+<text x="406.0" y="466.0" text-anchor="middle">discovery depth</text>
+<text x="16.0" y="233.0" text-anchor="middle">ratio (log scale)</text>
+<polyline points="82.0,305.2 154.0,294.8 226.0,296.4 298.0,301.9" fill="none" stroke="#1f77b4" stroke-width="2.0"/>
+<circle cx="82.0" cy="305.2" r="2.5" fill="#1f77b4"/>
+<circle cx="154.0" cy="294.8" r="2.5" fill="#1f77b4"/>
+<circle cx="226.0" cy="296.4" r="2.5" fill="#1f77b4"/>
+<circle cx="298.0" cy="301.9" r="2.5" fill="#1f77b4"/>
+<rect x="590.0" y="54.0" width="12.0" height="12.0" fill="#1f77b4" stroke="none"/>
+<text x="608.0" y="64.0" text-anchor="start">corner-corner-2</text>
+<polyline points="82.0,278.8 154.0,296.0 226.0,298.6 298.0,304.5 370.0,310.1" fill="none" stroke="#d62728" stroke-width="2.0"/>
+<circle cx="82.0" cy="278.8" r="2.5" fill="#d62728"/>
+<circle cx="154.0" cy="296.0" r="2.5" fill="#d62728"/>
+<circle cx="226.0" cy="298.6" r="2.5" fill="#d62728"/>
+<circle cx="298.0" cy="304.5" r="2.5" fill="#d62728"/>
+<circle cx="370.0" cy="310.1" r="2.5" fill="#d62728"/>
+<rect x="590.0" y="72.0" width="12.0" height="12.0" fill="#d62728" stroke="none"/>
+<text x="608.0" y="82.0" text-anchor="start">corner-side-2</text>
+<polyline points="82.0,374.3 154.0,312.2 226.0,315.7 298.0,308.1 370.0,310.3" fill="none" stroke="#2ca02c" stroke-width="2.0"/>
+<circle cx="82.0" cy="374.3" r="2.5" fill="#2ca02c"/>
+<circle cx="154.0" cy="312.2" r="2.5" fill="#2ca02c"/>
+<circle cx="226.0" cy="315.7" r="2.5" fill="#2ca02c"/>
+<circle cx="298.0" cy="308.1" r="2.5" fill="#2ca02c"/>
+<circle cx="370.0" cy="310.3" r="2.5" fill="#2ca02c"/>
+<rect x="590.0" y="90.0" width="12.0" height="12.0" fill="#2ca02c" stroke="none"/>
+<text x="608.0" y="100.0" text-anchor="start">disjoint-2</text>
+<polyline points="82.0,374.3 154.0,294.1 226.0,287.6" fill="none" stroke="#ff7f0e" stroke-width="2.0"/>
+<circle cx="82.0" cy="374.3" r="2.5" fill="#ff7f0e"/>
+<circle cx="154.0" cy="294.1" r="2.5" fill="#ff7f0e"/>
+<circle cx="226.0" cy="287.6" r="2.5" fill="#ff7f0e"/>
+<rect x="590.0" y="108.0" width="12.0" height="12.0" fill="#ff7f0e" stroke="none"/>
+<text x="608.0" y="118.0" text-anchor="start">disjoint-4</text>
+<polyline points="82.0,240.7 154.0,184.2 226.0,199.2" fill="none" stroke="#9467bd" stroke-width="2.0"/>
+<circle cx="82.0" cy="240.7" r="2.5" fill="#9467bd"/>
+<circle cx="154.0" cy="184.2" r="2.5" fill="#9467bd"/>
+<circle cx="226.0" cy="199.2" r="2.5" fill="#9467bd"/>
+<rect x="590.0" y="126.0" width="12.0" height="12.0" fill="#9467bd" stroke="none"/>
+<text x="608.0" y="136.0" text-anchor="start">grid-2x2</text>
+<polyline points="82.0,162.7 154.0,100.9" fill="none" stroke="#8c564b" stroke-width="2.0"/>
+<circle cx="82.0" cy="162.7" r="2.5" fill="#8c564b"/>
+<circle cx="154.0" cy="100.9" r="2.5" fill="#8c564b"/>
+<rect x="590.0" y="144.0" width="12.0" height="12.0" fill="#8c564b" stroke="none"/>
+<text x="608.0" y="154.0" text-anchor="start">grid-3x3</text>
+<polyline points="82.0,46.0 154.0,46.8" fill="none" stroke="#17becf" stroke-width="2.0"/>
+<circle cx="82.0" cy="46.0" r="2.5" fill="#17becf"/>
+<circle cx="154.0" cy="46.8" r="2.5" fill="#17becf"/>
+<rect x="590.0" y="162.0" width="12.0" height="12.0" fill="#17becf" stroke="none"/>
+<text x="608.0" y="172.0" text-anchor="start">grid-4x4-minus-one</text>
+<polyline points="82.0,420.0 154.0,335.0 226.0,371.7 298.0,361.9 370.0,376.4 442.0,381.5 514.0,391.1 586.0,398.4 658.0,406.3 730.0,413.3" fill="none" stroke="#e377c2" stroke-width="2.0"/>
+<circle cx="82.0" cy="420.0" r="2.5" fill="#e377c2"/>
+<circle cx="154.0" cy="335.0" r="2.5" fill="#e377c2"/>
+<circle cx="226.0" cy="371.7" r="2.5" fill="#e377c2"/>
+<circle cx="298.0" cy="361.9" r="2.5" fill="#e377c2"/>
+<circle cx="370.0" cy="376.4" r="2.5" fill="#e377c2"/>
+<circle cx="442.0" cy="381.5" r="2.5" fill="#e377c2"/>
+<circle cx="514.0" cy="391.1" r="2.5" fill="#e377c2"/>
+<circle cx="586.0" cy="398.4" r="2.5" fill="#e377c2"/>
+<circle cx="658.0" cy="406.3" r="2.5" fill="#e377c2"/>
+<circle cx="730.0" cy="413.3" r="2.5" fill="#e377c2"/>
+<rect x="590.0" y="180.0" width="12.0" height="12.0" fill="#e377c2" stroke="none"/>
+<text x="608.0" y="190.0" text-anchor="start">isolated-1</text>
+<polyline points="82.0,206.2 154.0,184.2 226.0,199.2" fill="none" stroke="#7f7f7f" stroke-width="2.0"/>
+<circle cx="82.0" cy="206.2" r="2.5" fill="#7f7f7f"/>
+<circle cx="154.0" cy="184.2" r="2.5" fill="#7f7f7f"/>
+<circle cx="226.0" cy="199.2" r="2.5" fill="#7f7f7f"/>
+<rect x="590.0" y="198.0" width="12.0" height="12.0" fill="#7f7f7f" stroke="none"/>
+<text x="608.0" y="208.0" text-anchor="start">line-4</text>
+<polyline points="82.0,305.2 154.0,294.8 226.0,296.4 298.0,301.9" fill="none" stroke="#bcbd22" stroke-width="2.0"/>
+<circle cx="82.0" cy="305.2" r="2.5" fill="#bcbd22"/>
+<circle cx="154.0" cy="294.8" r="2.5" fill="#bcbd22"/>
+<circle cx="226.0" cy="296.4" r="2.5" fill="#bcbd22"/>
+<circle cx="298.0" cy="301.9" r="2.5" fill="#bcbd22"/>
+<rect x="590.0" y="216.0" width="12.0" height="12.0" fill="#bcbd22" stroke="none"/>
+<text x="608.0" y="226.0" text-anchor="start">side-side-2</text>
+</svg>

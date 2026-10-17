@@ -1,0 +1,8 @@
+build/
+*.svg
+
+# Durable research plots are small generated SVGs and are tracked on purpose.
+!docs/research-plots/*.svg
+
+# Research campaign build trees (never committed)
+build-*/

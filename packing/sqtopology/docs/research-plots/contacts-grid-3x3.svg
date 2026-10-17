@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="520" viewBox="0 0 820 520">
+<style>text{font-family:ui-sans-serif,system-ui,sans-serif;font-size:12px;fill:#222} .t{font-size:14px;font-weight:600}</style>
+<text x="410.0" y="26.0" text-anchor="middle" class="t">Contact-count distribution by depth: grid-3x3</text>
+<rect x="90.0" y="46.0" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="46.0" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="46.0" width="233.3" height="80.8" fill="rgb(193,226,201)" stroke="#fff"/>
+<rect x="90.0" y="126.8" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="126.8" width="233.3" height="80.8" fill="rgb(218,233,230)" stroke="#fff"/>
+<rect x="556.7" y="126.8" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="90.0" y="207.6" width="233.3" height="80.8" fill="rgb(232,237,246)" stroke="#fff"/>
+<rect x="323.3" y="207.6" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="207.6" width="233.3" height="80.8" fill="rgb(139,211,140)" stroke="#fff"/>
+<rect x="90.0" y="288.4" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="288.4" width="233.3" height="80.8" fill="rgb(176,221,182)" stroke="#fff"/>
+<rect x="556.7" y="288.4" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="90.0" y="369.2" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="323.3" y="369.2" width="233.3" height="80.8" fill="rgb(255,255,255)" stroke="#fff"/>
+<rect x="556.7" y="369.2" width="233.3" height="80.8" fill="rgb(100,200,95)" stroke="#fff"/>
+<text x="82.0" y="102.6" text-anchor="end">30</text>
+<text x="82.0" y="183.4" text-anchor="end">31</text>
+<text x="82.0" y="264.2" text-anchor="end">32</text>
+<text x="82.0" y="345.0" text-anchor="end">33</text>
+<text x="82.0" y="425.8" text-anchor="end">34</text>
+<text x="206.7" y="468.0" text-anchor="middle">0</text>
+<text x="440.0" y="468.0" text-anchor="middle">1</text>
+<text x="673.3" y="468.0" text-anchor="middle">2</text>
+<text x="440.0" y="502.0" text-anchor="middle">discovery depth</text>
+<text x="16.0" y="248.0" text-anchor="middle">contact count</text>
+<text x="796.0" y="248.0" text-anchor="start">max 410655</text>
+</svg>
