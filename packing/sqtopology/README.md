@@ -201,8 +201,10 @@ about 10% of retired instructions and about 6% of the per-candidate wall time.
 dot -Tsvg /tmp/grid-3x3.dot -o /tmp/grid-3x3.svg
 ~~~
 
-Fixtures include isolated and disjoint squares, each elementary contact kind, `2x2`,
-`3x3`, `4x4`, and a `4x4` grid with one square removed.
+Fixtures include isolated and disjoint squares (`isolated-1`, `disjoint-2`,
+`disjoint-4`), a `1x4` row (`line-4`), each elementary contact kind
+(`corner-corner-2`, `corner-side-2`, `side-side-2`), `2x2`, `3x3`, `4x4`, and a
+`4x4` grid with one square removed.
 
 The `3x3` fixture deliberately records the central square's four side contacts and four
 diagonal corner-point contacts.
@@ -252,6 +254,39 @@ that it matters. Therefore current shard runs are **not** an exhaustive partitio
 `--emit-keys FILE` writes sorted exact search keys as `SQK5HEX:<hex>` text for offline
 comparison or merge. The hexadecimal rendering is generated only when explicitly requested;
 it is not built per candidate in the search hot path.
+
+## Research mode
+
+`research` is a single-process instrumentation traversal for the topology-space
+study. It runs the exact production rewrite and canonicalization semantics and only
+adds per-depth and per-state aggregation, so it never changes the discovered
+canonical key set:
+
+~~~bash
+./build/sqtopology research grid-4x4-minus-one \
+  --max-depth 2 \
+  --additions uncapped \
+  --json /tmp/research.json
+~~~
+
+Options:
+
+- `--max-depth N` sets the traversal depth;
+- `--additions N | uncapped` selects the production 256-addition cap or the full
+  event neighborhood `E(n) = 64*C(n,2) + 32*n` (uncapped is the default);
+- `--canonical-backend B` selects the canonical backend;
+- `--json FILE` writes the machine-readable report;
+- `--emit-keys FILE` also writes sorted `SQK5HEX` keys for the same-`n` overlap study;
+- `--no-symmetry` disables the residual-symmetry aggregation.
+
+Every run is a single process, so counts are global-unique for the whole reachable
+set; the JSON records this explicitly as `counts_scope`. Multi-worker `search` runs
+re-expand states shared across shards and are exploratory only.
+
+The campaign driver `tools/research_campaign.sh` runs a fixed seed/depth list and
+writes one JSON per run, and `tools/research_analyze.py` (stdlib-only, no plotting
+stack) renders tables, SVG plots, and exact key-set overlap. See
+`docs/topology-space-research-2026-10-17.md`.
 
 ## Process scaling
 
