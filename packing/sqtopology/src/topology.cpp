@@ -151,6 +151,22 @@ Topology Topology::normalized() const {
     return result;
 }
 
+Topology Topology::with_added_contact_normalized(Contact contact) const {
+    contact = normalized_contact(std::move(contact));
+    const auto position = std::lower_bound(
+        contacts_.begin(), contacts_.end(), contact,
+        [](const Contact& lhs, const Contact& rhs) {
+            return contact_sort_tuple(lhs) < contact_sort_tuple(rhs);
+        }
+    );
+    Topology result(square_count_);
+    result.contacts_.reserve(contacts_.size() + 1U);
+    result.contacts_.insert(result.contacts_.end(), contacts_.begin(), position);
+    result.contacts_.push_back(std::move(contact));
+    result.contacts_.insert(result.contacts_.end(), position, contacts_.end());
+    return result;
+}
+
 Contact make_square_contact(FeatureRef a, FeatureRef b) {
     Contact contact{
         .kind = inferred_kind(a.kind, b.kind),

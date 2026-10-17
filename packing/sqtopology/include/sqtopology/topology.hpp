@@ -63,6 +63,9 @@ class Topology {
     void add_contact(Contact contact);
     [[nodiscard]] ValidationResult validate() const;
     [[nodiscard]] Topology normalized() const;
+    // Requires normalized contact order. Returns the same order as appending
+    // with add_contact() and then normalized(), without sorting the whole list.
+    [[nodiscard]] Topology with_added_contact_normalized(Contact contact) const;
 
   private:
     std::uint32_t square_count_{};

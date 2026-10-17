@@ -86,14 +86,11 @@ std::vector<Rewrite> generate_rewrites_validated(
             return;
         }
 
-        Topology child = topology;
-        child.add_contact(std::move(contact));
-
         result.push_back(
             Rewrite{
                 .kind = kind,
                 .label = std::move(label),
-                .topology = child.normalized(),
+                .topology = topology.with_added_contact_normalized(std::move(contact)),
             }
         );
         ++additions;

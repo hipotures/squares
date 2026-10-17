@@ -77,3 +77,20 @@ RSS peaks are an upper bound on simultaneous worker RSS, excluding the harness.
 | 16 | 887813.8 | 1.020x | 12558.9 |
 
 Raw measurement: `/tmp/sqtopology-leaf.json`.
+
+## Keep: insert added contacts into normalized order
+
+Additions allocate the final child list once and insert at a binary-searched
+position, replacing full child normalization/copy/sort. Tests compare its exact
+contact ordering to append-and-normalize, including reversed endpoints. The
+10,000-candidate baseline exact-key comparison still passes.
+
+| Workers | Candidates/s | Relative to depth-bound cleanup | Generation µs |
+| --- | --- | --- | --- |
+| 1 | 71893.5 | 1.077x | 0.26 |
+| 2 | 140498.1 | 1.087x | 0.27 |
+| 4 | 281362.8 | 1.094x | 0.26 |
+| 8 | 542337.5 | 1.092x | 0.26 |
+| 16 | 971772.5 | 1.095x | 0.27 |
+
+Raw measurement: `/tmp/sqtopology-insert.json`.

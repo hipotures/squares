@@ -268,6 +268,29 @@ void test_shard_reproducibility() {
     );
 }
 
+void test_sorted_contact_insertion() {
+    using namespace sqtopology;
+    const auto contacts_fixture = make_fixture("grid-2x2");
+    for (const auto& name : fixture_names()) {
+        const auto base = make_fixture(name).normalized();
+        for (const auto& contact : contacts_fixture.contacts()) {
+            // Ordering equivalence is independent of semantic endpoint bounds.
+            auto appended = base;
+            appended.add_contact(contact);
+            const auto inserted = base.with_added_contact_normalized(contact);
+            expect(inserted.contacts() == appended.normalized().contacts(),
+                   "sorted insertion must exactly match append-and-normalize ordering");
+            if (contact.b) {
+                auto reversed = contact;
+                std::swap(reversed.a, *reversed.b);
+                expect(base.with_added_contact_normalized(reversed).contacts()
+                           == inserted.contacts(),
+                       "insertion must normalize reversed contact endpoints");
+            }
+        }
+    }
+}
+
 void test_depth_bound_frontier() {
     using namespace sqtopology;
     const SearchOptions options{
@@ -596,6 +619,7 @@ int main() {
         test_rewrites_are_deterministic();
         test_rewrite_validity_contract();
         test_shard_reproducibility();
+        test_sorted_contact_insertion();
         test_depth_bound_frontier();
         test_export_smoke();
         test_validated_incidence_fast_path_matches_checked_path();
