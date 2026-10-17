@@ -68,6 +68,7 @@ add_library(
     src/canonical.cpp
     src/export.cpp
     src/fixtures.cpp
+    src/orbit.cpp
     src/research.cpp
     src/rewrite.cpp
     src/search.cpp
@@ -98,10 +99,19 @@ add_executable(sqtopology src/main.cpp)
 target_link_libraries(sqtopology PRIVATE sqtopology_core)
 target_compile_options(sqtopology PRIVATE -Wall -Wextra -Wpedantic)
 
+# Research-only oracle front end: exact Burnside/Pólya orbit counting over the
+# explicit event set, and exact orbit-Hamming distances between seeds. It does
+# not use canonicalization for its results.
+add_executable(sqtopology_orbit src/orbit_main.cpp)
+target_link_libraries(sqtopology_orbit PRIVATE sqtopology_core)
+target_compile_options(sqtopology_orbit PRIVATE -Wall -Wextra -Wpedantic)
+
 enable_testing()
 add_executable(sqtopology_tests tests/test_sqtopology.cpp)
 target_link_libraries(sqtopology_tests PRIVATE sqtopology_core)
 target_compile_options(sqtopology_tests PRIVATE -Wall -Wextra -Wpedantic)
+target_compile_definitions(sqtopology_tests PRIVATE
+    SQTOPOLOGY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME sqtopology_tests COMMAND sqtopology_tests)
 
 if(SQTOPOLOGY_PGO STREQUAL "use")
