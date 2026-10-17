@@ -34,8 +34,10 @@ namespace sqtopology {
 using EventId = std::uint32_t;
 
 // Largest square count representable by the fixed-size group element below.
-// n = 4 only needs 4; the margin keeps small experiments convenient.
-inline constexpr std::uint32_t kMaxOrbitSquares = 8;
+// The direct brute-force paths stay comfortable through n = 4 and are capped by
+// their front ends; the class-aggregated wreath counter in wreath.hpp uses the
+// same representation up to n = 11.
+inline constexpr std::uint32_t kMaxOrbitSquares = 11;
 
 enum class EventKind : std::uint8_t {
     SquareSquare = 0,

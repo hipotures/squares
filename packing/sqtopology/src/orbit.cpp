@@ -1,5 +1,7 @@
 #include "sqtopology/orbit.hpp"
 
+#include "sqtopology/bigint.hpp"
+
 #include <algorithm>
 #include <bit>
 #include <chrono>
@@ -49,119 +51,7 @@ std::uint8_t d4_to_digit(const D4Element& element) {
 
 // ---------------------------------------------------------------------------
 // Minimal exact unsigned big integer, base 10^9 limbs, little-endian.
-// Only the operations needed by exact Burnside counting are provided.
 // ---------------------------------------------------------------------------
-
-class BigUint {
-  public:
-    BigUint() = default;
-
-    explicit BigUint(std::uint64_t value) {
-        while (value > 0) {
-            limbs_.push_back(static_cast<std::uint32_t>(value % kBase));
-            value /= kBase;
-        }
-    }
-
-    [[nodiscard]] bool is_zero() const noexcept { return limbs_.empty(); }
-
-    [[nodiscard]] static BigUint power_of_two(unsigned exponent) {
-        BigUint result(1);
-        for (unsigned step = 0; step < exponent; ++step) {
-            result.mul_small(2);
-        }
-        return result;
-    }
-
-    void add_into(const BigUint& other) {
-        const std::size_t size = std::max(limbs_.size(), other.limbs_.size());
-        limbs_.resize(size, 0);
-        std::uint64_t carry = 0;
-        for (std::size_t i = 0; i < size; ++i) {
-            std::uint64_t sum = carry + limbs_[i];
-            if (i < other.limbs_.size()) {
-                sum += other.limbs_[i];
-            }
-            if (sum >= kBase) {
-                limbs_[i] = static_cast<std::uint32_t>(sum - kBase);
-                carry = 1;
-            } else {
-                limbs_[i] = static_cast<std::uint32_t>(sum);
-                carry = 0;
-            }
-        }
-        if (carry != 0) {
-            limbs_.push_back(static_cast<std::uint32_t>(carry));
-        }
-    }
-
-    void mul_small(std::uint64_t factor) {
-        if (factor == 0) {
-            limbs_.clear();
-            return;
-        }
-        std::uint64_t carry = 0;
-        for (auto& limb : limbs_) {
-            const std::uint64_t product =
-                static_cast<std::uint64_t>(limb) * factor + carry;
-            limb = static_cast<std::uint32_t>(product % kBase);
-            carry = product / kBase;
-        }
-        while (carry > 0) {
-            limbs_.push_back(static_cast<std::uint32_t>(carry % kBase));
-            carry /= kBase;
-        }
-    }
-
-    // In-place exact division by a small positive divisor; returns the
-    // remainder. The caller checks that the remainder is zero where the
-    // mathematical value is known to be divisible.
-    [[nodiscard]] std::uint64_t div_small(std::uint64_t divisor) {
-        if (divisor == 0) {
-            throw std::invalid_argument("big integer division by zero");
-        }
-        std::uint64_t remainder = 0;
-        for (std::size_t i = limbs_.size(); i-- > 0;) {
-            const std::uint64_t current =
-                remainder * kBase + static_cast<std::uint64_t>(limbs_[i]);
-            limbs_[i] = static_cast<std::uint32_t>(current / divisor);
-            remainder = current % divisor;
-        }
-        trim();
-        return remainder;
-    }
-
-    [[nodiscard]] std::string to_decimal() const {
-        if (limbs_.empty()) {
-            return "0";
-        }
-        std::ostringstream out;
-        out << limbs_.back();
-        for (std::size_t i = limbs_.size() - 1; i-- > 0;) {
-            out << std::setw(9) << std::setfill('0') << limbs_[i];
-        }
-        return out.str();
-    }
-
-    [[nodiscard]] std::uint64_t to_uint64() const {
-        std::uint64_t value = 0;
-        for (std::size_t i = limbs_.size(); i-- > 0;) {
-            value = value * kBase + limbs_[i];
-        }
-        return value;
-    }
-
-  private:
-    static constexpr std::uint64_t kBase = 1000000000ULL;
-
-    void trim() {
-        while (!limbs_.empty() && limbs_.back() == 0) {
-            limbs_.pop_back();
-        }
-    }
-
-    std::vector<std::uint32_t> limbs_;
-};
 
 std::string pack_cycle_type(const EventCycleType& type) {
     std::string key;
@@ -919,10 +809,14 @@ std::string EventCycleType::to_compact_string() const {
 }
 
 EventCycleType event_cycle_type(const GroupElement& element) {
-    const std::vector<EventId> permutation = event_permutation(element);
+    const EventSetLayout layout = EventSetLayout::for_square_count(element.square_count);
+    ElementAction action;
+    action.initialize(element.square_count);
+    action.set_all(element);
+
     EventCycleType type;
-    std::vector<std::uint8_t> visited(permutation.size(), 0);
-    for (EventId start = 0; start < permutation.size(); ++start) {
+    std::vector<std::uint8_t> visited(static_cast<std::size_t>(layout.event_count), 0);
+    for (EventId start = 0; start < layout.event_count; ++start) {
         if (visited[start] != 0) {
             continue;
         }
@@ -930,7 +824,7 @@ EventCycleType event_cycle_type(const GroupElement& element) {
         EventId current = start;
         do {
             visited[current] = 1;
-            current = permutation[current];
+            current = action.map_event(current);
             ++length;
         } while (current != start);
         type.lengths.push_back(static_cast<std::uint16_t>(length));
