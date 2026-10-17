@@ -216,6 +216,9 @@ candidate throughput, speedup, efficiency, duplicates, and the sum of per-shard 
 unique counts.
 
 Longer runs should use tens of seconds per width so startup cost is negligible.
+For controlled comparisons on a fixed CPU set, add `--pin-workers`, or specify
+an ordered CPU list with `--cpus 0,1,2,3`. The report records each shard's CPU
+affinity, aggregate CPU/wall ratio, and the largest worker CPU/wall gap.
 
 ## Hot-path baseline cleanup
 

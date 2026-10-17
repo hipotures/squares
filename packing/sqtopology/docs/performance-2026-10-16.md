@@ -241,3 +241,12 @@ while most workers stayed near their usual ~18–19 s. The complete workload and
 unique counts were unchanged. Add cold-path process CPU time, page-fault, and
 context-switch accounting to distinguish scheduler/host effects in later runs.
 Raw reports: `/tmp/sqtopology-small-sorts*.json`.
+
+## Measurement refinement: optional CPU affinity
+
+The accounting run showed near-100% CPU/wall utilization at one worker, despite
+~10% uniformly higher stage costs. This is consistent with per-core/frequency
+variation, not added cold-path accounting cost. Add opt-in `--pin-workers` and
+`--cpus` controls for close comparisons; the primary benchmark remains unpinned.
+The native affinity smoke run processed its exact 32-candidate bound and recorded
+CPU 0 correctly. LTO comparisons use the primary benchmark plus pinned repeats.

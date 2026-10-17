@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -22,6 +23,13 @@ def parse_workers(raw: str) -> list[int]:
     values = [int(item) for item in raw.split(",") if item.strip()]
     if not values or any(value < 1 for value in values):
         raise argparse.ArgumentTypeError("workers must be positive comma-separated integers")
+    return values
+
+
+def parse_cpus(raw: str) -> list[int]:
+    values = [int(item) for item in raw.split(",") if item.strip()]
+    if not values or any(value < 0 for value in values) or len(set(values)) != len(values):
+        raise argparse.ArgumentTypeError("cpus must be distinct non-negative comma-separated integers")
     return values
 
 
@@ -51,6 +59,8 @@ def parse_args() -> argparse.Namespace:
         help="comma-separated canonical backends: dense-nauty,sparse-nauty,traces",
     )
     parser.add_argument("--seconds", type=float, default=10.0)
+    parser.add_argument("--pin-workers", action="store_true", help="pin shards to available CPUs in order")
+    parser.add_argument("--cpus", type=parse_cpus, help="CPU order for pinning; implies --pin-workers")
     parser.add_argument("--max-candidates", type=int, default=0)
     parser.add_argument("--max-unique", type=int, default=200_000)
     parser.add_argument("--max-depth", type=int, default=3)
@@ -74,6 +84,12 @@ def run_width(
     workers: int,
 ) -> dict[str, object]:
     processes: list[subprocess.Popen[str]] = []
+    cpus = None
+    if args.pin_workers or args.cpus is not None:
+        available = sorted(os.sched_getaffinity(0))
+        cpus = args.cpus if args.cpus is not None else available
+        if any(cpu not in available for cpu in cpus):
+            raise ValueError(f"requested CPU outside allowed affinity: {available}")
     started = time.perf_counter()
 
     for shard in range(workers):
@@ -106,6 +122,8 @@ def run_width(
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                preexec_fn=(lambda cpu=cpus[shard % len(cpus)]: os.sched_setaffinity(0, {cpu}))
+                if cpus is not None else None,
             )
         )
 
@@ -136,6 +154,7 @@ def run_width(
     return {
         "backend": backend,
         "workers": workers,
+        "cpu_affinity": [cpus[shard % len(cpus)] for shard in range(workers)] if cpus is not None else None,
         "external_wall_seconds": external_wall,
         "max_worker_wall_seconds": max_worker_wall,
         "min_worker_wall_seconds": min(float(item["wall_seconds"]) for item in summaries),
@@ -236,12 +255,14 @@ def print_stage_profile(rows: list[dict[str, object]]) -> None:
         ("dedup", "dedup_seconds"),
         ("other", "unattributed_seconds"),
     )
-    print(f"{'workers':>7}" + "".join(f"{label:>12}" for label, _ in fields))
+    print(f"{'workers':>7}" + "".join(f"{label:>12}" for label, _ in fields) + f"{'cpu/wall%':>12}")
     for row in rows:
         scale = 1_000_000.0 / int(row["raw_candidates"]) if row["raw_candidates"] else 0.0
+        cpu = float(row.get("user_cpu_seconds", 0.0)) + float(row.get("system_cpu_seconds", 0.0))
+        cpu_text = f"{100.0 * cpu / float(row['wall_seconds']):12.1f}" if cpu else f"{'n/a':>12}"
         print(f"{int(row['workers']):7d}" + "".join(
             f"{float(row[key]) * scale:12.2f}" for _, key in fields
-        ))
+        ) + cpu_text)
 
 
 def print_canonical_profile(rows: list[dict[str, object]]) -> None:
@@ -360,6 +381,8 @@ def main() -> int:
                     "max_unique": args.max_unique,
                     "max_depth": args.max_depth,
                     "max_additions": args.max_additions,
+                    "pin_workers": args.pin_workers or args.cpus is not None,
+                    "cpus": args.cpus,
                     "backends": args.backends,
                     "rows": rows,
                 },
