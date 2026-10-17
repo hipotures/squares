@@ -230,6 +230,8 @@ the semantic representation unchanged while removing avoidable work:
 - generated children are moved into the frontier rather than normalized/copied again;
 - the search path validates a topology once and then uses a validated incidence builder;
 - incidence edges are preallocated and are not sorted merely for nauty input;
+- a bounded per-thread cache reuses the fixed square/container gadget prefix;
+  contacts are appended fresh, with arithmetic port IDs;
 - canonicalization consumes the incidence graph directly instead of copying/sorting it;
 - contact normalization uses structural tuples rather than temporary string keys.
 

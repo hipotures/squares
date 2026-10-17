@@ -291,3 +291,23 @@ Boost headers are optional; CMake can select the standard-container fallback.
 
 At 16 workers, summed peak RSS fell from 12,556 to 12,255 MiB for the same
 12,972,556 retained exact keys. Raw measurement: `/tmp/sqtopology-flat-set.json`.
+
+## Keep: reuse bounded square/container gadget prefixes
+
+The immutable prefix depends only on square count. A per-thread cache retains
+one prefix for at most 256 squares; contact factors are appended fresh. Port IDs
+are computed from their fixed layout rather than an allocated lookup table.
+Tests cover cache-size changes, the uncached path, gadget degrees, and absence
+of leaked contact factors. Every fixture canonical form and a bounded 2,000-
+candidate exact search key set match the starting binary, with generated-state
+validation enabled in the new binary.
+
+| Workers | Candidates/s | Relative to flat set | Graph conversion µs |
+| --- | --- | --- | --- |
+| 1 | 105711.3 | 1.030x | 0.31 |
+| 2 | 213371.4 | 1.045x | 0.29 |
+| 4 | 414881.0 | 1.021x | 0.30 |
+| 8 | 789825.6 | 1.020x | 0.31 |
+| 16 | 1450573.4 | 1.034x | 0.34 |
+
+Raw measurement: `/tmp/sqtopology-prefix.json`.

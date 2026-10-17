@@ -104,62 +104,70 @@ std::string validation_message(const ValidationResult& validation) {
     return out.str();
 }
 
-ColoredGraph build_incidence_graph(const Topology& topology) {
-    ColoredGraph graph;
-    graph.colors.reserve(
-        static_cast<std::size_t>(topology.square_count()) * 9U
-        + 5U
-        + topology.contacts().size()
-    );
-    graph.edges.reserve(
-        static_cast<std::size_t>(topology.square_count()) * 16U
-        + 8U
-        + topology.contacts().size() * 2U
-    );
-
-    std::vector<std::array<std::uint32_t, 8>> ports(topology.square_count());
-
-    for (SquareId square = 0; square < topology.square_count(); ++square) {
+void append_incidence_prefix(ColoredGraph& graph, std::uint32_t square_count) {
+    for (SquareId square = 0; square < square_count; ++square) {
         const auto center = add_vertex(graph, VertexColor::SquareObject);
         for (std::uint8_t ring = 0; ring < 8; ++ring) {
-            const bool side = (ring & 1U) != 0;
-            const auto port = add_vertex(
-                graph,
-                side ? VertexColor::SquareSidePort : VertexColor::SquareCornerPort
-            );
-            ports[square][ring] = port;
+            const auto port = add_vertex(graph, (ring & 1U)
+                ? VertexColor::SquareSidePort : VertexColor::SquareCornerPort);
             add_edge(graph, center, port);
         }
         for (std::uint8_t ring = 0; ring < 8; ++ring) {
-            add_edge(graph, ports[square][ring], ports[square][(ring + 1U) % 8U]);
+            add_edge(graph, center + 1U + ring, center + 1U + (ring + 1U) % 8U);
         }
     }
-
     const auto container = add_vertex(graph, VertexColor::ContainerObject);
-    std::array<std::uint32_t, 4> walls{};
     for (std::uint8_t wall = 0; wall < 4; ++wall) {
-        walls[wall] = add_vertex(graph, VertexColor::ContainerWall);
-        add_edge(graph, container, walls[wall]);
+        const auto vertex = add_vertex(graph, VertexColor::ContainerWall);
+        add_edge(graph, container, vertex);
     }
     for (std::uint8_t wall = 0; wall < 4; ++wall) {
-        add_edge(graph, walls[wall], walls[(wall + 1U) % 4U]);
+        add_edge(graph, container + 1U + wall, container + 1U + (wall + 1U) % 4U);
+    }
+}
+
+ColoredGraph build_incidence_graph(const Topology& topology) {
+    ColoredGraph graph;
+    graph.colors.reserve(static_cast<std::size_t>(topology.square_count()) * 9U
+        + 5U + topology.contacts().size());
+    graph.edges.reserve(static_cast<std::size_t>(topology.square_count()) * 16U
+        + 8U + topology.contacts().size() * 2U);
+
+    // Vertex IDs and fixed gadget edges depend only on square count. Cache one
+    // bounded prefix per thread; contact factors are appended in the same order.
+    struct PrefixCache {
+        std::uint32_t square_count = std::numeric_limits<std::uint32_t>::max();
+        ColoredGraph graph;
+    };
+    thread_local PrefixCache prefix;
+    constexpr std::uint32_t max_cached_squares = 256;
+    if (topology.square_count() <= max_cached_squares
+        && prefix.square_count == topology.square_count()) {
+        graph.colors.insert(graph.colors.end(), prefix.graph.colors.begin(), prefix.graph.colors.end());
+        graph.edges.insert(graph.edges.end(), prefix.graph.edges.begin(), prefix.graph.edges.end());
+    } else {
+        append_incidence_prefix(graph, topology.square_count());
+        if (topology.square_count() <= max_cached_squares) {
+            prefix.square_count = topology.square_count();
+            prefix.graph = graph;
+        }
     }
 
     for (const auto& contact : topology.contacts()) {
         const auto event = add_vertex(graph, contact_color(contact.kind));
-        const auto a_port = ports[contact.a.square][feature_ring_index(contact.a)];
+        const auto a_port = 9U * contact.a.square + 1U + feature_ring_index(contact.a);
         add_edge(graph, event, a_port);
 
         if (contact.kind == ContactKind::Wall) {
             if (!contact.wall.has_value()) {
                 throw std::logic_error("validated wall contact lost wall index");
             }
-            add_edge(graph, event, walls[*contact.wall]);
+            add_edge(graph, event, 9U * topology.square_count() + 1U + *contact.wall);
         } else {
             if (!contact.b.has_value()) {
                 throw std::logic_error("validated square contact lost second feature");
             }
-            const auto b_port = ports[contact.b->square][feature_ring_index(*contact.b)];
+            const auto b_port = 9U * contact.b->square + 1U + feature_ring_index(*contact.b);
             add_edge(graph, event, b_port);
         }
     }

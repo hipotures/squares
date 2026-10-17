@@ -356,6 +356,30 @@ void test_validated_incidence_fast_path_matches_checked_path() {
     );
 }
 
+void test_incidence_prefix_cache_transitions() {
+    using namespace sqtopology;
+    for (const std::uint32_t squares : {1U, 15U, 4U, 257U, 15U, 4U, 1U}) {
+        const auto graph = to_incidence_graph(Topology(squares));
+        expect(graph.vertex_count() == 9U * squares + 5U,
+               "fixed incidence prefix must preserve every square and container vertex");
+        expect(graph.edges.size() == 16U * squares + 8U,
+               "fixed incidence prefix must preserve all gadget edges across size changes");
+        std::vector<unsigned> degrees(graph.vertex_count());
+        for (const auto& [a, b] : graph.edges) { ++degrees[a]; ++degrees[b]; }
+        for (std::uint32_t square = 0; square < squares; ++square) {
+            expect(degrees[9U * square] == 8, "square centers must retain all eight ports");
+            for (unsigned port = 1; port <= 8; ++port)
+                expect(degrees[9U * square + port] == 3, "free ports must retain their center and cycle neighbors");
+        }
+        expect(degrees[9U * squares] == 4, "container center must retain all four walls");
+    }
+    const auto first = to_incidence_graph(make_fixture("corner-corner-2"));
+    (void)to_incidence_graph(make_fixture("side-side-2"));
+    const auto again = to_incidence_graph(make_fixture("corner-corner-2"));
+    expect(first.colors == again.colors && first.edges == again.edges,
+           "cached prefixes must never retain contact factors from prior topologies");
+}
+
 void test_backend_names() {
     using namespace sqtopology;
 
@@ -711,6 +735,7 @@ int main() {
         test_depth_bound_frontier();
         test_export_smoke();
         test_validated_incidence_fast_path_matches_checked_path();
+        test_incidence_prefix_cache_transitions();
         test_backend_names();
         test_binary_key_matches_textual_equivalence();
         test_compact_binary_key_layout();
