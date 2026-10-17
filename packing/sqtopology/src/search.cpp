@@ -11,6 +11,8 @@
 #include <unordered_set>
 #include <utility>
 
+#include <sys/resource.h>
+
 namespace sqtopology {
 namespace {
 
@@ -152,12 +154,20 @@ SearchResult run_search(
 
         result.stats.stored_canonical_key_bytes += key_bytes;
         result.stats.unique_states = seen.size();
-        frontier.push_back(
-            QueueItem{
-                .topology = std::move(candidate),
-                .depth = depth,
-            }
-        );
+        // States at the depth bound still need exact deduplication, but can
+        // never be expanded. Keeping their topologies only inflates the queue.
+        if (depth < options.max_depth) {
+            frontier.push_back(
+                QueueItem{
+                    .topology = std::move(candidate),
+                    .depth = depth,
+                }
+            );
+            result.stats.peak_frontier_states = std::max(
+                result.stats.peak_frontier_states,
+                static_cast<std::uint64_t>(frontier.size())
+            );
+        }
         return !limit_reached(result.stats, options);
     };
 
@@ -211,6 +221,10 @@ SearchResult run_search(
 
     result.stats.unique_states = seen.size();
     result.stats.wall_seconds = seconds_between(started, Clock::now());
+    rusage usage{};
+    if (getrusage(RUSAGE_SELF, &usage) == 0) {
+        result.stats.peak_rss_kib = static_cast<std::uint64_t>(usage.ru_maxrss);
+    }
 
     if (options.retain_keys) {
         result.unique_encodings.reserve(seen.size());
@@ -252,7 +266,7 @@ std::string search_stats_to_json(
     std::ostringstream out;
     out << std::setprecision(17)
         << '{'
-        << "\"schema\":\"sqtopology.search-summary.v6\","
+        << "\"schema\":\"sqtopology.search-summary.v7\","
         << "\"canonical_backend\":\"" << to_string(stats.canonical_backend) << "\","
         << "\"shard\":{\"index\":" << shard.index
         << ",\"count\":" << shard.count << "},"
@@ -270,6 +284,8 @@ std::string search_stats_to_json(
         << "\"canonical_profile_enabled\":"
         << (stats.canonical_profiled_calls > 0 ? "true" : "false") << ','
         << "\"canonical_profiled_calls\":" << stats.canonical_profiled_calls << ','
+        << "\"peak_frontier_states\":" << stats.peak_frontier_states << ','
+        << "\"peak_rss_kib\":" << stats.peak_rss_kib << ','
         << "\"wall_seconds\":" << stats.wall_seconds << ','
         << "\"generation_seconds\":" << stats.generation_seconds << ','
         << "\"validation_seconds\":" << stats.validation_seconds << ','

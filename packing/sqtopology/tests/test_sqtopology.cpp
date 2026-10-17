@@ -5,6 +5,7 @@
 #include "sqtopology/search.hpp"
 #include "sqtopology/topology.hpp"
 
+#include <algorithm>
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
@@ -265,6 +266,26 @@ void test_shard_reproducibility() {
         first.stats.duplicates == second.stats.duplicates,
         "same shard must have the same duplicate count"
     );
+}
+
+void test_depth_bound_frontier() {
+    using namespace sqtopology;
+    const SearchOptions options{
+        .max_candidates = 0, .max_unique = 0, .max_depth = 1,
+        .max_additions_per_parent = 32, .retain_keys = true,
+    };
+    const auto seed = make_fixture("grid-2x2");
+    const auto result = run_search(seed, options);
+    expect(result.stats.peak_frontier_states == 0,
+           "depth-bound states must be deduplicated without retaining topologies");
+    std::vector<std::string> expected{canonical_key_hex(canonical_key(seed, CanonicalBackend::Traces))};
+    for (const auto& child : generate_rewrites(seed, RewriteOptions{.max_additions = 32})) {
+        expected.push_back(canonical_key_hex(canonical_key(child.topology, CanonicalBackend::Traces)));
+    }
+    std::sort(expected.begin(), expected.end());
+    expected.erase(std::unique(expected.begin(), expected.end()), expected.end());
+    expect(result.unique_encodings == expected,
+           "depth-bound states must still participate in exact canonical deduplication");
 }
 
 void test_export_smoke() {
@@ -575,6 +596,7 @@ int main() {
         test_rewrites_are_deterministic();
         test_rewrite_validity_contract();
         test_shard_reproducibility();
+        test_depth_bound_frontier();
         test_export_smoke();
         test_validated_incidence_fast_path_matches_checked_path();
         test_backend_names();

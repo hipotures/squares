@@ -59,3 +59,21 @@ integer-color graphs retain a comparison-sort fallback. Native tests pass.
 | 16 | 870549.4 | 1.024x |
 
 Raw measurement: `/tmp/sqtopology-partition.json`.
+
+## Keep: discard topologies at the depth bound
+
+Every candidate still undergoes exact deduplication. Only expandable topologies
+enter the frontier. The one-level search test verifies its exact retained keys
+against an independent enumeration and checks that no topology is queued.
+Reports now include Linux peak RSS and peak frontier state counts. Summed worker
+RSS peaks are an upper bound on simultaneous worker RSS, excluding the harness.
+
+| Workers | Candidates/s | Relative to counting partition | Peak RSS sum MiB |
+| --- | --- | --- | --- |
+| 1 | 66778.4 | 1.071x | 1018.8 |
+| 2 | 129289.1 | 1.023x | 1934.9 |
+| 4 | 257126.8 | 1.024x | 3778.6 |
+| 8 | 496538.0 | 1.038x | 7227.8 |
+| 16 | 887813.8 | 1.020x | 12558.9 |
+
+Raw measurement: `/tmp/sqtopology-leaf.json`.

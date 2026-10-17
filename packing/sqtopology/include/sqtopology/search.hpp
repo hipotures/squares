@@ -44,6 +44,8 @@ struct SearchStats {
     std::uint64_t total_canonical_key_bytes{};
     std::uint64_t stored_canonical_key_bytes{};
     std::uint64_t canonical_profiled_calls{};
+    std::uint64_t peak_frontier_states{};
+    std::uint64_t peak_rss_kib{};
     double wall_seconds{};
     double generation_seconds{};
     double validation_seconds{};

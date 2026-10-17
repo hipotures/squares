@@ -188,6 +188,9 @@ def run_width(
         "canonical_profile_other_seconds": summed(
             summaries, "canonical_profile_other_seconds"
         ),
+        "sum_worker_peak_rss_kib": summed(summaries, "peak_rss_kib"),
+        "max_worker_peak_rss_kib": max(int(item.get("peak_rss_kib", 0)) for item in summaries),
+        "sum_peak_frontier_states": summed(summaries, "peak_frontier_states"),
         "worker_summaries": summaries,
     }
 
@@ -268,7 +271,7 @@ def print_key_footprint(rows: list[dict[str, object]]) -> None:
     print("exact canonical-key footprint")
     print(
         f"{'workers':>7} {'avg_key_B':>12} {'stored_MiB':>12} "
-        f"{'unique':>12}"
+        f"{'unique':>12} {'RSS_sum_MiB':>13}"
     )
     for row in rows:
         valid = int(row["valid_candidates"])
@@ -278,7 +281,8 @@ def print_key_footprint(rows: list[dict[str, object]]) -> None:
         stored_mib = stored_bytes / (1024.0 * 1024.0)
         print(
             f"{int(row['workers']):7d} {avg_key:12.1f} {stored_mib:12.1f} "
-            f"{int(row['local_unique_sum']):12d}"
+            f"{int(row['local_unique_sum']):12d} "
+            f"{float(row['sum_worker_peak_rss_kib']) / 1024.0:13.1f}"
         )
 
 
