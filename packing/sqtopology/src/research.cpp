@@ -213,12 +213,15 @@ ResearchResult run_research_search(
     std::vector<std::uint64_t> incoming_events;
     std::vector<std::uint32_t> distinct_parents;
     std::vector<std::uint32_t> last_parent;
+    // Distinct canonical parents at depth-1 (geodesic predecessors) of each state.
+    std::vector<std::uint32_t> geodesic_parents;
 
     const auto ensure_capacity = [&](std::size_t size) {
         depth_of.resize(size, 0);
         incoming_events.resize(size, 0);
         distinct_parents.resize(size, 0);
         last_parent.resize(size, kNoParent);
+        geodesic_parents.resize(size, 0);
     };
 
     const bool collect_symmetry = options.collect_symmetry;
@@ -297,6 +300,7 @@ ResearchResult run_research_search(
         record.parents_expanded = frontier.size();
 
         std::vector<FrontierEntry> next_frontier;
+        const std::uint32_t level_first_id = next_id;
 
         for (std::size_t parent_index = 0; parent_index < frontier.size(); ++parent_index) {
             const std::uint32_t parent_id = frontier[parent_index].id;
@@ -378,11 +382,47 @@ ResearchResult run_research_search(
                     last_parent[child_id] = parent_id;
                     ++distinct_parents[child_id];
                     ++distinct_children;
+                    // Depth-resolved accounting: parents expanded at this level
+                    // sit at depth-1, so an edge to a child at this depth is a
+                    // geodesic-forward predecessor edge.
+                    const auto child_depth = depth_of[child_id];
+                    const auto current_depth = static_cast<std::uint32_t>(depth);
+                    if (child_depth == current_depth) {
+                        ++geodesic_parents[child_id];
+                    } else if (child_depth + 1U == current_depth) {
+                        // Same-level edge. The contact-weight parity of every
+                        // orbit is fixed, so this must never occur.
+                        ++record.same_level_edges;
+                    } else {
+                        ++record.backward_edges;
+                    }
                 }
             }
 
             record.children_per_parent.add(distinct_children);
         }
+
+        // States first discovered at this depth received contiguous canonical
+        // ids starting at level_first_id.
+        for (std::uint32_t id = level_first_id; id < next_id; ++id) {
+            const auto predecessors = geodesic_parents[id];
+            record.geodesic_predecessors.add(predecessors);
+            if (predecessors == depth) {
+                ++record.states_with_full_predecessors;
+            } else {
+                ++record.states_with_merged_predecessors;
+            }
+            result.convergence.geodesic_predecessors_per_state.add(predecessors);
+            result.convergence.geodesic_predecessor_total += predecessors;
+            result.convergence.depth_total += depth;
+            if (predecessors == depth) {
+                ++result.convergence.full_predecessor_states;
+            } else {
+                ++result.convergence.merged_predecessor_states;
+            }
+        }
+        result.convergence.total_same_level_edges += record.same_level_edges;
+        result.convergence.total_backward_edges += record.backward_edges;
 
         record.cumulative_unique = seen.size();
         record.wall_seconds = seconds_between(level_started, Clock::now());
@@ -423,6 +463,11 @@ ResearchResult run_research_search(
         distinct_edges += distinct_parents[id];
     }
     result.convergence.total_distinct_parent_edges = distinct_edges;
+    if (result.convergence.depth_total > 0) {
+        result.convergence.mean_geodesic_predecessor_ratio =
+            static_cast<double>(result.convergence.geodesic_predecessor_total)
+            / static_cast<double>(result.convergence.depth_total);
+    }
 
     rusage usage{};
     if (getrusage(RUSAGE_SELF, &usage) == 0) {
@@ -487,6 +532,14 @@ std::string research_result_to_json(const ResearchResult& result) {
             << ",\"corner_side\":" << record.state_type_totals[1]
             << ",\"side_side\":" << record.state_type_totals[2]
             << ",\"wall\":" << record.state_type_totals[3] << '}'
+            << ",\"geodesic_predecessors\":";
+        write_histogram(out, record.geodesic_predecessors);
+        out << ",\"states_with_full_predecessors\":"
+            << record.states_with_full_predecessors
+            << ",\"states_with_merged_predecessors\":"
+            << record.states_with_merged_predecessors
+            << ",\"same_level_edges\":" << record.same_level_edges
+            << ",\"backward_edges\":" << record.backward_edges
             << ",\"symmetry\":";
         write_symmetry(out, record.symmetry);
         out << ",\"wall_seconds\":" << record.wall_seconds
@@ -510,7 +563,18 @@ std::string research_result_to_json(const ResearchResult& result) {
     write_log_histogram(out, result.convergence.incoming_events_per_child);
     out << ",\"same_parent_multiplicity\":";
     write_log_histogram(out, result.convergence.same_parent_multiplicity);
-    out << "},\"retained_keys\":" << (result.unique_keys.empty() ? "false" : "true")
+    out << ",\"geodesic_predecessors_per_state\":";
+    write_histogram(out, result.convergence.geodesic_predecessors_per_state);
+    out << ",\"geodesic_predecessor_total\":"
+        << result.convergence.geodesic_predecessor_total
+        << ",\"predecessor_depth_total\":" << result.convergence.depth_total
+        << ",\"mean_geodesic_predecessor_ratio\":"
+        << result.convergence.mean_geodesic_predecessor_ratio
+        << ",\"full_predecessor_states\":" << result.convergence.full_predecessor_states
+        << ",\"merged_predecessor_states\":" << result.convergence.merged_predecessor_states
+        << ",\"total_same_level_edges\":" << result.convergence.total_same_level_edges
+        << ",\"total_backward_edges\":" << result.convergence.total_backward_edges
+        << "},\"retained_keys\":" << (result.unique_keys.empty() ? "false" : "true")
         << "}\n";
 
     return out.str();

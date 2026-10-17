@@ -86,6 +86,17 @@ struct DepthRecord {
     // contact kind totals over newly discovered states: cc, cs, ss, wall.
     std::array<std::uint64_t, 4> state_type_totals{0, 0, 0, 0};
     SymmetryStats symmetry;
+    // Depth-resolved edge accounting for the states first discovered at this
+    // depth. geodesic_predecessors counts distinct canonical parents at depth
+    // d-1, one entry per new state: for an unquotiented Hamming cube a state at
+    // exact distance d has exactly d of them. same_level_edges must stay zero by
+    // the weight-parity argument; backward_edges are children already known at
+    // depth <= d-2.
+    ValueHistogram geodesic_predecessors;
+    std::uint64_t states_with_full_predecessors{0};
+    std::uint64_t states_with_merged_predecessors{0};
+    std::uint64_t same_level_edges{0};
+    std::uint64_t backward_edges{0};
     double wall_seconds{0.0};
 };
 
@@ -102,6 +113,18 @@ struct ConvergenceStats {
     std::uint64_t multi_parent_states{0};
     std::uint64_t max_distinct_parents{0};
     std::uint64_t max_incoming_events{0};
+    // Depth-resolved predecessor accounting over all states at depth >= 1:
+    // p(s) = distinct canonical neighbors first discovered at depth-1.
+    // The labeled hypercube baseline is p = d for an empty seed.
+    ValueHistogram geodesic_predecessors_per_state;
+    std::uint64_t geodesic_predecessor_total{0};
+    std::uint64_t depth_total{0};
+    std::uint64_t full_predecessor_states{0};
+    std::uint64_t merged_predecessor_states{0};
+    std::uint64_t total_same_level_edges{0};
+    std::uint64_t total_backward_edges{0};
+    // Exact mean of p(s)/d(s): geodesic_predecessor_total / depth_total.
+    double mean_geodesic_predecessor_ratio{0.0};
 };
 
 struct ResearchResult {
