@@ -61,6 +61,17 @@ bool valid_feature_kind(FeatureKind kind) {
     return kind == FeatureKind::Corner || kind == FeatureKind::Side;
 }
 
+bool valid_contact_kind(ContactKind kind) {
+    switch (kind) {
+        case ContactKind::CornerCorner:
+        case ContactKind::CornerSide:
+        case ContactKind::SideSide:
+        case ContactKind::Wall:
+            return true;
+    }
+    return false;
+}
+
 bool valid_feature(const FeatureRef& feature, std::uint32_t square_count) {
     return valid_feature_kind(feature.kind)
         && feature.square < square_count
@@ -96,6 +107,11 @@ ValidationResult Topology::validate() const {
     for (std::size_t i = 0; i < contacts_.size(); ++i) {
         const auto& contact = contacts_[i];
         const std::string prefix = "contact " + std::to_string(i) + ": ";
+
+        if (!valid_contact_kind(contact.kind)) {
+            result.errors.push_back(prefix + "unknown contact kind");
+            continue;
+        }
 
         if (!valid_feature(contact.a, square_count_)) {
             result.errors.push_back(prefix + "invalid first feature");
