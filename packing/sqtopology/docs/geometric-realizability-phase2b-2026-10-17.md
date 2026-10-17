@@ -208,6 +208,15 @@ the SAT (non-overlap) tolerance as well. Near-tolerance constructions show the
 naive forced-event argument is not valid as stated, so these rules are **not**
 implemented. They are a target for a future tolerance-aware analysis.
 
+**Phase-2c update.** The CS case was later salvaged with a different, local
+half-plane argument: a corner lying in the relative interior of a side that is
+itself on a wall cannot avoid overlapping that side's square or leaving the
+container, so the *whole pattern* is impossible (no forced-event bookkeeping
+is needed). It is implemented as **R14** in Phase-2c. The CC case remains
+deferred: both corner wedges face inward, and the SAT tolerance admits
+`O(tau)`-penetration configurations, so the naive argument is still not
+tolerance-safe.
+
 **Label-sensitive impossibility (rule C of the previous review).** Not a valid
 filter: the reflected feature frame realizes the assignment (the two weight-2
 classes flipped by the symmetry repair).
@@ -223,6 +232,10 @@ Final (this note, workers=16, R1-R13, H_n branch reduction):
 | 1 | 5 | 5 | 0 | 0 | 5 | 100% |
 | 2 | 87 | 25 | 41 | 21 | 46 | 52.9% |
 | 3 | 1411 | 48 | 816 | 547 | 595 | 42.2% |
+
+**Superseded by Phase-2c** (filter R14 adds 1 proved class at weight 2 and 40
+at weight 3, giving 25/40/22 and 48/776/587; no feasible class changed). The
+table above is kept as the `a36aa2f3` record.
 
 Transition from `d1c8e89d` (no feasible class changed; no old proof was
 invalidated):
@@ -312,11 +325,30 @@ Comparison with `n = 2` weight 2:
 | wall-only classes | 31 (11 feasible) | 31 (11 feasible) |
 | classes with 2 wall contacts | 31 | 31 (same status split) |
 
-The third square changes exactly one family: square-square-only contact
-patterns become realizable. The wall-contact cross-tab is identical to
-`n = 2`, so wall contacts are a *local* obstruction that the free square
-cannot cure; square-square contacts can often be realized by moving the third
-square away. No new obstruction family appears at `n = 3`.
+**Correction (Phase-2c).** The original interpretation above over-read the
+aggregate comparison. Classify each class by its *support*, the number of
+square IDs that appear in at least one contact event (a wall contact supports
+its square; an untouched square does not):
+
+| support | classes | feasible | not found | proved |
+| --- | --- | --- | --- | --- |
+| 1 | 22 | 2 | 7 | 13 |
+| 2 | 65 | 23 | 34 | 8 |
+| 3 | 32 | 29 | 3 | 0 |
+
+The support-1 and support-2 status vectors are **identical** to the `n = 2`
+weight-2 corpus (22 and 65 classes respectively). The `n = 3` corpus is
+therefore the disjoint union of the embedded `n = 2` classes and **32
+genuinely new support-3 classes** (29 feasible, 3 not found, 0 proved). In
+particular, every one of the 23 feasible square-square-only classes has
+support 3: the third square participates in the contact graph (typically as
+the hub of a two-contact V), so these are new three-square structures, not
+two-square configurations with a square moved away.
+
+The identical wall-contact cross-tab is **evidence consistent with**
+predominantly local wall obstructions, not a theorem; the support decomposition
+is the precise statement. No new obstruction family appears at `n = 3` in the
+support-3 set (0 proved there, 3 unresolved).
 
 Feasible `n = 3` weight-2 classes use branch 0 in 52 cases and branch 4 in 2
 cases (`frame_reflected` on square 2), so 3.7% require a non-standard frame
@@ -354,7 +386,8 @@ or verified witnesses; no numerical failure is reported as impossibility.
   816 of 1411 classes unresolved; the `n = 3` weight-2 corpus leaves 44 of 119.
 - The new filters are sound but incomplete. R14/R15 were investigated and
   deliberately not adopted because their forced-event step is not
-  tolerance-safe without an additional SAT-coupling proof.
+  tolerance-safe without an additional SAT-coupling proof. (Phase-2c adopted
+  the CS case as R14 via a local half-plane proof; the CC case stays open.)
 - The `H_n` branch reduction is exact but requires the per-`n` permutation
   cache; for very large `n` the cache grows as `4^n * E(n)` and should be
   built lazily or streamed.
@@ -363,9 +396,9 @@ or verified witnesses; no numerical failure is reported as impossibility.
   per-branch budget, not because it is unrealizable.
 - The corpus solver budget was not increased for the parallel comparison; the
   results are comparable to the historical run.
-- The `n = 3` corpus is measured at weight 2 only. Weight 3 would be a much
-  larger run (`a_3(3) = 2979` before symmetry, 1411 after) and is not attempted
-  here.
+- The `n = 3` corpus is measured at weight 2 only. Weight 3 has
+  `C(288, 3) = 3,939,936` labeled event subsets and `a_3(3) = 2,979` canonical
+  `G_3` classes (not 1,411, which is `a_3(2)`); it is not attempted here.
 - `L` values remain heuristic upper bounds from the ladder/bisection, not
   certified infima.
 
@@ -394,11 +427,13 @@ default suite).
 1. **Tolerance-aware forced-event filters (R14/R15).** The largest remaining
    proof lane is the forced wall-corner event under CC/CS. It needs a proof
    that couples the contact tolerance with the SAT/non-overlap tolerance;
-   the current naive version is not sound.
-2. **n = 3 weight 3.** `a_3(3)` is 1411 before the `G_3` quotient; the
-   parallel/`H_n` machinery makes it a feasible one-off run. It would test
-   whether the `n = 2` weight-3 picture (wall-local impossibility plus
-   square-square realizability) persists.
+   the current naive version is not sound. (Phase-2c: the CS case is settled
+   as R14; the CC case is still open.)
+2. **n = 3 weight 3.** `C(288, 3) = 3,939,936` labeled event subsets reduce
+   to `a_3(3) = 2,979` canonical `G_3` classes; the parallel/`H_n` machinery
+   makes it a feasible one-off run. It would test whether the `n = 2`
+   weight-3 picture (wall-local impossibility plus square-square
+   realizability) persists.
 3. **Small solver study.** A fixed stratified sample of the remaining
    `n = 2` weight-3 `NOT_FOUND` classes, with contact-pattern-aware starts and
    a 4x bounded budget, would quantify how much of the unknown set is a solver

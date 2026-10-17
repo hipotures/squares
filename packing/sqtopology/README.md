@@ -374,6 +374,32 @@ See `docs/wreath-cycle-index-counting-2026-10-17.md` for the derivation, the low
 stabilization theorem (`a_d` is constant for `n >= 2d` with increment `C(d+2, 2)` at the
 stabilization point), the staged compression tables, and the trivial-stabilizer spectra.
 
+### Geometric realizability (`sqtopology_realize`)
+
+The core tool above never assigns coordinates. The separate research front end
+`sqtopology_realize` (Phase-2) attaches a square-geometry model, an exact
+contact extractor/verifier, and a deterministic Levenberg-Marquardt solver to
+the canonical `G_n` contact classes counted by `sqtopology_orbit`. Every class
+receives exactly one of three statuses: `VERIFIED_FEASIBLE` (a witness scene
+re-verified from scratch), `PROVED_INFEASIBLE` (a documented, `G_n`-invariant
+necessary-condition proof), or `NOT_FOUND` (solver failure, never
+impossibility).
+
+~~~bash
+./build/sqtopology_realize fixtures
+./build/sqtopology_realize corpus --n 3 --weight 3 --count-only
+./build/sqtopology_realize corpus --n 3 --weight 3 --workers 16 --json /tmp/n3-w3.json
+~~~
+
+The corpus enumerator reproduces the exact orbit coefficients (e.g.
+`a_3(3) = 2,979` canonical classes from `C(288, 3) = 3,939,936` labeled
+subsets), the worker pool is deterministic and scheduling-independent, and a
+per-class `support` field separates genuinely `n`-square contact structures
+from lower-`n` configurations embedded with unused squares. Campaign records:
+`docs/geometric-realizability-phase2-2026-10-17.md`,
+`docs/geometric-realizability-phase2b-2026-10-17.md`, and
+`docs/geometric-realizability-phase2c-2026-10-17.md`.
+
 ## Process scaling
 
 The Python harness is orchestration only. It launches long-running native shards and waits
