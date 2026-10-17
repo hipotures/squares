@@ -316,10 +316,33 @@ Consequences:
 - same-`n` seeds with disjoint shallow key sets are separated finite-radius balls in one
   connected quotient graph, not distinct global basins.
 
-The next exact-counting target is Burnside/Pólya orbit enumeration, beginning with `n=1`,
-where the acting symmetry group has only 64 elements. Search remains useful as an
-independent differential validator and later for quotient-graph structure that orbit
-counting alone does not expose.
+The next exact-counting target was Burnside/Pólya orbit enumeration, beginning with `n=1`,
+where the acting symmetry group has only 64 elements. That target is now implemented; see
+the next subsection.
+
+### Exact orbit counting (`sqtopology_orbit`)
+
+`sqtopology_orbit` is a separate research front end that implements the Burnside/Pólya
+orbit count and the exact orbit-Hamming distance `delta([A],[B]) = min_g |A xor g(B)|`
+directly from the semantic event set. It never calls canonicalization, so it acts as an
+independent oracle for the canonicalizing engine:
+
+~~~bash
+./build/sqtopology_orbit count --n 2 --json /tmp/orbit-count-n2.json
+./build/sqtopology_orbit distance --first line-4 --second grid-2x2
+./build/sqtopology_orbit matrix --fixtures disjoint-4,line-4,grid-2x2
+~~~
+
+`tests/data/` keeps exact reference JSON for `n = 1..4` and for the `n = 2` and `n = 4`
+seed-distance matrices. The counts and distances are cross-checked against the production
+research traversal (including existing campaign numbers), against an independent
+stdlib-only Python re-implementation (`tools/orbit_reference.py`, wired into CTest), and
+inside `tests/test_orbit.cpp`. See
+`docs/boolean-quotient-orbit-counting-2026-10-17.md` for the exact polynomials, the
+seed-distance matrices, and the depth-resolved geodesic-predecessor metric that replaces
+the raw multi-parent fraction as a quotient-convergence statistic. Search remains useful as
+an independent empirical validator and for quotient-graph structure that orbit counting
+alone does not expose.
 
 ## Process scaling
 
