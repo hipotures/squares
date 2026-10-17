@@ -362,8 +362,11 @@ Direct enumeration of `|G_n| = n! * 8^n * 8` elements is comfortable only throug
 exact big-integer arithmetic and six internal checks; at `n = 5` it is about 400x faster
 and 56x smaller than the direct element oracle while producing the same 801 coefficients.
 `wreath-cross` re-derives class sizes and induced cycle types by enumerating every element
-for `n <= 4`, and `staged` gives low-weight counts under the nested symmetry stages
-(local `D4^n`, `S_n x D4_container`, `D4 wr S_n`, full `G_n`).
+for `n <= 4`, and `staged` compares low-weight orbit counts under several related symmetry
+subgroups (`D4^n`, `S_n x D4_container`, `D4 wr S_n`, full `G_n`). These are not one
+four-step nested chain: `D4^n < D4 wr S_n < G_n`, while `S_n x D4_container` is a different
+subgroup of `G_n`. The partial-quotient counts therefore compare symmetry effects but do not
+uniquely decompose or attribute the total compression.
 `tests/data/wreath-count-n5.json` and `tests/data/wreath-low-weight.json` hold the
 committed `n = 5` polynomial and the `a_0..a_6` table for `n <= 11`;
 `tools/wreath_reference.py` is an independent stdlib-only differential wired into CTest.
