@@ -957,7 +957,7 @@ CanonicalForm canonicalize_colored_graph(
     }
 
     std::ostringstream encoding;
-    encoding << "SQT1|n:" << canonical.n << "|c:";
+    encoding << "SQT2|n:" << canonical.n << "|c:";
     for (std::size_t i = 0; i < result.canonical_colors.size(); ++i) {
         if (i != 0) {
             encoding << ',';

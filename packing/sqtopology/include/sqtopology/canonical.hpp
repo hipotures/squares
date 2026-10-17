@@ -95,7 +95,12 @@ struct CanonicalProfile {
 );
 [[nodiscard]] std::string canonical_key_hex(const CanonicalKey& key);
 
-// Human-facing SQT1 form remains dense-nauty based for stable inspection/export.
+// Human-facing textual canonical form. The `SQTn` marker versions the encoding
+// itself: it is bumped whenever the canonical vertex set, vertex colors, or edge
+// semantics change, so two forms with different markers are not comparable. It is a
+// per-build inspection/export artifact rather than a cross-version interchange
+// format; the exact search key (SQK5) is the stable equality namespace. The current
+// encoding, after the square/container object vertices were removed, is SQT2.
 [[nodiscard]] CanonicalForm canonicalize_colored_graph(
     const ColoredGraph& graph,
     CanonicalProfile* profile = nullptr
