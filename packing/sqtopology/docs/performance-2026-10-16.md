@@ -366,3 +366,38 @@ to 239.4e9 retired instructions (-10.2%) and 82.95e9 to 77.99e9 cycles (-6.0%), 
 time 15.46 s to 14.51 s. An identical build with `-g` added is within 0.1%, confirming the
 gain is the profile and not debug information. Raw perf data: `/tmp/stat-default.txt`,
 `/tmp/stat-pgo2.txt`; reports `/tmp/fin2-default-*.json`, `/tmp/fin2-pgo2-*.json`.
+
+## Session retained result
+
+Two changes are retained from this session on top of the `8181d6ba` snapshot
+(105,711 / 1,450,573 candidates/s at 1 / 16 workers):
+
+1. drop the redundant square/container object vertices (see above);
+2. build the retained binary with PGO (`tools/pgo_train.sh`).
+
+Full retained sweep, `grid-4x4-minus-one`, Traces, 30 s per width, PGO build,
+`--profile-canonical`:
+
+| Workers | Candidates/s | Speedup | Efficiency | Canonical µs |
+| --- | --- | --- | --- | --- |
+| 1 | 134142.7 | 1.00 | 100.0% | 6.66 |
+| 2 | 266810.6 | 1.99 | 99.5% | 6.67 |
+| 4 | 526012.6 | 3.92 | 98.0% | 6.73 |
+| 8 | 979381.2 | 7.30 | 91.3% | 6.90 |
+| 16 | 1807790.7 | 13.48 | 84.2% | 7.41 |
+
+Within the canonicalization block the Traces engine is 4.26-4.71 µs, output
+preparation 0.93-1.04 µs, input build 0.56-0.63 µs, partition 0.37-0.42 µs, key
+build 0.28-0.32 µs, and hashing 0.08-0.09 µs. Average exact key is 643-646 bytes
+and 16-worker storage is 7.99 GiB.
+
+Against the session start `8181d6ba` this is 1.269x at 1 worker and 1.246x at 16
+workers. Against the session's own starting measurement at `91a415a7`
+(35,852 / 494,827) the cumulative result is 3.74x / 3.65x.
+
+Raw reports: `/tmp/sqtopo-best-full.json`, `/tmp/sqtopo-best-full2.json`,
+`/tmp/backends-best.json`; binary snapshot `/tmp/sqtopo-best-bin`.
+
+The 16-worker width finishes the whole depth-3 space in about 15 s, so that column
+is makespan-limited and varies by up to ~10% with host load; run-to-run repeats of
+the 1-worker width on the same binary landed at 134-136k candidates/s.

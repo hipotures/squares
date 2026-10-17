@@ -332,10 +332,10 @@ for comparisons. Dense nauty and sparse nauty remain stock implementations.
 
 ## Canonical backend comparison
 
-Search defaults to `traces`. The target-host 30-second benchmark on
-`grid-4x4-minus-one` measured 396,297 candidates/s at 16 workers, versus 377,754 for
-sparse nauty and 192,157 for dense nauty. Dense and sparse backends remain selectable
-for regression testing and workload-specific comparisons.
+Search defaults to `traces`. The target-host 15-second benchmark on
+`grid-4x4-minus-one` at 16 workers measured 1,813,688 candidates/s for Traces,
+versus 1,323,391 for sparse nauty and 267,486 for dense nauty (PGO build). Dense and
+sparse backends remain selectable for regression testing and workload-specific comparisons.
 
 Search can now use any of three in-process canonical-labeling backends:
 
