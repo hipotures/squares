@@ -44,3 +44,18 @@ multiple depths, and checked/trusted exact search keys on three shards. A fixed
 | 16 | 849884.4 | 1.718x |
 
 Raw measurement: `/tmp/sqtopology-trusted.json`.
+
+## Keep: stable counting placement for color partitions
+
+The common byte-color partition preserves the exact old ordering; arbitrary
+integer-color graphs retain a comparison-sort fallback. Native tests pass.
+
+| Workers | Candidates/s | Relative to trusted path |
+| --- | --- | --- |
+| 1 | 62357.5 | 1.009x |
+| 2 | 126336.9 | 1.029x |
+| 4 | 251129.3 | 1.047x |
+| 8 | 478544.6 | 1.031x |
+| 16 | 870549.4 | 1.024x |
+
+Raw measurement: `/tmp/sqtopology-partition.json`.

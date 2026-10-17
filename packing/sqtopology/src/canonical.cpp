@@ -161,20 +161,39 @@ Partition build_partition(const ColoredGraph& graph) {
         .ptn = std::vector<int>(n, 0),
         .orbits = std::vector<int>(n, 0),
     };
-    std::iota(partition.lab.begin(), partition.lab.end(), 0);
-
-    std::stable_sort(
-        partition.lab.begin(),
-        partition.lab.end(),
-        [&graph](int lhs, int rhs) {
+    // Incidence colors occupy a small integer range. Stable counting placement
+    // produces exactly the old (color, vertex ID) ordering without comparison
+    // sorting or stable_sort's temporary allocation. Keep the general graph API.
+    std::array<std::size_t, 256> counts{};
+    int max_color = 0;
+    bool byte_colors = true;
+    for (const auto color : graph.colors) {
+        if (color < 0 || color > 255) {
+            byte_colors = false;
+            break;
+        }
+        ++counts[static_cast<std::size_t>(color)];
+        max_color = std::max(max_color, color);
+    }
+    if (byte_colors) {
+        std::size_t offset = 0;
+        for (int color = 0; color <= max_color; ++color) {
+            const auto count = counts[static_cast<std::size_t>(color)];
+            counts[static_cast<std::size_t>(color)] = offset;
+            offset += count;
+        }
+        for (std::size_t vertex = 0; vertex < n; ++vertex) {
+            const auto color = static_cast<std::size_t>(graph.colors[vertex]);
+            partition.lab[counts[color]++] = static_cast<int>(vertex);
+        }
+    } else {
+        std::iota(partition.lab.begin(), partition.lab.end(), 0);
+        std::sort(partition.lab.begin(), partition.lab.end(), [&graph](int lhs, int rhs) {
             const auto lhs_color = graph.colors[static_cast<std::size_t>(lhs)];
             const auto rhs_color = graph.colors[static_cast<std::size_t>(rhs)];
-            if (lhs_color != rhs_color) {
-                return lhs_color < rhs_color;
-            }
-            return lhs < rhs;
-        }
-    );
+            return lhs_color != rhs_color ? lhs_color < rhs_color : lhs < rhs;
+        });
+    }
 
     for (std::size_t i = 0; i + 1U < n; ++i) {
         const auto current = graph.colors[
