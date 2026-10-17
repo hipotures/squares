@@ -56,28 +56,31 @@ A topology generated here may be geometrically impossible. That is expected.
 
 ## Semantic encoding
 
-Each square is converted to a colored graph gadget with one square-object vertex and an
-alternating eight-cycle of ports:
+Each square is converted to a colored graph gadget: an alternating eight-cycle of ports,
+with no separate object vertex:
 
 ~~~text
 corner0 - side0 - corner1 - side1 - corner2 - side2 - corner3 - side3 - corner0
 ~~~
 
-The center is connected to all eight ports. Side and corner ports have different colors,
-but the numeric port indices do not. The color-preserving automorphism group of this gadget
-contains exactly the intended square `D4` feature relabelings.
+Side and corner ports have different colors, but the numeric port indices do not.
+The color-preserving automorphism group of that alternating cycle is exactly the
+intended square `D4` feature relabelings, so no additional square-object anchor
+vertex is required. The squares are recovered as the connected components of the
+ports' induced subgraph.
 
-The container has one container-object vertex and a four-cycle of equally colored wall
-vertices. This exposes the container's `D4` symmetry to canonical labeling.
+The container is a four-cycle of equally colored wall vertices. Its color-preserving
+automorphism group is exactly the container `D4`, so it likewise needs no separate
+container-object vertex.
 
 A contact is a factor/event vertex, colored by contact kind, connected to the participating
 feature ports. A wall contact connects a square feature port to a container-wall vertex.
 
-Packed-square object vertices all share one color. nauty may therefore permute them, so
-square IDs are also quotiented out.
+Packed squares remain interchangeable: nauty may permute eight-cycle components that
+are not anchored by distinct contacts, so square IDs are quotiented out.
 
 The human-facing canonical form remains the full versioned textual encoding (`SQT1|...`).
-Search uses a separate exact binary key (`SQK4`) containing the canonical color sequence
+Search uses a separate exact binary key (`SQK5`) containing the canonical color sequence
 and an exact sorted canonical edge list. Its cached standard-library string fingerprint is only the
 unordered-set bucket hash: equality is always decided by the complete binary bytes.
 
@@ -193,7 +196,7 @@ The second point is deliberate in phase 1. Shard outputs can be merged offline, 
 future canonical-augmentation search can remove cross-shard overlap if measurements show
 that it matters. Therefore current shard runs are **not** an exhaustive partition proof.
 
-`--emit-keys FILE` writes sorted exact search keys as `SQK4HEX:<hex>` text for offline
+`--emit-keys FILE` writes sorted exact search keys as `SQK5HEX:<hex>` text for offline
 comparison or merge. The hexadecimal rendering is generated only when explicitly requested;
 it is not built per candidate in the search hot path.
 
@@ -257,7 +260,7 @@ and deterministic shards. The public `generate_rewrites()`, `run_search()`, and
 
 Phase 1.3 removes human-readable canonical serialization from the search hot path.
 
-After the selected canonical-labeling backend returns, search builds an exact `SQK4`
+After the selected canonical-labeling backend returns, search builds an exact `SQK5`
 binary key directly from:
 
 - a version marker and backend tag;
@@ -267,8 +270,8 @@ binary key directly from:
 - the sorted canonical undirected edge list.
 
 Endpoint indices use one byte while the canonical graph has at most 256 vertices, two
-bytes up to 65,536 vertices, and four bytes above that. For the current ~190-vertex,
-~350-edge incidence graphs this puts the adjacency payload near 700 bytes, versus about
+bytes up to 65,536 vertices, and four bytes above that. For the current ~176-vertex,
+~227-edge incidence graphs the whole key is near 650 bytes, versus about
 2.2 KiB for the earlier packed-triangle SQK3 and roughly 4.6 KiB of dense nauty words.
 
 Sparse nauty extracts the canonical edge list from its sparse output. Traces returns
@@ -290,7 +293,7 @@ debugging, and semantic regression tests. Search does not build the human-facing
 for every candidate.
 
 Tests compare binary-key equality against textual canonical-form equality across symmetry
-transforms and distinct contact types. Retained search keys are rendered as `SQK4HEX:...`
+transforms and distinct contact types. Retained search keys are rendered as `SQK5HEX:...`
 only at the end of a run when `--emit-keys` is requested.
 
 ### nauty/Traces integration
@@ -353,9 +356,9 @@ python3 tools/bench_scaling.py \
 All backends consume the same `ColoredGraph` and the same initial color partition.
 Sparse nauty and Traces keep their canonical output sparse through exact-key construction.
 The canonical adjacency is normalized to a sorted undirected edge list before serialization.
-Dense nauty uses the same SQK4 logical format after extracting edges from its dense output.
+Dense nauty uses the same SQK5 logical format after extracting edges from its dense output.
 
-The exact search key format is now `SQK4` and includes a backend tag. This is deliberate:
+The exact search key format is now `SQK5` and includes a backend tag. This is deliberate:
 different canonical-labeling engines are required to identify the same isomorphism classes,
 but they are not required to choose byte-identical canonical labels. Therefore emitted
 keys from different backends must not be merged as if they belonged to one key namespace.

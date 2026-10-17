@@ -105,33 +105,38 @@ std::string validation_message(const ValidationResult& validation) {
 }
 
 void append_incidence_prefix(ColoredGraph& graph, std::uint32_t square_count) {
+    // Each square is an alternating corner/side 8-cycle. The color-preserving
+    // automorphism group of that cycle is exactly the local D4, so no explicit
+    // square-object vertex is needed: the squares are recovered as the
+    // connected components of the ports' induced subgraph.
     for (SquareId square = 0; square < square_count; ++square) {
-        const auto center = add_vertex(graph, VertexColor::SquareObject);
+        const auto base = 8U * square;
         for (std::uint8_t ring = 0; ring < 8; ++ring) {
-            const auto port = add_vertex(graph, (ring & 1U)
+            add_vertex(graph, (ring & 1U)
                 ? VertexColor::SquareSidePort : VertexColor::SquareCornerPort);
-            add_edge(graph, center, port);
         }
         for (std::uint8_t ring = 0; ring < 8; ++ring) {
-            add_edge(graph, center + 1U + ring, center + 1U + (ring + 1U) % 8U);
+            add_edge(graph, base + ring, base + (ring + 1U) % 8U);
         }
     }
-    const auto container = add_vertex(graph, VertexColor::ContainerObject);
+    // The container is an equally colored 4-cycle; its automorphism group is
+    // exactly the container D4. The wall cycle is likewise recovered as a
+    // component of the wall-color subgraph without a container-object vertex.
+    const auto wall_base = 8U * square_count;
     for (std::uint8_t wall = 0; wall < 4; ++wall) {
-        const auto vertex = add_vertex(graph, VertexColor::ContainerWall);
-        add_edge(graph, container, vertex);
+        add_vertex(graph, VertexColor::ContainerWall);
     }
     for (std::uint8_t wall = 0; wall < 4; ++wall) {
-        add_edge(graph, container + 1U + wall, container + 1U + (wall + 1U) % 4U);
+        add_edge(graph, wall_base + wall, wall_base + (wall + 1U) % 4U);
     }
 }
 
 ColoredGraph build_incidence_graph(const Topology& topology) {
     ColoredGraph graph;
-    graph.colors.reserve(static_cast<std::size_t>(topology.square_count()) * 9U
-        + 5U + topology.contacts().size());
-    graph.edges.reserve(static_cast<std::size_t>(topology.square_count()) * 16U
-        + 8U + topology.contacts().size() * 2U);
+    graph.colors.reserve(static_cast<std::size_t>(topology.square_count()) * 8U
+        + 4U + topology.contacts().size());
+    graph.edges.reserve(static_cast<std::size_t>(topology.square_count()) * 8U
+        + 4U + topology.contacts().size() * 2U);
 
     // Vertex IDs and fixed gadget edges depend only on square count. Cache one
     // bounded prefix per thread; contact factors are appended in the same order.
@@ -155,19 +160,19 @@ ColoredGraph build_incidence_graph(const Topology& topology) {
 
     for (const auto& contact : topology.contacts()) {
         const auto event = add_vertex(graph, contact_color(contact.kind));
-        const auto a_port = 9U * contact.a.square + 1U + feature_ring_index(contact.a);
+        const auto a_port = 8U * contact.a.square + feature_ring_index(contact.a);
         add_edge(graph, event, a_port);
 
         if (contact.kind == ContactKind::Wall) {
             if (!contact.wall.has_value()) {
                 throw std::logic_error("validated wall contact lost wall index");
             }
-            add_edge(graph, event, 9U * topology.square_count() + 1U + *contact.wall);
+            add_edge(graph, event, 8U * topology.square_count() + *contact.wall);
         } else {
             if (!contact.b.has_value()) {
                 throw std::logic_error("validated square contact lost second feature");
             }
-            const auto b_port = 9U * contact.b->square + 1U + feature_ring_index(*contact.b);
+            const auto b_port = 8U * contact.b->square + feature_ring_index(*contact.b);
             add_edge(graph, event, b_port);
         }
     }
@@ -726,10 +731,10 @@ std::string build_binary_key_bytes(
     const ColoredGraph& graph,
     const CanonicalBackendResult& canonical
 ) {
-    constexpr std::string_view magic = "SQK4";
+    constexpr std::string_view magic = "SQK5";
 
     if (canonical.n <= 0) {
-        throw std::logic_error("SQK4 requires a non-empty canonical graph");
+        throw std::logic_error("SQK5 requires a non-empty canonical graph");
     }
 
     std::vector<std::pair<std::uint32_t, std::uint32_t>> dense_edges;
@@ -746,7 +751,7 @@ std::string build_binary_key_bytes(
     }
 
     if (edges->size() > std::numeric_limits<std::uint32_t>::max()) {
-        throw std::logic_error("SQK4 edge count exceeds 32-bit encoding");
+        throw std::logic_error("SQK5 edge count exceeds 32-bit encoding");
     }
 
     const auto n = static_cast<std::uint32_t>(canonical.n);
@@ -778,20 +783,20 @@ std::string build_binary_key_bytes(
             static_cast<std::size_t>(canonical.lab[static_cast<std::size_t>(i)])
         ];
         if (color < 0 || color > 255) {
-            throw std::logic_error("canonical vertex color outside SQK4 byte range");
+            throw std::logic_error("canonical vertex color outside SQK5 byte range");
         }
         bytes.push_back(static_cast<char>(color));
     }
 
     if (endpoint_width == 1U) {
         // The common incidence graph fits in a byte. Allocate the final range
-        // once and write endpoints directly, preserving SQK4 byte for byte.
+        // once and write endpoints directly, preserving SQK5 byte for byte.
         const auto offset = bytes.size();
         bytes.resize(offset + edge_bytes);
         auto* output = bytes.data() + offset;
         for (const auto& [a, b] : *edges) {
             if (a >= b || b >= n) {
-                throw std::logic_error("SQK4 canonical edge list is not normalized");
+                throw std::logic_error("SQK5 canonical edge list is not normalized");
             }
             *output++ = static_cast<char>(a);
             *output++ = static_cast<char>(b);
@@ -799,7 +804,7 @@ std::string build_binary_key_bytes(
     } else {
         for (const auto& [a, b] : *edges) {
             if (a >= b || b >= n) {
-                throw std::logic_error("SQK4 canonical edge list is not normalized");
+                throw std::logic_error("SQK5 canonical edge list is not normalized");
             }
             append_index_be(bytes, a, endpoint_width);
             append_index_be(bytes, b, endpoint_width);
@@ -898,7 +903,7 @@ std::string canonical_key_hex(const CanonicalKey& key) {
     constexpr char hex[] = "0123456789abcdef";
     std::string text;
     text.reserve(8U + key.bytes.size() * 2U);
-    text.append("SQK4HEX:");
+    text.append("SQK5HEX:");
     for (const unsigned char byte : key.bytes) {
         text.push_back(hex[byte >> 4U]);
         text.push_back(hex[byte & 0x0fU]);

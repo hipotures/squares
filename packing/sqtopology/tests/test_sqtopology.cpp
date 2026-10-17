@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
+#include <map>
 #include <numeric>
 #include <random>
 #include <stdexcept>
@@ -54,6 +55,64 @@ sqtopology::CanonicalKey canonical_key(
         sqtopology::to_incidence_graph(topology),
         backend
     );
+}
+
+// Historical incidence gadget that carried one square-object vertex per square
+// and one container-object vertex. The production gadget dropped those vertices
+// because the alternating port cycle already realizes the local D4. This builder
+// is kept only as an independent oracle for the equivalence-relation test.
+sqtopology::ColoredGraph reference_incidence_graph(const sqtopology::Topology& input) {
+    using namespace sqtopology;
+    const auto topology = input.normalized();
+    ColoredGraph graph;
+    const auto add_vertex = [&graph](VertexColor color) {
+        const auto id = static_cast<std::uint32_t>(graph.colors.size());
+        graph.colors.push_back(static_cast<int>(color));
+        return id;
+    };
+    const auto add_edge = [&graph](std::uint32_t a, std::uint32_t b) {
+        if (b < a) std::swap(a, b);
+        graph.edges.emplace_back(a, b);
+    };
+    const auto event_color = [](ContactKind kind) {
+        switch (kind) {
+            case ContactKind::CornerCorner: return VertexColor::ContactCornerCorner;
+            case ContactKind::CornerSide: return VertexColor::ContactCornerSide;
+            case ContactKind::SideSide: return VertexColor::ContactSideSide;
+            case ContactKind::Wall: return VertexColor::ContactWall;
+        }
+        return VertexColor::ContactWall;
+    };
+    for (SquareId square = 0; square < topology.square_count(); ++square) {
+        const auto center = add_vertex(VertexColor::SquareObject);
+        for (std::uint8_t ring = 0; ring < 8; ++ring) {
+            const auto port = add_vertex((ring & 1U) ? VertexColor::SquareSidePort
+                                                      : VertexColor::SquareCornerPort);
+            add_edge(center, port);
+        }
+        for (std::uint8_t ring = 0; ring < 8; ++ring) {
+            add_edge(center + 1U + ring, center + 1U + (ring + 1U) % 8U);
+        }
+    }
+    const auto container = add_vertex(VertexColor::ContainerObject);
+    for (std::uint8_t wall = 0; wall < 4; ++wall) {
+        const auto vertex = add_vertex(VertexColor::ContainerWall);
+        add_edge(container, vertex);
+    }
+    for (std::uint8_t wall = 0; wall < 4; ++wall) {
+        add_edge(container + 1U + wall, container + 1U + (wall + 1U) % 4U);
+    }
+    for (const auto& contact : topology.contacts()) {
+        const auto event = add_vertex(event_color(contact.kind));
+        add_edge(event, 9U * contact.a.square + 1U + feature_ring_index(contact.a));
+        if (contact.kind == ContactKind::Wall) {
+            add_edge(event, 9U * topology.square_count() + 1U + *contact.wall);
+        } else {
+            add_edge(event, 9U * contact.b->square + 1U + feature_ring_index(*contact.b));
+        }
+    }
+    graph.normalize_edges();
+    return graph;
 }
 
 void test_validation() {
@@ -360,18 +419,20 @@ void test_incidence_prefix_cache_transitions() {
     using namespace sqtopology;
     for (const std::uint32_t squares : {1U, 15U, 4U, 257U, 15U, 4U, 1U}) {
         const auto graph = to_incidence_graph(Topology(squares));
-        expect(graph.vertex_count() == 9U * squares + 5U,
-               "fixed incidence prefix must preserve every square and container vertex");
-        expect(graph.edges.size() == 16U * squares + 8U,
-               "fixed incidence prefix must preserve all gadget edges across size changes");
+        expect(graph.vertex_count() == 8U * squares + 4U,
+               "fixed incidence prefix must preserve every square port and wall vertex");
+        expect(graph.edges.size() == 8U * squares + 4U,
+               "fixed incidence prefix must preserve all gadget cycle edges across size changes");
         std::vector<unsigned> degrees(graph.vertex_count());
         for (const auto& [a, b] : graph.edges) { ++degrees[a]; ++degrees[b]; }
         for (std::uint32_t square = 0; square < squares; ++square) {
-            expect(degrees[9U * square] == 8, "square centers must retain all eight ports");
-            for (unsigned port = 1; port <= 8; ++port)
-                expect(degrees[9U * square + port] == 3, "free ports must retain their center and cycle neighbors");
+            for (unsigned port = 0; port < 8; ++port)
+                expect(degrees[8U * square + port] == 2,
+                       "free ports must retain their two cycle neighbors");
         }
-        expect(degrees[9U * squares] == 4, "container center must retain all four walls");
+        for (unsigned wall = 0; wall < 4U; ++wall)
+            expect(degrees[8U * squares + wall] == 2,
+                   "container walls must retain their two cycle neighbors");
     }
     const auto first = to_incidence_graph(make_fixture("corner-corner-2"));
     (void)to_incidence_graph(make_fixture("side-side-2"));
@@ -448,10 +509,60 @@ void test_binary_key_matches_textual_equivalence() {
         }
 
         expect(
-            canonical_key_hex(binary_keys.front()).starts_with("SQK4HEX:"),
+            canonical_key_hex(binary_keys.front()).starts_with("SQK5HEX:"),
             "retained binary key text must carry the SQK2HEX version marker"
         );
     }
+}
+
+void test_search_key_equivalence_relation_is_gadget_invariant() {
+    using namespace sqtopology;
+
+    std::vector<Topology> corpus;
+    constexpr std::size_t max_corpus = 4000;
+    const RewriteOptions options{.max_additions = 48};
+    for (const auto* name : {"grid-2x2", "grid-3x3", "disjoint-2", "corner-side-2",
+                             "side-side-2", "corner-corner-2", "isolated-1",
+                             "grid-4x4-minus-one"}) {
+        const auto base = make_fixture(name);
+        std::vector<Topology> level{base};
+        corpus.push_back(base);
+        for (int depth = 0; depth < 2 && corpus.size() < max_corpus; ++depth) {
+            std::vector<Topology> next;
+            for (const auto& parent : level) {
+                if (next.size() >= 400) break;
+                for (auto& rewrite : generate_rewrites(parent, options)) {
+                    next.push_back(std::move(rewrite.topology));
+                }
+            }
+            for (const auto& child : next) corpus.push_back(child);
+            level = std::move(next);
+            if (level.empty()) break;
+        }
+    }
+
+    std::map<std::string, std::string> reference_to_production;
+    std::map<std::string, std::string> production_to_reference;
+    for (const auto& topology : corpus) {
+        const auto reference = canonical_key_colored_graph(
+            reference_incidence_graph(topology),
+            CanonicalBackend::Traces
+        ).bytes;
+        const auto production = canonical_key(topology, CanonicalBackend::Traces).bytes;
+
+        const auto [ref_it, ref_new] = reference_to_production.emplace(reference, production);
+        expect(ref_new || ref_it->second == production,
+               "one reference gadget class must map to exactly one production class");
+
+        const auto [prod_it, prod_new] = production_to_reference.emplace(production, reference);
+        expect(prod_new || prod_it->second == reference,
+               "one production class must map to exactly one reference gadget class");
+    }
+
+    expect(reference_to_production.size() == production_to_reference.size(),
+           "the production gadget must induce the historical exact-key equivalence relation");
+    expect(production_to_reference.size() > 100,
+           "the gadget equivalence test needs a non-trivial corpus");
 }
 
 void test_compact_binary_key_layout() {
@@ -478,7 +589,7 @@ void test_compact_binary_key_layout() {
 
     expect(
         key.bytes.size() == expected_bytes,
-        "SQK4 must store colors plus one exact canonical edge list"
+        "SQK5 must store colors plus one exact canonical edge list"
     );
 
     const auto triangle_bits = n * (n - 1U) / 2U;
@@ -502,9 +613,9 @@ void test_key_endpoint_width_boundary() {
                                    CanonicalBackend::SparseNauty, CanonicalBackend::Traces}) {
             const auto key = canonical_key_colored_graph(graph, backend);
             const auto width = static_cast<unsigned char>(key.bytes[9]);
-            expect(width == (n <= 256 ? 1 : 2), "SQK4 endpoint width must handle vertex 255 exactly");
+            expect(width == (n <= 256 ? 1 : 2), "SQK5 endpoint width must handle vertex 255 exactly");
             expect(key.bytes.size() == 14 + n + graph.edges.size() * 2 * width,
-                   "SQK4 boundary payload must have the expected length");
+                   "SQK5 boundary payload must have the expected length");
             ColoredGraph decoded;
             for (std::size_t i = 0; i < n; ++i)
                 decoded.colors.push_back(static_cast<unsigned char>(key.bytes[14 + i]));
@@ -522,7 +633,7 @@ void test_key_endpoint_width_boundary() {
                 decoded.edges.emplace_back(a, b);
             }
             expect(canonicalize_colored_graph(decoded).encoding == text,
-                   "SQK4 must encode the complete graph across the byte-width boundary");
+                   "SQK5 must encode the complete graph across the byte-width boundary");
             expect(canonical_key_colored_graph(decoded, backend) == key,
                    "canonical binary keys must be idempotent across endpoint widths");
         }
@@ -738,6 +849,7 @@ int main() {
         test_incidence_prefix_cache_transitions();
         test_backend_names();
         test_binary_key_matches_textual_equivalence();
+        test_search_key_equivalence_relation_is_gadget_invariant();
         test_compact_binary_key_layout();
         test_key_endpoint_width_boundary();
         test_canonical_microprofile_preserves_semantics();

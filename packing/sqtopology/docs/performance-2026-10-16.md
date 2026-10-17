@@ -311,3 +311,38 @@ validation enabled in the new binary.
 | 16 | 1450573.4 | 1.034x | 0.34 |
 
 Raw measurement: `/tmp/sqtopology-prefix.json`.
+
+## Keep: drop the redundant square/container object vertices
+
+The alternating eight-cycle of square ports has color-preserving automorphism group exactly
+the local `D4`, so the historical square-object anchor vertex was never needed: the squares
+are recovered as the connected components of the ports' induced subgraph. The container's
+four wall vertices form a cycle whose automorphism group is exactly the container `D4`, so
+its object vertex was redundant too. Removing both anchor vertices therefore preserves the
+exact isomorphism classes while shrinking the canonical graph.
+
+The proof obligation is tested directly: a new native test builds a reference, center-based
+gadget and verifies that the production gadget's exact-key partition is a bijection of the
+reference gadget's partition over a ~3000-state rewrite corpus spanning the fixtures and two
+depths. All symmetry-invariance, backend-agreement, and key-layout tests pass. At 16 workers
+the fixed-work search now yields the identical 26,689,273 raw candidates and 12,972,556 local
+unique states as the previous encoding, which is exactly what equivalence-preserving dedup
+implies.
+
+Same-session unpinned A/B, 30 s per width, Traces:
+
+| Workers | Baseline cand/s | Drop-object cand/s | Relative | Key bytes |
+| --- | --- | --- | --- | --- |
+| 1 | 109176.2 | 124478.8 | 1.140x | 906 -> 643 |
+| 16 | 1449768.8 | 1701354.4 | 1.173x | 910 -> 646 |
+
+Full retained sweep: 126,271.7 / 247,984.8 / 489,896.7 / 908,319.4 / 1,529,556.2
+candidates/s at 1/2/4/8/16 workers, with a 6.88 / 6.99 / 7.04 / 7.20 / 7.86 us
+canonicalization block and 0.29-0.32 us graph conversion. The Traces engine block is
+4.46 / 4.55 / 4.57 / 4.67 / 5.15 us.
+
+At 16 workers the whole depth-3 space now finishes in 15-18 s instead of the full 30 s, so
+the 16-worker throughput is makespan-limited and varies by roughly 10% with scheduler
+placement; the fixed-work candidate total is the stable cross-version signal. Raw
+measurements: `/tmp/sqtopo-dropcenter.json`, `/tmp/sqtopo-ab-base.json`,
+`/tmp/sqtopo-ab-new.json`.

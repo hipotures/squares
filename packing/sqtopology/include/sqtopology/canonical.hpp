@@ -12,6 +12,10 @@
 namespace sqtopology {
 
 enum class VertexColor : int {
+    // SquareObject and ContainerObject are historical gadget anchors. The port
+    // cycle and wall cycle already realize the local/container D4, so the
+    // incidence builder no longer emits those vertices; the values stay
+    // reserved so the remaining SQK5 color bytes are stable.
     SquareObject = 1,
     SquareCornerPort = 2,
     SquareSidePort = 3,
@@ -48,7 +52,7 @@ struct CanonicalForm {
 };
 
 // Exact search equality key. fingerprint is only the unordered-set bucket hash;
-// bytes remain the equality oracle. SQK4 keys are backend-tagged and encode the
+// bytes remain the equality oracle. SQK5 keys are backend-tagged and encode the
 // canonical simple graph as an exact sorted edge list.
 struct CanonicalKey {
     std::string bytes;
