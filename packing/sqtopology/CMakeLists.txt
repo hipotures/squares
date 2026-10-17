@@ -29,6 +29,19 @@ else()
     set(SQTOPOLOGY_NAUTY_TARGET sqtopology_nauty)
 endif()
 
+# Bind nauty's TLS directly into the executable when its archive is available.
+# The discovered target retains include paths and secondary link dependencies.
+option(SQTOPOLOGY_STATIC_NAUTY "Prefer the installed static nauty archive" ON)
+if(SQTOPOLOGY_STATIC_NAUTY)
+    find_library(SQTOPOLOGY_NAUTY_ARCHIVE NAMES libnauty.a HINTS ${NAUTY_LIBRARY_DIRS})
+    if(SQTOPOLOGY_NAUTY_ARCHIVE)
+        add_library(sqtopology_static_nauty INTERFACE)
+        target_link_libraries(sqtopology_static_nauty INTERFACE
+            ${SQTOPOLOGY_NAUTY_ARCHIVE} ${SQTOPOLOGY_NAUTY_TARGET})
+        set(SQTOPOLOGY_NAUTY_TARGET sqtopology_static_nauty)
+    endif()
+endif()
+
 add_library(
     sqtopology_core
     src/canonical.cpp

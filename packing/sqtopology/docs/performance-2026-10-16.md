@@ -121,3 +121,20 @@ The clean benchmark excludes the rejected sparse buffer experiment.
 
 Hash time fell from about 0.68 to 0.10 µs at one worker.
 Raw measurement: `/tmp/sqtopology-hash-only.json`.
+
+## Keep: prefer the installed static nauty archive
+
+The installed archive avoids shared-library TLS indirection without changing
+nauty code or labeling semantics. CMake retains the discovered dependency usage
+requirements and falls back to shared linking when no archive exists. `ldd`
+confirms the executable has no dynamic nauty dependency; native tests pass.
+
+| Workers | Candidates/s | Relative to block hashing |
+| --- | --- | --- |
+| 1 | 81452.7 | 1.075x |
+| 2 | 160122.0 | 1.074x |
+| 4 | 316811.9 | 1.086x |
+| 8 | 613026.9 | 1.083x |
+| 16 | 1081407.7 | 1.059x |
+
+Raw measurement: `/tmp/sqtopology-static-integrated.json`.
