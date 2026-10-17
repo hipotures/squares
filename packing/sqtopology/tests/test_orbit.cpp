@@ -5,11 +5,13 @@
 // production symmetry transforms. The oracle itself never derives its action
 // from canonicalization; canonicalization appears here only as a cross-check.
 
+#include "sqtopology/bigint.hpp"
 #include "sqtopology/canonical.hpp"
 #include "sqtopology/fixtures.hpp"
 #include "sqtopology/orbit.hpp"
 #include "sqtopology/research.hpp"
 #include "sqtopology/topology.hpp"
+#include "sqtopology/wreath.hpp"
 
 #include <algorithm>
 #include <array>
@@ -1230,6 +1232,425 @@ void test_ball_criterion_n2() {
     expect(balls[0][2].size() == 93, "disjoint-2 B_2 size equals a_0 + a_1 + a_2");
 }
 
+// ---------------------------------------------------------------------------
+// Wreath-product class aggregation (wreath.hpp)
+//
+// The class-aggregated Burnside counter replaces direct enumeration of all
+// |G_n| elements by a sum over the 5 * (wreath types) conjugacy classes. The
+// tests below pin the class classification, the class-size formula, the full
+// coefficient arrays against the committed direct-oracle goldens, the n = 5
+// golden, the low-weight table with its stabilization structure, and the
+// staged sub-group quotients.
+// ---------------------------------------------------------------------------
+
+BigUint big_from_decimal(const std::string& digits) {
+    BigUint value;
+    for (const char digit : digits) {
+        expect(digit >= '0' && digit <= '9', "decimal digit");
+        value.mul_small(10);
+        BigUint addend(static_cast<std::uint64_t>(digit - '0'));
+        value.add_into(addend);
+    }
+    return value;
+}
+
+// "cycle_type" -> element count map for an orbit-count golden JSON.
+std::map<std::string, std::uint64_t> golden_cycle_type_elements(const std::string& json) {
+    std::map<std::string, std::uint64_t> table;
+    const std::string key = "\"cycle_type\":\"";
+    std::size_t position = 0;
+    while ((position = json.find(key, position)) != std::string::npos) {
+        const auto start = position + key.size();
+        const auto end = json.find('"', start);
+        expect(end != std::string::npos, "cycle type string terminator");
+        const std::string cycle_type = json.substr(start, end - start);
+        const std::string elements_key = "\"group_elements\":";
+        const auto elements_position = json.find(elements_key, end);
+        expect(elements_position != std::string::npos, "group_elements after cycle type");
+        std::size_t index = elements_position + elements_key.size();
+        std::uint64_t value = 0;
+        bool any = false;
+        while (index < json.size() && json[index] >= '0' && json[index] <= '9') {
+            value = value * 10 + static_cast<std::uint64_t>(json[index] - '0');
+            ++index;
+            any = true;
+        }
+        expect(any, "group_elements value digits");
+        expect(table.emplace(cycle_type, value).second, "distinct golden cycle type");
+        position = index;
+    }
+    return table;
+}
+
+WreathCountOptions low_weight_options(std::uint32_t bound) {
+    WreathCountOptions options;
+    options.low_weight_only = true;
+    options.low_weight_max = bound;
+    return options;
+}
+
+void test_bigint_wide_paths() {
+    // Regression for the 64-bit overflow that corrupted n >= 7 divisions:
+    // remainder * base and limb * factor can exceed 2^64 even though the
+    // divisor and the factor fit in 64 bits.
+    BigUint wide(3);
+    wide.mul_small(9999999999999999999ULL);
+    expect(wide.to_decimal() == "29999999999999999997", "wide mul_small");
+    const std::uint64_t wide_remainder = wide.div_small(9999999999999999999ULL);
+    expect(wide_remainder == 0, "wide div_small remainder");
+    expect(wide.to_decimal() == "3", "wide div_small quotient");
+
+    // The exact n = 7 a_6 numerator from the corrupted run: |G_7| * 442602511.
+    BigUint numerator(84557168640ULL);
+    numerator.mul_small(442602511ULL);
+    expect(numerator.to_decimal() == "37425215163114455040", "n=7 numerator");
+    const std::uint64_t remainder = numerator.div_small(84557168640ULL);
+    expect(remainder == 0, "n=7 numerator remainder");
+    expect(numerator.to_decimal() == "442602511", "n=7 numerator quotient");
+
+    // Multi-limb round trip: (3 * 10^20 - 3) / 7 leaves remainder 3.
+    BigUint round_trip = big_from_decimal("299999999999999999997");
+    const std::uint64_t round_trip_remainder = round_trip.div_small(7);
+    expect(round_trip_remainder == 3, "round trip remainder");
+    round_trip.mul_small(7);
+    round_trip.add_into(BigUint(3));
+    expect(round_trip.to_decimal() == "299999999999999999997", "round trip value");
+}
+
+void test_wreath_classification() {
+    const std::array<std::uint64_t, 6> expected_types{5, 20, 65, 190, 506, 1265};
+    const std::array<std::uint64_t, 6> expected_classes{25, 100, 325, 950, 2530, 6325};
+    std::uint64_t order = 1;
+    for (std::uint32_t n = 1; n <= 6; ++n) {
+        order = group_element_count(n);
+        const auto types = enumerate_group_conjugacy_types(n);
+        expect(
+            types.size() == expected_types[n - 1],
+            "wreath type count at n=" + std::to_string(n)
+        );
+        expect(
+            group_conjugacy_class_count_wreath(n) == expected_classes[n - 1],
+            "wreath class count at n=" + std::to_string(n)
+        );
+        expect(
+            kD4ClassCount * static_cast<std::uint64_t>(types.size()) == expected_classes[n - 1],
+            "container factor at n=" + std::to_string(n)
+        );
+        std::uint64_t wreath_part = 0;
+        std::uint64_t full_part = 0;
+        for (const auto& type : types) {
+            const std::uint64_t size = group_class_size(type);
+            wreath_part += size;
+            for (std::uint32_t container = 0; container < kD4ClassCount; ++container) {
+                full_part += size * d4_class_size(static_cast<D4Class>(container));
+                GroupConjugacyType full = type;
+                full.container = static_cast<D4Class>(container);
+                const GroupElement element = representative_group_element(full);
+                expect(
+                    wreath_type_of_element(element) == full,
+                    "representative round trip at n=" + std::to_string(n)
+                );
+            }
+        }
+        // Wreath part order n! * 8^n; full order n! * 8^n * 8.
+        expect(
+            wreath_part * 8 == order && full_part == order,
+            "class-size sums at n=" + std::to_string(n)
+        );
+    }
+
+    // Hand-computed class sizes: the identity type of wreath part n = 1 has
+    // five classes of sizes 1, 1, 2, 2, 2; a single 2-cycle with an identity
+    // cycle product at n = 2 has size 2!/2 * 8 = 8 before the container.
+    for (std::uint32_t element_class = 0; element_class < kD4ClassCount; ++element_class) {
+        GroupConjugacyType single;
+        single.square_count = 1;
+        single.counts[1][element_class] = 1;
+        const std::uint64_t expected = d4_class_size(static_cast<D4Class>(element_class));
+        expect(group_class_size(single) == expected, "n=1 single-cycle class size");
+        single.container = D4Class::Rotation90;
+        expect(
+            group_class_size(single) == 2 * expected,
+            "n=1 container-90 doubles the class size"
+        );
+    }
+    GroupConjugacyType two_cycle;
+    two_cycle.square_count = 2;
+    two_cycle.counts[2][0] = 1;
+    expect(group_class_size(two_cycle) == 8, "n=2 identity 2-cycle class size");
+    GroupConjugacyType two_fixed;
+    two_fixed.square_count = 2;
+    two_fixed.counts[1][0] = 2;
+    expect(group_class_size(two_fixed) == 1, "n=2 identity fixed-point class size");
+}
+
+void test_wreath_cross_check() {
+    const std::array<std::uint64_t, 4> expected_classes{25, 100, 325, 950};
+    for (std::uint32_t n = 1; n <= 4; ++n) {
+        const auto result = cross_check_wreath_against_elements(n);
+        expect(result.square_count == n, "cross-check n");
+        expect(result.elements == group_element_count(n), "cross-check element count");
+        expect(result.classes == expected_classes[n - 1], "cross-check class count");
+        expect(result.classes_seen == expected_classes[n - 1], "cross-check classes seen");
+        expect(result.counts_match, "cross-check class sizes equal element counts");
+        expect(result.induced_types_match, "cross-check induced types constant on classes");
+    }
+}
+
+void test_wreath_golden_and_full_counts() {
+    // n = 1..4: the class-aggregated counter must reproduce the committed
+    // direct-oracle goldens coefficient-by-coefficient, including the
+    // induced-cycle-type distribution.
+    for (std::uint32_t n = 1; n <= 4; ++n) {
+        WreathCountOptions golden_options;
+        golden_options.emit_cycle_type_table = true;
+        const auto result = wreath_burnside_count(n, golden_options);
+        const std::string golden = read_source_file(
+            "tests/data/orbit-count-n" + std::to_string(n) + ".json"
+        );
+        expect(result.square_count == n, "golden n");
+        expect(
+            result.coefficient_decimal == extract_string_array(golden, "coefficients"),
+            "golden coefficients at n=" + std::to_string(n)
+        );
+        expect(
+            result.total_orbit_count_decimal == extract_string(golden, "total_orbit_count"),
+            "golden total at n=" + std::to_string(n)
+        );
+        expect(
+            result.distinct_induced_cycle_types == extract_uint(golden, "distinct_cycle_types"),
+            "golden distinct induced types at n=" + std::to_string(n)
+        );
+        std::map<std::string, std::uint64_t> induced;
+        for (const auto& record : result.induced_types) {
+            induced.emplace(record.cycle_type.to_compact_string(), record.class_elements);
+        }
+        expect(
+            induced == golden_cycle_type_elements(golden),
+            "golden induced-type distribution at n=" + std::to_string(n)
+        );
+        expect(result.checks_class_size_sum, "class size sum at n=" + std::to_string(n));
+        expect(result.checks_divisible, "divisibility at n=" + std::to_string(n));
+        expect(result.checks_complement_symmetric, "complement at n=" + std::to_string(n));
+        expect(result.checks_total_matches, "dual total at n=" + std::to_string(n));
+        expect(result.checks_endpoints_unit, "endpoints at n=" + std::to_string(n));
+        expect(result.checks_positive, "positivity at n=" + std::to_string(n));
+        expect(result.class_size_sum == group_element_count(n), "class sizes sum to |G|");
+    }
+
+    // n = 5 golden: complete coefficient array, totals, and the published
+    // class classification.
+    const std::string n5_json = read_source_file("tests/data/wreath-count-n5.json");
+    expect(extract_uint(n5_json, "n") == 5, "n=5 golden n");
+    expect(extract_uint(n5_json, "event_count") == 800, "n=5 golden E");
+    expect(extract_uint(n5_json, "group_size") == 31457280ULL, "n=5 golden |G|");
+    expect(extract_uint(n5_json, "wreath_conjugacy_types") == 506, "n=5 golden types");
+    expect(extract_uint(n5_json, "total_conjugacy_classes") == 2530, "n=5 golden classes");
+    expect(
+        extract_uint(n5_json, "distinct_induced_cycle_types") == 493,
+        "n=5 golden induced types"
+    );
+    const auto n5_golden_coefficients = extract_string_array(n5_json, "coefficients");
+    expect(n5_golden_coefficients.size() == 801, "n=5 golden coefficient count");
+    const auto n5 = wreath_burnside_count(5);
+    expect(n5.coefficient_decimal == n5_golden_coefficients, "n=5 coefficients");
+    expect(
+        n5.total_orbit_count_decimal == extract_string(n5_json, "total_orbit_count"),
+        "n=5 total"
+    );
+    expect(n5.checks_complement_symmetric, "n=5 complement symmetry");
+    expect(
+        n5.checks_total_matches && n5.checks_divisible && n5.checks_class_size_sum,
+        "n=5 checks"
+    );
+    // Both totals: the complement identity gives sum a_d = a_E as well.
+    expect(n5.coefficient_decimal.back() == "1", "n=5 last coefficient");
+
+    // n = 6: live run with pinned heads, center coefficient, and total.
+    const auto n6 = wreath_burnside_count(6);
+    expect(n6.event_count == 1152, "n=6 E");
+    expect(n6.group_size == 1509949440ULL, "n=6 |G|");
+    expect(n6.wreath_conjugacy_types == 1265, "n=6 types");
+    expect(n6.total_conjugacy_classes == 6325, "n=6 classes");
+    expect(n6.distinct_induced_cycle_types == 1112, "n=6 induced types");
+    expect(n6.coefficient_decimal.size() == 1153, "n=6 coefficient count");
+    const std::vector<std::string> n6_heads{
+        "1", "5", "125", "3660", "152092", "7599740",
+        "434321891", "27189870037", "1806257816768", "124059363877872",
+    };
+    expect(
+        std::vector<std::string>(n6.coefficient_decimal.begin(), n6.coefficient_decimal.begin() + 10)
+            == n6_heads,
+        "n=6 head coefficients"
+    );
+    expect(
+        n6.coefficient_decimal[n6.event_count / 2]
+            == "9521649124346453771251050019076009467250737232275618330805943352240362924478"
+               "181435128846278424732353270150626881076690897082289472429058283162995987438725544"
+               "128510361199748049634537682428637749633600368375088001904958676101527671604981870"
+               "047552889587753521705901563626338635842235721222164180015454476667187836374456040"
+               "16349458165578544",
+        "n=6 center coefficient"
+    );
+    expect(
+        n6.total_orbit_count_decimal
+            == "4051283166994485863550615941484358941754086643531512593500420612252919413735"
+               "821241940424843831605538493248692524532961500985822316095043537134122256604152447"
+               "696940859144399441219945972150455395319938209323491508529788526637508241907184680"
+               "305253325333199230016368616548882276864460757078989920860556959893540825253557998"
+               "1746020551560790016",
+        "n=6 total"
+    );
+    expect(
+        n6.checks_complement_symmetric && n6.checks_total_matches && n6.checks_divisible,
+        "n=6 checks"
+    );
+    // Low-weight mode must reproduce the full-run prefix at n = 6.
+    const auto n6_low = wreath_burnside_count(6, low_weight_options(6));
+    expect(
+        std::vector<std::string>(n6.coefficient_decimal.begin(), n6.coefficient_decimal.begin() + 7)
+            == n6_low.coefficient_decimal,
+        "n=6 low-weight equals full prefix"
+    );
+}
+
+void test_wreath_low_weight_table() {
+    const std::string table_json = read_source_file("tests/data/wreath-low-weight.json");
+    expect(
+        extract_string(table_json, "schema") == "sqtopology.wreath-low-weight.v1",
+        "low-weight schema"
+    );
+    expect(extract_uint(table_json, "max_weight") == 6, "low-weight bound");
+    const auto ns = extract_uint_array(table_json, "n");
+    const std::array<std::vector<std::string>, 7> columns{
+        extract_string_array(table_json, "a0"),
+        extract_string_array(table_json, "a1"),
+        extract_string_array(table_json, "a2"),
+        extract_string_array(table_json, "a3"),
+        extract_string_array(table_json, "a4"),
+        extract_string_array(table_json, "a5"),
+        extract_string_array(table_json, "a6"),
+    };
+    expect(ns.size() == 11, "low-weight row count");
+    for (std::size_t index = 0; index < 11; ++index) {
+        expect(ns[index] == index + 1, "low-weight n column");
+        for (const auto& column : columns) {
+            expect(column.size() == 11, "low-weight column size");
+        }
+    }
+
+    // Live recomputation for a subset of rows (all rows are recomputed by the
+    // research campaign; this keeps the test fast).
+    const std::array<std::uint32_t, 9> live{1, 2, 3, 4, 5, 6, 7, 8, 10};
+    for (const std::uint32_t n : live) {
+        const auto result = wreath_burnside_count(n, low_weight_options(6));
+        expect(result.coefficient_decimal.size() == 7, "low-weight coefficient count");
+        for (std::size_t degree = 0; degree < 7; ++degree) {
+            expect(
+                result.coefficient_decimal[degree] == columns[degree][n - 1],
+                "low-weight a_" + std::to_string(degree) + " at n=" + std::to_string(n)
+            );
+        }
+        expect(result.checks_class_size_sum, "low-weight class sizes");
+        expect(result.checks_divisible, "low-weight divisibility");
+        expect(result.checks_positive, "low-weight positivity");
+        expect(result.class_size_sum == group_element_count(n), "low-weight |G| identity");
+    }
+
+    // Stabilization structure: a_d(n) is non-decreasing in n and constant for
+    // n >= 2d (support of a d-event configuration spans at most 2d squares).
+    for (std::size_t index = 0; index < 11; ++index) {
+        const std::uint32_t n = ns[index];
+        for (std::size_t degree = 1; degree < 7; ++degree) {
+            if (index > 0) {
+                expect(
+                    std::stoull(columns[degree][index])
+                        >= std::stoull(columns[degree][index - 1]),
+                    "low-weight monotonicity"
+                );
+            }
+            if (n >= 2 * degree) {
+                const std::string stable = columns[degree][2 * degree - 1];
+                expect(
+                    columns[degree][index] == stable,
+                    "low-weight stabilization at n >= 2d for d=" + std::to_string(degree)
+                );
+            }
+        }
+    }
+    expect(columns[1][0] == "2" && columns[1][1] == "5", "a_1 special value at n=1");
+    expect(columns[2][3] == "125", "a_2 stabilizes at n=4");
+    expect(columns[3][5] == "3660", "a_3 stabilizes at n=6");
+    expect(columns[4][7] == "152283", "a_4 stabilizes at n=8");
+    expect(columns[5][9] == "7646706", "a_5 stabilizes at n=10");
+}
+
+void test_staged_quotients() {
+    // Stage 4 (full G_n) must equal the low-weight coefficients for n <= 6.
+    for (std::uint32_t n = 2; n <= 6; ++n) {
+        const auto row = staged_quotient_counts(n, 4);
+        expect(row.square_count == n && row.weight_max == 4, "staged row header");
+        expect(row.local_only.size() == 5, "staged local_only size");
+        expect(row.squares_only.size() == 5, "staged squares_only size");
+        expect(row.local_and_squares.size() == 5, "staged local_and_squares size");
+        expect(row.full.size() == 5, "staged full size");
+        const auto low = wreath_burnside_count(n, low_weight_options(4));
+        expect(row.full == low.coefficient_decimal, "staged stage 4 equals full counts");
+    }
+
+    // Pinned stage values (independently recomputed by tools/wreath_reference.py
+    // for the element-enumerated D4^n and S_n x D4 stages).
+    const auto one = staged_quotient_counts(1, 4);
+    expect(
+        one.local_only == std::vector<std::string>{"1", "8", "84", "696", "4748"},
+        "staged n=1 local"
+    );
+    expect(
+        one.squares_only == std::vector<std::string>{"1", "8", "100", "792", "5244"},
+        "staged n=1 squares"
+    );
+    expect(
+        one.local_and_squares == std::vector<std::string>{"1", "8", "84", "696", "4748"},
+        "staged n=1 wreath"
+    );
+    expect(
+        one.full == std::vector<std::string>{"1", "2", "22", "116", "744"},
+        "staged n=1 full"
+    );
+    const auto two = staged_quotient_counts(2, 4);
+    expect(
+        two.local_only == std::vector<std::string>{"1", "20", "456", "10224", "228500"},
+        "staged n=2 local"
+    );
+    expect(
+        two.squares_only == std::vector<std::string>{"1", "44", "1756", "53028", "1303352"},
+        "staged n=2 squares"
+    );
+    expect(
+        two.local_and_squares == std::vector<std::string>{"1", "11", "236", "5150", "114490"},
+        "staged n=2 wreath"
+    );
+    expect(
+        two.full == std::vector<std::string>{"1", "5", "87", "1411", "26620"},
+        "staged n=2 full"
+    );
+    const auto six = staged_quotient_counts(6, 4);
+    expect(
+        six.local_only[4] == "72228348" && six.squares_only[4] == "98039030"
+            && six.local_and_squares[4] == "435031" && six.full[4] == "152092",
+        "staged n=6 weight-4 column"
+    );
+
+    // Staged tables are limited to n <= 6.
+    bool threw = false;
+    try {
+        (void)staged_quotient_counts(7, 2);
+    } catch (const std::invalid_argument&) {
+        threw = true;
+    }
+    expect(threw, "staged rejects n=7");
+}
+
 }  // namespace
 
 int main() {
@@ -1243,6 +1664,12 @@ int main() {
         test_burnside_n1_exact();
         test_burnside_n2_exact_and_golden();
         test_golden_count_files();
+        test_bigint_wide_paths();
+        test_wreath_classification();
+        test_wreath_cross_check();
+        test_wreath_golden_and_full_counts();
+        test_wreath_low_weight_table();
+        test_staged_quotients();
         test_research_matches_burnside_and_accounting();
         test_seed_distances_n2();
         test_seed_distances_n4();
