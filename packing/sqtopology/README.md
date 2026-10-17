@@ -288,6 +288,39 @@ writes one JSON per run, and `tools/research_analyze.py` (stdlib-only, no plotti
 stack) renders tables, SVG plots, and exact key-set overlap. See
 `docs/topology-space-research-2026-10-17.md`.
 
+### Mathematical interpretation of uncapped research
+
+The first campaign's raw measurements are valid, but its original prose over-interpreted
+several patterns. The durable interpretation is now recorded as an erratum in
+`docs/topology-space-research-2026-10-17.md`.
+
+For fixed `n`, the complete semantic contact-event set has
+
+```
+E(n) = 64*C(n,2) + 32*n
+```
+
+elements. An uncapped labeled topology is exactly a subset of that event set, and one rewrite
+toggles one event. The labeled rewrite graph is therefore the Boolean hypercube `Q_E`.
+Canonicalization then takes the quotient by square permutation, local square `D4`, and
+container `D4`; equivalently, the research object is a symmetry quotient of a Boolean
+lattice, not an unknown generic branching process.
+
+Consequences:
+
+- the labeled distance-`d` layer has exactly `C(E,d)` states;
+- the layer-size ratio falling below one near `E/2` means the binomial layers are
+  shrinking, not that traversal terminates there;
+- multiple generation paths are expected even before quotienting, so raw multi-parent
+  fractions are not by themselves a quotient-convergence statistic;
+- same-`n` seeds with disjoint shallow key sets are separated finite-radius balls in one
+  connected quotient graph, not distinct global basins.
+
+The next exact-counting target is Burnside/Pólya orbit enumeration, beginning with `n=1`,
+where the acting symmetry group has only 64 elements. Search remains useful as an
+independent differential validator and later for quotient-graph structure that orbit
+counting alone does not expose.
+
 ## Process scaling
 
 The Python harness is orchestration only. It launches long-running native shards and waits
