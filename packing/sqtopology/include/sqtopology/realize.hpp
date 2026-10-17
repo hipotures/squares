@@ -53,15 +53,32 @@ enum class RealizabilityStatus : std::uint8_t {
 //       side on that wall, which absorbs both corner contacts;
 //   R6: two opposite corners of one square on the same wall force the other
 //       two corners to distance 1/sqrt(2) on either side of the wall line, so
-//       one is outside the container.
+//       one is outside the container;
+//   R7: one corner feature required on two distinct walls (disjoint opposite
+//       segments, or an adjacent-wall wedge whose absorbing side lies on the
+//       wall);
+//   R8: a corner and a non-incident side of the same square on one wall
+//       (corner-to-side-line distance is exactly 1);
+//   R9: two distinct sides of one square on the same wall (adjacent sides are
+//       perpendicular; opposite sides are parallel at distance 1);
+//   R10: an orientation/parallelism cycle in Z_2 (SS parallel, wall-side
+//       parallel to the wall, adjacent sides perpendicular);
+//   R11: a CC class containing two distinct corners of one square;
+//   R12: two corners of one square on the interior of the same side feature
+//       (open side length 1 - 2e-6, corner distance at least 1);
+//   R13: a CC class containing a non-endpoint corner of a square and a corner
+//       required on one of that square's sides (distance 1).
 //
-// All six predicates depend only on incidences between features and walls, so
-// they are invariant under the full G_n action (endpoint, adjacency and
-// opposite-pair relations are D4 relations). A proof therefore lifts from the
-// class representative to every gauge branch and to the whole canonical orbit.
-// R1-R5 are statements about the exact-stratum absorption rules; R6 is a
-// containment statement. R6 is tolerance-safe because the violation is
-// 1/sqrt(2), far above the 1e-7 extraction tolerance.
+// All predicates depend only on incidences and fixed unit-square feature
+// distances, so they are invariant under the full G_n action (endpoint,
+// adjacency, opposition, parallelism and coincidence are D4 relations). A
+// proof therefore lifts from the class representative to every gauge branch
+// and to the whole canonical orbit. R7-R13 are tolerance-safe because their
+// contradictions are separated by a fixed distance (1, sqrt(2) or the 2e-6
+// strict-interior margin) or by 90 degrees, far above the 1e-7 contact
+// tolerance. Forced-event rules whose conclusion would accumulate several
+// contact tolerances (R14/R15 candidates) are deliberately not included; see
+// docs/geometric-realizability-phase2b-2026-10-17.md.
 struct InfeasibilityFilter {
     bool proved{false};
     std::string reason;
@@ -106,6 +123,12 @@ struct SolveConfig {
     bool minimize_container{true};
     std::uint32_t minimization_steps{8};
     std::uint64_t seed{0x9e3779b97f4a7c15ULL};
+    // Corpus worker count. Each canonical class is an independent work item and
+    // is solved on one thread; the per-class solver is single-threaded, so
+    // N workers mean N concurrent single-threaded solvers (no nested
+    // oversubscription). Must be at least 1. Workers only affect scheduling:
+    // class order, seeds and results are independent of the worker count.
+    std::uint32_t workers{1};
 };
 
 struct SolveResult {

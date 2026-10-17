@@ -4,18 +4,22 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <bit>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <functional>
 #include <map>
+#include <mutex>
 #include <optional>
 #include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -290,6 +294,317 @@ InfeasibilityFilter static_infeasibility_filters(const Topology& sigma) {
                 result.reason = message.str();
                 return result;
             }
+        }
+    }
+
+    // R7-R10: wall and orientation contradictions. These are stated directly in
+    // terms of the extracted contact relations and are invariant under the
+    // full G_n action (D4 preserves incidence, adjacency, opposition,
+    // parallelism and perpendicularity).
+    //
+    // R7: one corner feature required on two distinct walls. Two opposite wall
+    // segments are disjoint, so the point cannot lie on both. Two adjacent
+    // walls meet at the container corner; containment forces the square's
+    // interior wedge (90 degrees) into the container quadrant (90 degrees), and
+    // one of the two incident sides ends up with both endpoints within the
+    // contact tolerance of one wall (see the proof in the Phase-2 document).
+    // That side-wall event absorbs the corresponding corner-wall event, so the
+    // two corner events cannot both be exact.
+    std::map<std::uint64_t, std::set<std::uint8_t>> corner_walls_r7;
+    for (const auto& contact : sigma.contacts()) {
+        if (contact.kind != ContactKind::Wall || !contact.wall.has_value()) {
+            continue;
+        }
+        if (contact.a.kind == FeatureKind::Corner) {
+            corner_walls_r7[corner_node(contact.a.square, contact.a.index)]
+                .insert(*contact.wall);
+        }
+    }
+    for (const auto& [node, walls] : corner_walls_r7) {
+        if (walls.size() >= 2U) {
+            const SquareId square = static_cast<SquareId>(node / 4U);
+            const std::uint8_t corner = static_cast<std::uint8_t>(node % 4U);
+            std::ostringstream message;
+            message << "R7: corner " << static_cast<int>(corner)
+                    << " of square " << square << " is required on walls";
+            for (const std::uint8_t wall : walls) {
+                message << ' ' << static_cast<int>(wall);
+            }
+            message << " simultaneously";
+            result.proved = true;
+            result.reason = message.str();
+            return result;
+        }
+    }
+
+    // R8: a corner and a non-incident side of the same square required on the
+    // same wall. The corner-to-line distance of a non-incident side is exactly
+    // 1, while both features being within the 1e-7 tolerance of the wall line
+    // bounds that distance by 2e-7. (Incident sides are R4, where the distance
+    // is zero and absorption applies instead.)
+    std::map<std::uint64_t, std::set<std::uint8_t>> wall_corners_r8;
+    std::map<std::uint64_t, std::set<std::uint8_t>> wall_sides_r8;
+    for (const auto& contact : sigma.contacts()) {
+        if (contact.kind != ContactKind::Wall || !contact.wall.has_value()) {
+            continue;
+        }
+        if (contact.a.kind == FeatureKind::Corner) {
+            wall_corners_r8[side_node(contact.a.square, *contact.wall)]
+                .insert(contact.a.index);
+        } else {
+            wall_sides_r8[side_node(contact.a.square, *contact.wall)]
+                .insert(contact.a.index);
+        }
+    }
+    for (const auto& [node, corners] : wall_corners_r8) {
+        const auto found = wall_sides_r8.find(node);
+        if (found == wall_sides_r8.end()) {
+            continue;
+        }
+        const SquareId square = static_cast<SquareId>(node / 4U);
+        const std::uint8_t wall = static_cast<std::uint8_t>(node % 4U);
+        for (const std::uint8_t corner : corners) {
+            for (const std::uint8_t side : found->second) {
+                const bool incident = corner == side
+                    || corner == static_cast<std::uint8_t>((side + 1U) % 4U);
+                if (incident) {
+                    continue;
+                }
+                std::ostringstream message;
+                message << "R8: corner " << static_cast<int>(corner)
+                        << " and non-incident side " << static_cast<int>(side)
+                        << " of square " << square
+                        << " are required on wall " << static_cast<int>(wall)
+                        << ", but their distance is 1";
+                result.proved = true;
+                result.reason = message.str();
+                return result;
+            }
+        }
+    }
+
+    // R9: two distinct sides of one square on the same wall. Adjacent sides are
+    // perpendicular, so their supporting lines cannot coincide; opposite sides
+    // are parallel at distance 1, so the wall line cannot be within tolerance
+    // of both. The contradiction is at distance 1 or 90 degrees, far above the
+    // 1e-7 extraction tolerance.
+    for (const auto& [node, sides] : wall_sides_r8) {
+        if (sides.size() < 2U) {
+            continue;
+        }
+        const SquareId square = static_cast<SquareId>(node / 4U);
+        const std::uint8_t wall = static_cast<std::uint8_t>(node % 4U);
+        std::ostringstream message;
+        message << "R9: sides";
+        for (const std::uint8_t side : sides) {
+            message << ' ' << static_cast<int>(side);
+        }
+        message << " of square " << square
+                << " are required on wall " << static_cast<int>(wall)
+                << ", but distinct sides cannot share one line";
+        result.proved = true;
+        result.reason = message.str();
+        return result;
+    }
+
+    // R10: orientation/parallelism cycle. Side-side contacts force two sides to
+    // be parallel; wall-side contacts force a side parallel to a wall; inside a
+    // square adjacent sides are perpendicular (opposite sides parallel). Assign
+    // each side and wall an axis in Z_2 (mod 180 degrees) and reject a
+    // contradiction. A conflict means two required directions differ by 90
+    // degrees while the extraction tolerances allow at most O(1e-7) radians,
+    // so this is tolerance-safe. The rule is invariant because D4 preserves
+    // parallelism and perpendicularity.
+    {
+        const std::uint32_t square_count = sigma.square_count();
+        const std::uint32_t wall_base = 4U * square_count;
+        const std::uint32_t node_count = wall_base + 4U;
+        std::vector<std::uint32_t> parent(node_count);
+        std::vector<std::uint8_t> parity(node_count, 0);
+        std::vector<std::uint8_t> rank(node_count, 0);
+        for (std::uint32_t node = 0; node < node_count; ++node) {
+            parent[node] = node;
+        }
+        const std::function<std::pair<std::uint32_t, std::uint8_t>(std::uint32_t)> find =
+            [&](std::uint32_t node) {
+                if (parent[node] == node) {
+                    return std::make_pair(node, std::uint8_t{0});
+                }
+                const auto root = find(parent[node]);
+                parity[node] ^= root.second;
+                parent[node] = root.first;
+                return std::make_pair(parent[node], parity[node]);
+            };
+        // rel=0: parallel (same axis), rel=1: perpendicular.
+        const auto unite = [&](std::uint32_t first, std::uint32_t second,
+                               std::uint8_t relation) {
+            auto root_first = find(first);
+            auto root_second = find(second);
+            if (root_first.first == root_second.first) {
+                return (root_first.second ^ root_second.second) == relation;
+            }
+            if (rank[root_first.first] < rank[root_second.first]) {
+                std::swap(root_first, root_second);
+            }
+            parent[root_second.first] = root_first.first;
+            parity[root_second.first] =
+                root_first.second ^ root_second.second ^ relation;
+            if (rank[root_first.first] == rank[root_second.first]) {
+                ++rank[root_first.first];
+            }
+            return true;
+        };
+        bool consistent = true;
+        // Wall axes: 0 and 2 horizontal, 1 and 3 vertical.
+        consistent = consistent && unite(wall_base + 0U, wall_base + 2U, 0);
+        consistent = consistent && unite(wall_base + 1U, wall_base + 3U, 0);
+        consistent = consistent && unite(wall_base + 0U, wall_base + 1U, 1);
+        for (SquareId square = 0; square < square_count && consistent; ++square) {
+            for (std::uint8_t side = 0; side < 3U; ++side) {
+                consistent = consistent && unite(
+                    side_node(square, side),
+                    side_node(square, static_cast<std::uint8_t>(side + 1U)),
+                    1
+                );
+            }
+        }
+        for (const auto& contact : sigma.contacts()) {
+            if (!consistent) {
+                break;
+            }
+            if (contact.kind == ContactKind::SideSide && contact.b.has_value()) {
+                consistent = consistent && unite(
+                    side_node(contact.a.square, contact.a.index),
+                    side_node(contact.b->square, contact.b->index),
+                    0
+                );
+            } else if (contact.kind == ContactKind::Wall && contact.wall.has_value()
+                       && contact.a.kind == FeatureKind::Side) {
+                consistent = consistent && unite(
+                    side_node(contact.a.square, contact.a.index),
+                    wall_base + *contact.wall,
+                    0
+                );
+            }
+        }
+        if (!consistent) {
+            result.proved = true;
+            result.reason =
+                "R10: orientation cycle forces two required directions to be "
+                "both parallel and perpendicular";
+            return result;
+        }
+    }
+
+    // R11-R13: coincidence and feature-metric contradictions. A corner-corner
+    // chain identifies corner points within O(k * contact) of each other, where
+    // k is the chain length (at most 4n). All conclusions below are separated
+    // from the tolerance by a fixed distance (1 or sqrt(2)) or by the strict
+    // CS interior margin (2e-6), so they are tolerance-safe for the square
+    // counts this solver supports.
+    //
+    // R11: two distinct corners of one square in one CC class would coincide,
+    // but their distance is 1 (adjacent) or sqrt(2) (opposite).
+    std::map<std::uint64_t, std::vector<std::pair<SquareId, std::uint8_t>>> cc_members;
+    for (const auto& contact : sigma.contacts()) {
+        if (contact.kind != ContactKind::CornerCorner || !contact.b.has_value()) {
+            continue;
+        }
+        cc_members[find_root(corner_node(contact.a.square, contact.a.index))]
+            .push_back({contact.a.square, contact.a.index});
+        cc_members[find_root(corner_node(contact.b->square, contact.b->index))]
+            .push_back({contact.b->square, contact.b->index});
+    }
+    for (auto& [root, members] : cc_members) {
+        (void)root;
+        std::sort(members.begin(), members.end());
+        members.erase(std::unique(members.begin(), members.end()), members.end());
+        std::map<SquareId, std::uint8_t> seen_corner;
+        for (const auto& [square, corner] : members) {
+            if (seen_corner.count(square) != 0U) {
+                std::ostringstream message;
+                message << "R11: corners " << static_cast<int>(seen_corner[square])
+                        << " and " << static_cast<int>(corner) << " of square "
+                        << square << " are forced to coincide by CC contacts";
+                result.proved = true;
+                result.reason = message.str();
+                return result;
+            }
+            seen_corner[square] = corner;
+        }
+    }
+
+    // R12: two corners of one square cannot both lie in the open interior of
+    // the same side (of any square). Their mutual distance is at least 1,
+    // while the open side has length at most 1 - 2 * interior = 1 - 2e-6.
+    std::map<std::uint64_t, std::vector<std::pair<SquareId, std::uint8_t>>> side_corners;
+    for (const auto& contact : sigma.contacts()) {
+        if (contact.kind != ContactKind::CornerSide || !contact.b.has_value()) {
+            continue;
+        }
+        const FeatureRef corner = contact.a.kind == FeatureKind::Corner
+            ? contact.a
+            : *contact.b;
+        const FeatureRef side = contact.a.kind == FeatureKind::Side
+            ? contact.a
+            : *contact.b;
+        side_corners[side_node(side.square, side.index)]
+            .push_back({corner.square, corner.index});
+    }
+    for (const auto& [node, corners] : side_corners) {
+        std::vector<std::pair<SquareId, std::uint8_t>> sorted = corners;
+        std::sort(sorted.begin(), sorted.end());
+        sorted.erase(std::unique(sorted.begin(), sorted.end()), sorted.end());
+        std::map<SquareId, std::uint8_t> seen_corner;
+        for (const auto& [square, corner] : sorted) {
+            if (seen_corner.count(square) != 0U) {
+                std::ostringstream message;
+                message << "R12: two corners of square " << square
+                        << " are required on the interior of one side feature";
+                result.proved = true;
+                result.reason = message.str();
+                return result;
+            }
+            seen_corner[square] = corner;
+        }
+    }
+
+    // R13: if a corner is CS-required on a side, every corner in its CC class
+    // lies at that point. A corner of the side's own square that is not an
+    // endpoint of the side is at distance 1 from the side line, so it cannot
+    // coincide with the CS point.
+    for (const auto& contact : sigma.contacts()) {
+        if (contact.kind != ContactKind::CornerSide || !contact.b.has_value()) {
+            continue;
+        }
+        const FeatureRef corner = contact.a.kind == FeatureKind::Corner
+            ? contact.a
+            : *contact.b;
+        const FeatureRef side = contact.a.kind == FeatureKind::Side
+            ? contact.a
+            : *contact.b;
+        const std::uint64_t root = find_root(corner_node(corner.square, corner.index));
+        const auto found = cc_members.find(root);
+        if (found == cc_members.end()) {
+            continue;
+        }
+        for (const auto& [square, member_corner] : found->second) {
+            if (square != side.square) {
+                continue;
+            }
+            if (member_corner == side.index
+                || member_corner == static_cast<std::uint8_t>((side.index + 1U) % 4U)) {
+                continue;
+            }
+            std::ostringstream message;
+            message << "R13: corner " << static_cast<int>(member_corner)
+                    << " of square " << square
+                    << " coincides (via CC) with a corner required on side "
+                    << static_cast<int>(side.index)
+                    << " of the same square, but its distance to that side is 1";
+            result.proved = true;
+            result.reason = message.str();
+            return result;
         }
     }
 
@@ -1642,6 +1957,49 @@ RepresentativeOutcome solve_representative(
     return outcome;
 }
 
+// H_n event permutations, cached per square count. H_n is the subgroup of
+// parity-consistent elements where the scene action stays in the standard
+// feature frame; solving one representative per H_n-orbit of gauge branches is
+// exact because standard-frame realizability is H_n-invariant.
+const std::vector<std::vector<EventId>>& h_n_event_permutations(std::uint32_t square_count) {
+    static std::mutex cache_mutex;
+    static std::map<std::uint32_t, std::vector<std::vector<EventId>>> cache;
+    std::lock_guard<std::mutex> lock(cache_mutex);
+    auto found = cache.find(square_count);
+    if (found != cache.end()) {
+        return found->second;
+    }
+    std::vector<std::vector<EventId>> permutations;
+    const std::uint64_t elements = group_element_count(square_count);
+    for (std::uint64_t index = 0; index < elements; ++index) {
+        const GroupElement element = decode_group_element(square_count, index);
+        bool consistent = true;
+        for (SquareId square = 0; square < square_count; ++square) {
+            if (element.local[square].reflected != element.container.reflected) {
+                consistent = false;
+                break;
+            }
+        }
+        if (consistent) {
+            permutations.push_back(event_permutation(element));
+        }
+    }
+    return cache.emplace(square_count, std::move(permutations)).first->second;
+}
+
+std::vector<std::uint64_t> canonical_branch_key(const Topology& topology) {
+    const EventBitset bitset = topology_to_event_bitset(topology);
+    const auto& permutations = h_n_event_permutations(topology.square_count());
+    std::vector<std::uint64_t> best;
+    for (const auto& permutation : permutations) {
+        EventBitset moved = permute_event_bitset(permutation, bitset);
+        if (best.empty() || moved < best) {
+            best = std::move(moved);
+        }
+    }
+    return best;
+}
+
 GroupElement frame_branch_element(std::uint32_t square_count, std::uint32_t mask) {
     GroupElement element = identity_group_element(square_count);
     for (SquareId square = 0; square < square_count; ++square) {
@@ -1698,8 +2056,10 @@ SolveResult realize_topology(const Topology& sigma, const SolveConfig& config) {
     // selected by b. Every labelling realizable by a physical scene with frame
     // vector b is tau_b applied to a standard-frame labelling, so these 2^n
     // representatives cover exactly the G_n orbit (proof in the Phase-2 doc).
+    // Branches in the same H_n orbit are the same standard-frame problem, so
+    // only one representative per orbit is solved.
     const std::uint32_t branch_count = 1U << normalized.square_count();
-    std::set<std::vector<std::string>> tried;
+    std::set<std::vector<std::uint64_t>> tried;
     bool weak_found = false;
     double weak_l = 0.0;
     Scene weak_scene;
@@ -1716,7 +2076,7 @@ SolveResult realize_topology(const Topology& sigma, const SolveConfig& config) {
         const Topology branch = mask == 0U
             ? normalized
             : apply_group_element_to_topology(normalized, tau);
-        if (!tried.insert(sorted_contact_keys(branch.contacts())).second) {
+        if (!tried.insert(canonical_branch_key(branch)).second) {
             continue;
         }
         ++result.branches_tried;
@@ -2010,15 +2370,72 @@ CorpusReport run_corpus(
     std::uint32_t weight,
     const SolveConfig& config
 ) {
+    if (config.workers == 0) {
+        throw std::invalid_argument("run_corpus requires at least one worker");
+    }
     CorpusReport report;
     report.square_count = square_count;
     report.weight = weight;
     report.config = config;
-    for (auto& corpus : corpus_classes(square_count, weight)) {
-        CorpusClassResult result;
-        result.corpus = std::move(corpus);
-        result.solve = realize_topology(result.corpus.topology, config);
-        report.classes.push_back(std::move(result));
+
+    std::vector<CorpusClass> classes = corpus_classes(square_count, weight);
+    report.classes.resize(classes.size());
+    for (std::size_t index = 0; index < classes.size(); ++index) {
+        report.classes[index].corpus = std::move(classes[index]);
+    }
+
+    const std::size_t worker_count = std::min<std::size_t>(
+        config.workers,
+        std::max<std::size_t>(report.classes.size(), 1U)
+    );
+    if (worker_count <= 1) {
+        for (std::size_t index = 0; index < report.classes.size(); ++index) {
+            report.classes[index].solve = realize_topology(
+                report.classes[index].corpus.topology, config);
+        }
+        return report;
+    }
+
+    // One atomic index queue and one result slot per class. Each worker writes
+    // only its own slot, so no result mutex is needed and class order in the
+    // report does not depend on completion order. The first exception stops
+    // the queue and is rethrown after every worker has joined.
+    std::atomic<std::size_t> next{0};
+    std::atomic<bool> stop{false};
+    std::mutex error_mutex;
+    std::exception_ptr first_error;
+    const auto worker = [&]() {
+        for (;;) {
+            const std::size_t index = next.fetch_add(1, std::memory_order_relaxed);
+            if (index >= report.classes.size() || stop.load(std::memory_order_relaxed)) {
+                return;
+            }
+            try {
+                report.classes[index].solve = realize_topology(
+                    report.classes[index].corpus.topology, config);
+            } catch (...) {
+                {
+                    std::lock_guard<std::mutex> lock(error_mutex);
+                    if (!first_error) {
+                        first_error = std::current_exception();
+                    }
+                }
+                stop.store(true, std::memory_order_relaxed);
+                return;
+            }
+        }
+    };
+
+    std::vector<std::thread> threads;
+    threads.reserve(worker_count);
+    for (std::size_t worker_index = 0; worker_index < worker_count; ++worker_index) {
+        threads.emplace_back(worker);
+    }
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    if (first_error) {
+        std::rethrow_exception(first_error);
     }
     return report;
 }
@@ -2108,7 +2525,8 @@ std::string corpus_report_to_json(const CorpusReport& report) {
         << ",\"minimize_container\":"
         << (report.config.minimize_container ? "true" : "false")
         << ",\"minimization_steps\":" << report.config.minimization_steps
-        << ",\"seed\":\"" << report.config.seed << "\"}"
+        << ",\"seed\":\"" << report.config.seed << "\""
+        << ",\"workers\":" << report.config.workers << "}"
         << ",\"status_counts\":{\"VERIFIED_FEASIBLE\":" << feasible
         << ",\"NOT_FOUND\":" << not_found
         << ",\"PROVED_INFEASIBLE\":" << infeasible << '}'

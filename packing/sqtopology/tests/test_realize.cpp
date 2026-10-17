@@ -24,6 +24,8 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <random>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -660,6 +662,250 @@ void test_branch_lifting() {
 }
 
 // ---------------------------------------------------------------------------
+// Deterministic corpus parallelism
+// ---------------------------------------------------------------------------
+
+void expect_same_semantics(const CorpusReport& first, const CorpusReport& second) {
+    expect(first.classes.size() == second.classes.size(), "worker class counts match");
+    for (std::size_t index = 0; index < first.classes.size(); ++index) {
+        const auto& a = first.classes[index];
+        const auto& b = second.classes[index];
+        expect(
+            keys_of(a.corpus.topology) == keys_of(b.corpus.topology),
+            "worker class representative order"
+        );
+        expect(a.solve.status == b.solve.status, "worker status");
+        expect(a.solve.exact_witness == b.solve.exact_witness, "worker exact flag");
+        expect(a.solve.weak_witness == b.solve.weak_witness, "worker weak flag");
+        expect(a.solve.filter_reason == b.solve.filter_reason, "worker filter reason");
+        expect(a.solve.frame_branch == b.solve.frame_branch, "worker branch");
+        expect(a.solve.branches_tried == b.solve.branches_tried, "worker branch count");
+        expect(a.solve.solves == b.solve.solves, "worker solve count");
+        expect(
+            std::abs(a.solve.container_side - b.solve.container_side) <= 1e-12,
+            "worker container side"
+        );
+        if (a.solve.exact_witness) {
+            expect(
+                scene_to_json(a.solve.witness) == scene_to_json(b.solve.witness),
+                "worker witness coordinates"
+            );
+        }
+    }
+}
+
+void test_worker_determinism() {
+    SolveConfig one;
+    one.workers = 1;
+    SolveConfig many = one;
+    many.workers = 4;
+    const CorpusReport serial = run_corpus(2, 1, one);
+    const CorpusReport parallel = run_corpus(2, 1, many);
+    expect(serial.classes.size() == 5, "worker test class count");
+    expect_same_semantics(serial, parallel);
+
+    // No duplicate or missing class representatives.
+    std::set<std::vector<std::string>> keys;
+    for (const auto& entry : parallel.classes) {
+        expect(keys.insert(keys_of(entry.corpus.topology)).second,
+               "parallel run has no duplicate classes");
+    }
+    expect(keys.size() == 5, "parallel run has every class");
+
+    // Worker count zero is rejected rather than silently redefined.
+    SolveConfig zero = one;
+    zero.workers = 0;
+    bool threw = false;
+    try {
+        (void)run_corpus(2, 1, zero);
+    } catch (const std::invalid_argument&) {
+        threw = true;
+    }
+    expect(threw, "zero workers is rejected");
+}
+
+// ---------------------------------------------------------------------------
+// R7-R13: orientation, coincidence and feature-metric filters
+// ---------------------------------------------------------------------------
+
+void expect_new_rule(const Topology& topology, const std::string& rule,
+                     const std::string& name) {
+    const InfeasibilityFilter filter = static_infeasibility_filters(topology);
+    expect(filter.proved, "new rule must fire: " + name);
+    expect(filter.reason.rfind(rule, 0) == 0, "expected " + rule + " for " + name);
+    const SolveResult result = realize_topology(topology);
+    expect(
+        result.status == RealizabilityStatus::ProvedInfeasible,
+        "new rule topology is proved infeasible: " + name
+    );
+    expect_filter_invariance(topology, name, true);
+}
+
+void test_new_geometric_filters() {
+    {
+        // R7: one corner required on two distinct walls.
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 1));
+        expect_new_rule(topology.normalized(), "R7", "R7-same-corner-two-walls");
+    }
+    {
+        // R8: corner + non-incident side of the same square on one wall.
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 1}, 0));
+        expect_new_rule(topology.normalized(), "R8", "R8-corner-nonincident-side");
+    }
+    {
+        // R9: two distinct sides of one square on the same wall.
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 1}, 0));
+        expect_new_rule(topology.normalized(), "R9", "R9-two-sides-one-wall");
+    }
+    {
+        // R10: square-square parallelism cycle.
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Side, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Side, 1},
+                                                  FeatureRef{1, FeatureKind::Side, 2}));
+        expect_new_rule(topology.normalized(), "R10", "R10-parallelism-cycle");
+    }
+    {
+        // R11: a CC chain forces two corners of one square to coincide.
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Corner, 0}));
+        topology.add_contact(make_square_contact(FeatureRef{1, FeatureKind::Corner, 0},
+                                                  FeatureRef{0, FeatureKind::Corner, 1}));
+        expect_new_rule(topology.normalized(), "R11", "R11-same-square-coincidence");
+    }
+    {
+        // R12: two corners of one square on the same side feature.
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 1},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        expect_new_rule(topology.normalized(), "R12", "R12-two-corners-one-side");
+    }
+    {
+        // R13: a CC class puts a non-endpoint corner of the side's square on
+        // that side, at metric distance 1.
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Corner, 2}));
+        expect_new_rule(topology.normalized(), "R13", "R13-cc-on-side");
+    }
+
+    // Positive controls: close to the rules but realizable.
+    const auto expect_feasible = [](const Topology& topology, const std::string& name) {
+        expect(!static_infeasibility_filters(topology).proved,
+               "positive control must pass every filter: " + name);
+        const SolveResult result = realize_topology(topology);
+        expect(result.status == RealizabilityStatus::VerifiedFeasible,
+               "positive control must be realizable: " + name);
+        expect(verify_witness(result.witness, topology).exact_accepted,
+               "positive control witness re-verifies: " + name);
+    };
+    {
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 1}, 1));
+        expect_feasible(topology.normalized(), "R7-positive-different-corners");
+    }
+    {
+        // R8 is a same-square rule; the same wall pattern across two squares
+        // is realizable.
+        Topology topology(2);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Corner, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{1, FeatureKind::Side, 1}, 0));
+        expect_feasible(topology.normalized(), "R8-positive-other-square");
+    }
+    {
+        Topology topology(1);
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 0}, 0));
+        topology.add_contact(make_wall_contact(FeatureRef{0, FeatureKind::Side, 1}, 1));
+        expect_feasible(topology.normalized(), "R9-positive-different-walls");
+    }
+    {
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Side, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        expect_feasible(topology.normalized(), "R10-positive-single-ss");
+    }
+    {
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Corner, 0}));
+        expect_feasible(topology.normalized(), "R11-positive-single-cc");
+    }
+    {
+        Topology topology(2);
+        topology.add_contact(make_square_contact(FeatureRef{0, FeatureKind::Corner, 0},
+                                                  FeatureRef{1, FeatureKind::Side, 0}));
+        expect_feasible(topology.normalized(), "R12-positive-single-cs");
+    }
+}
+
+void test_filters_never_reject_verified_scenes() {
+    // Generate contained, contact-rich lattice scenes, extract their exact
+    // contact sets and require that no filter rejects a set that a scene just
+    // produced. This is an independent soundness check of every proof rule.
+    std::mt19937_64 rng(987654321ULL);
+    std::uint64_t checked = 0;
+    for (int trial = 0; trial < 3000; ++trial) {
+        const int rows = 1 + static_cast<int>(rng() % 4);
+        const int cols = 1 + static_cast<int>(rng() % 4);
+        const double side = static_cast<double>(std::max(rows, cols))
+            + (rng() % 2 == 0 ? 0.0 : 0.5);
+        const double shift = (rng() % 3 == 0) ? 0.5 : 0.0;
+        Scene scene;
+        scene.container_side = side;
+        for (int row = 0; row < rows; ++row) {
+            for (int column = 0; column < cols; ++column) {
+                if (rng() % 5 == 0) {
+                    continue;
+                }
+                const bool interior = row > 0 && column > 0
+                    && row + 1 < rows && column + 1 < cols;
+                double theta = 0.5 * 3.14159265358979323846
+                    * static_cast<double>(rng() % 4);
+                if (interior && rng() % 4 == 0) {
+                    theta = 0.25 * 3.14159265358979323846
+                        * static_cast<double>(1 + 2 * (rng() % 4));
+                }
+                scene.squares.push_back(SquarePose{
+                    static_cast<double>(column) + 0.5 + shift,
+                    side - static_cast<double>(row) - 0.5 + shift,
+                    theta,
+                    rng() % 2 == 0,
+                });
+            }
+        }
+        if (scene.squares.empty()) {
+            continue;
+        }
+        const ExtractionResult extraction = extract_contacts(scene);
+        if (extraction.exact.empty()) {
+            continue;
+        }
+        const Topology topology =
+            topology_of(extraction.exact, static_cast<std::uint32_t>(scene.squares.size()));
+        const InfeasibilityFilter filter = static_infeasibility_filters(topology);
+        expect(
+            !filter.proved,
+            "a filter rejected a contact set extracted from a scene: " + filter.reason
+        );
+        ++checked;
+    }
+    expect(checked > 500, "random-scene filter check covered enough scenes");
+}
+
+// ---------------------------------------------------------------------------
 // Corpus enumeration and a light corpus solve
 // ---------------------------------------------------------------------------
 
@@ -820,6 +1066,9 @@ int main() {
         {"frame parity is gauge", test_frame_parity_is_gauge},
         {"scene action on wall contacts", test_scene_action_on_wall_contacts},
         {"scene action transfers witnesses", test_scene_action_transfers_witnesses},
+        {"worker determinism", test_worker_determinism},
+        {"new geometric filters", test_new_geometric_filters},
+        {"filters never reject verified scenes", test_filters_never_reject_verified_scenes},
         {"corpus enumeration counts", test_corpus_enumeration_counts},
         {"filter group invariance", test_filter_group_invariance},
         {"absorption filters", test_absorption_filters},

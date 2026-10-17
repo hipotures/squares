@@ -138,10 +138,11 @@ target_compile_options(sqtopology_geometry_tests PRIVATE -Wall -Wextra -Wpedanti
 add_test(NAME sqtopology_geometry_tests COMMAND sqtopology_geometry_tests)
 
 # Phase-2 realizability: verifier fixtures, negative fixtures, solver fixture
-# topologies, full-G_n psi_g covariance n = 1..3, filter invariance, branch
-# lifting, and the n = 2/3 low-weight corpus enumeration. The corpus solve
-# coverage is limited to n = 2 weight 1 and n = 3 weight 1 here; the full
-# weight-2 run is the dedicated target below.
+# topologies, full-G_n psi_g covariance n = 1..3, filter invariance (R1-R13),
+# branch lifting, worker determinism, random-scene filter soundness, and the
+# n = 2/3 low-weight corpus enumeration. The corpus solve coverage is limited
+# to n = 2 weight 1 and n = 3 weight 1 here; bounded parallel corpus targets
+# are defined below.
 add_executable(sqtopology_realize_tests tests/test_realize.cpp)
 target_link_libraries(sqtopology_realize_tests PRIVATE sqtopology_core)
 target_compile_options(sqtopology_realize_tests PRIVATE -Wall -Wextra -Wpedantic)
@@ -154,15 +155,22 @@ add_test(NAME sqtopology_realize_tests COMMAND sqtopology_realize_tests)
 add_test(NAME sqtopology_realize_fixtures COMMAND sqtopology_realize fixtures)
 add_test(NAME sqtopology_realize_negative COMMAND sqtopology_realize negative)
 
-# Full n = 2 weight-2 corpus (87 classes, ~33k solves across up to 2^2 gauge
-# branches, ~30 s in Release). It writes the machine-readable report next to the
-# build tree. Kept separate from the ordinary suite because of its runtime.
+# Bounded parallel corpus targets. They exercise the worker pool and the
+# filter set end to end at four workers; the 16-worker research runs are
+# documented in docs/geometric-realizability-phase2b-2026-10-17.md.
 add_test(
     NAME sqtopology_realize_corpus_w2
-    COMMAND sqtopology_realize corpus --n 2 --weight 2
+    COMMAND sqtopology_realize corpus --n 2 --weight 2 --workers 4
         --json ${CMAKE_CURRENT_BINARY_DIR}/realizability-n2-w2.json
 )
-set_tests_properties(sqtopology_realize_corpus_w2 PROPERTIES TIMEOUT 1200)
+set_tests_properties(sqtopology_realize_corpus_w2 PROPERTIES TIMEOUT 600)
+
+add_test(
+    NAME sqtopology_realize_corpus_n3_w2
+    COMMAND sqtopology_realize corpus --n 3 --weight 2 --workers 4
+        --json ${CMAKE_CURRENT_BINARY_DIR}/realizability-n3-w2.json
+)
+set_tests_properties(sqtopology_realize_corpus_n3_w2 PROPERTIES TIMEOUT 600)
 
 # Separate target for the n = 12 low-weight closure: |G_12| ~ 2.6e20 exceeds
 # 64 bits and one live class-aggregated run costs ~14 s, so it is kept out of

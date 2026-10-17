@@ -8,7 +8,7 @@
 // Usage:
 //   sqtopology_realize fixtures [--json FILE]
 //   sqtopology_realize negative [--json FILE] [--max-solves N]
-//   sqtopology_realize corpus --n 2 --weight W [--json FILE]
+//   sqtopology_realize corpus --n N --weight W [--json FILE]
 //       [--max-solves N] [--starts M] [--iterations I] [--steps S]
 //       [--no-minimize] [--ladder a,b,c] [--seed S]
 
@@ -276,6 +276,8 @@ int corpus_command(int argc, char** argv) {
             config.ladder = parse_ladder(value);
         } else if (arg == "--seed") {
             config.seed = std::stoull(std::string(value));
+        } else if (arg == "--workers") {
+            config.workers = parse_positive(value, "--workers", 1024);
         } else {
             throw std::invalid_argument("unknown corpus option: " + std::string(arg));
         }
@@ -329,9 +331,9 @@ void usage() {
         << "Usage:\n"
         << "  sqtopology_realize fixtures [--json FILE]\n"
         << "  sqtopology_realize negative [--json FILE] [--max-solves N]\n"
-        << "  sqtopology_realize corpus --n 2 --weight W [--json FILE]\n"
+        << "  sqtopology_realize corpus --n N --weight W [--json FILE]\n"
         << "      [--max-solves N] [--starts M] [--iterations I] [--steps S]\n"
-        << "      [--no-minimize] [--ladder a,b,c] [--seed S]\n";
+        << "      [--no-minimize] [--ladder a,b,c] [--seed S] [--workers N]\n";
 }
 
 }  // namespace
