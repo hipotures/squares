@@ -717,12 +717,27 @@ std::string build_binary_key_bytes(
         bytes.push_back(static_cast<char>(color));
     }
 
-    for (const auto& [a, b] : *edges) {
-        if (a >= b || b >= n) {
-            throw std::logic_error("SQK4 canonical edge list is not normalized");
+    if (endpoint_width == 1U) {
+        // The common incidence graph fits in a byte. Allocate the final range
+        // once and write endpoints directly, preserving SQK4 byte for byte.
+        const auto offset = bytes.size();
+        bytes.resize(offset + edge_bytes);
+        auto* output = bytes.data() + offset;
+        for (const auto& [a, b] : *edges) {
+            if (a >= b || b >= n) {
+                throw std::logic_error("SQK4 canonical edge list is not normalized");
+            }
+            *output++ = static_cast<char>(a);
+            *output++ = static_cast<char>(b);
         }
-        append_index_be(bytes, a, endpoint_width);
-        append_index_be(bytes, b, endpoint_width);
+    } else {
+        for (const auto& [a, b] : *edges) {
+            if (a >= b || b >= n) {
+                throw std::logic_error("SQK4 canonical edge list is not normalized");
+            }
+            append_index_be(bytes, a, endpoint_width);
+            append_index_be(bytes, b, endpoint_width);
+        }
     }
 
     return bytes;

@@ -170,3 +170,22 @@ finish time. Do not infer a linking-policy improvement from that difference.
 Raw measurements: `/tmp/sqtopology-traces-stock.json`,
 `/tmp/sqtopology-traces-reuse.json`, `/tmp/sqtopology-static-stock.json`,
 `/tmp/sqtopology-static-reuse.json`, `/tmp/sqtopology-cache-integrated.json`.
+
+## Keep: direct writes for byte-width SQK4 endpoints
+
+The common endpoint-width-one branch allocates the final string range once and
+writes bytes directly. Wider endpoints keep the existing path. Tests decode
+keys at 255, 256, and 257 vertices and verify complete graph equivalence and
+idempotence on all backends. The 12,000-graph byte differential passes.
+
+| Workers | Candidates/s | Relative to integrated scratch cache | Key build µs |
+| --- | --- | --- | --- |
+| 1 | 94265.8 | 1.102x | 0.34 |
+| 2 | 187143.5 | 1.050x | 0.35 |
+| 4 | 363805.6 | 1.039x | 0.35 |
+| 8 | 710020.7 | 1.052x | 0.36 |
+| 16 | 1266792.4 | 1.048x | 0.38 |
+
+Key construction fell from ~0.84 to ~0.34 µs at one worker. Its engine timer
+returned to 5.57 µs, consistent with the earlier source-cache controls.
+Raw measurement: `/tmp/sqtopology-byte-writer.json`.

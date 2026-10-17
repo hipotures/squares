@@ -462,6 +462,46 @@ void test_compact_binary_key_layout() {
     );
 }
 
+void test_key_endpoint_width_boundary() {
+    using namespace sqtopology;
+    for (const std::size_t n : {255U, 256U, 257U}) {
+        ColoredGraph graph;
+        graph.colors.assign(n, 1);
+        graph.colors[0] = 2;
+        graph.colors[n / 3] = 3;
+        for (std::uint32_t i = 1; i < n; ++i) graph.edges.emplace_back(i - 1, i);
+        const auto text = canonicalize_colored_graph(graph).encoding;
+        for (const auto backend : {CanonicalBackend::DenseNauty,
+                                   CanonicalBackend::SparseNauty, CanonicalBackend::Traces}) {
+            const auto key = canonical_key_colored_graph(graph, backend);
+            const auto width = static_cast<unsigned char>(key.bytes[9]);
+            expect(width == (n <= 256 ? 1 : 2), "SQK4 endpoint width must handle vertex 255 exactly");
+            expect(key.bytes.size() == 14 + n + graph.edges.size() * 2 * width,
+                   "SQK4 boundary payload must have the expected length");
+            ColoredGraph decoded;
+            for (std::size_t i = 0; i < n; ++i)
+                decoded.colors.push_back(static_cast<unsigned char>(key.bytes[14 + i]));
+            std::size_t cursor = 14 + n;
+            const auto read_index = [&]() {
+                std::uint32_t value = 0;
+                for (unsigned byte = 0; byte < width; ++byte)
+                    value = (value << 8) | static_cast<unsigned char>(key.bytes[cursor++]);
+                return value;
+            };
+            while (cursor < key.bytes.size()) {
+                const auto a = read_index();
+                const auto b = read_index();
+                expect(a < b && b < n, "decoded canonical edges must be normalized and in range");
+                decoded.edges.emplace_back(a, b);
+            }
+            expect(canonicalize_colored_graph(decoded).encoding == text,
+                   "SQK4 must encode the complete graph across the byte-width boundary");
+            expect(canonical_key_colored_graph(decoded, backend) == key,
+                   "canonical binary keys must be idempotent across endpoint widths");
+        }
+    }
+}
+
 void test_canonical_microprofile_preserves_semantics() {
     using namespace sqtopology;
 
@@ -667,6 +707,7 @@ int main() {
         test_backend_names();
         test_binary_key_matches_textual_equivalence();
         test_compact_binary_key_layout();
+        test_key_endpoint_width_boundary();
         test_canonical_microprofile_preserves_semantics();
         test_search_canonical_microprofile();
         test_search_backends_agree();
