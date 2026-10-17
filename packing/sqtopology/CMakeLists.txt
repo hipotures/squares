@@ -73,6 +73,7 @@ add_library(
     src/rewrite.cpp
     src/search.cpp
     src/topology.cpp
+    src/wreath.cpp
 )
 target_include_directories(sqtopology_core PUBLIC include)
 target_link_libraries(sqtopology_core PUBLIC ${SQTOPOLOGY_NAUTY_TARGET})
@@ -134,6 +135,20 @@ if(Python3_Interpreter_FOUND)
             --check-tool $<TARGET_FILE:sqtopology_orbit>
             --max-n 3
             --deep-brute
+    )
+    # Independent stdlib-only re-implementation of the wreath-product class
+    # aggregation (class sizes by element enumeration, coefficients by
+    # per-type Pólya sums, induced-type table, staged sub-groups). All n <= 3
+    # elements are checked for induced-type constancy and the wreath-type
+    # partition is compared against generator-BFS conjugation orbits.
+    add_test(
+        NAME sqtopology_wreath_reference
+        COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tools/wreath_reference.py
+            --check-tool $<TARGET_FILE:sqtopology_orbit>
+            --max-n 3
+            --deep-constancy
+            --bfs
     )
 endif()
 

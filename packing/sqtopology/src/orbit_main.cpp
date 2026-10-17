@@ -13,6 +13,7 @@
 #include "sqtopology/fixtures.hpp"
 #include "sqtopology/orbit.hpp"
 #include "sqtopology/topology.hpp"
+#include "sqtopology/wreath.hpp"
 
 #include <cstdint>
 #include <exception>
@@ -30,14 +31,16 @@ using sqtopology::D4Element;
 using sqtopology::GroupElement;
 using sqtopology::OrbitDistanceResult;
 
-std::uint32_t parse_square_count(std::string_view text) {
+std::uint32_t parse_square_count(std::string_view text, std::uint32_t maximum) {
     if (text.empty() || text.front() == '-') {
         throw std::invalid_argument("--n expects a positive integer");
     }
     std::size_t consumed = 0;
     const auto value = std::stoul(std::string(text), &consumed);
-    if (consumed != text.size() || value == 0 || value > sqtopology::kMaxOrbitSquares) {
-        throw std::invalid_argument("--n expects 1 <= n <= 8");
+    if (consumed != text.size() || value == 0 || value > maximum) {
+        throw std::invalid_argument(
+            "--n expects 1 <= n <= " + std::to_string(maximum)
+        );
     }
     return static_cast<std::uint32_t>(value);
 }
@@ -129,7 +132,7 @@ int count_command(int argc, char** argv) {
         }
         const std::string_view value = argv[++i];
         if (arg == "--n") {
-            square_count = parse_square_count(value);
+            square_count = parse_square_count(value, 8);
         } else if (arg == "--json") {
             json_path = std::string(value);
         } else {
@@ -359,7 +362,145 @@ void usage() {
         << "Usage:\n"
         << "  sqtopology_orbit count --n N [--contributions] [--no-conjugacy] [--json FILE]\n"
         << "  sqtopology_orbit distance --first FIXTURE --second FIXTURE [--json FILE]\n"
-        << "  sqtopology_orbit matrix --fixtures A,B,C [--json FILE]\n";
+        << "  sqtopology_orbit matrix --fixtures A,B,C [--json FILE]\n"
+        << "  sqtopology_orbit wreath --n N [--low-weight D] [--cycle-types] [--json FILE]\n"
+        << "  sqtopology_orbit wreath-cross --n N [--json FILE]\n"
+        << "  sqtopology_orbit staged --n N --weight D [--json FILE]\n";
+}
+
+int wreath_command(int argc, char** argv) {
+    std::uint32_t square_count = 0;
+    std::uint32_t low_weight = 0;
+    bool low_weight_set = false;
+    bool cycle_types = false;
+    std::string json_path;
+    for (int i = 2; i < argc; ++i) {
+        const std::string_view arg = argv[i];
+        if (arg == "--cycle-types") {
+            cycle_types = true;
+            continue;
+        }
+        if (i + 1 >= argc) {
+            throw std::invalid_argument(std::string(arg) + " requires a value");
+        }
+        const std::string_view value = argv[++i];
+        if (arg == "--n") {
+            square_count = parse_square_count(value, sqtopology::kMaxWreathSquares);
+        } else if (arg == "--low-weight") {
+            low_weight = parse_square_count(value, 4096);
+            low_weight_set = true;
+        } else if (arg == "--json") {
+            json_path = std::string(value);
+        } else {
+            throw std::invalid_argument("unknown wreath option: " + std::string(arg));
+        }
+    }
+    if (square_count == 0) {
+        throw std::invalid_argument("wreath requires --n");
+    }
+    sqtopology::WreathCountOptions options;
+    options.low_weight_only = low_weight_set;
+    options.low_weight_max = low_weight;
+    options.emit_cycle_type_table = cycle_types;
+    const auto result = sqtopology::wreath_burnside_count(square_count, options);
+    const std::string json = sqtopology::wreath_count_to_json(result);
+    if (!json_path.empty()) {
+        sqtopology::write_text_file(json_path, json);
+    }
+    std::cout << json;
+    return 0;
+}
+
+int wreath_cross_command(int argc, char** argv) {
+    std::uint32_t square_count = 0;
+    std::string json_path;
+    for (int i = 2; i < argc; ++i) {
+        const std::string_view arg = argv[i];
+        if (i + 1 >= argc) {
+            throw std::invalid_argument(std::string(arg) + " requires a value");
+        }
+        const std::string_view value = argv[++i];
+        if (arg == "--n") {
+            square_count = parse_square_count(value, 4);
+        } else if (arg == "--json") {
+            json_path = std::string(value);
+        } else {
+            throw std::invalid_argument("unknown wreath-cross option: " + std::string(arg));
+        }
+    }
+    if (square_count == 0) {
+        throw std::invalid_argument("wreath-cross requires --n");
+    }
+    const auto result = sqtopology::cross_check_wreath_against_elements(square_count);
+    std::ostringstream out;
+    out << "{\"schema\":\"sqtopology.wreath-cross-check.v1\""
+        << ",\"n\":" << result.square_count
+        << ",\"elements\":" << result.elements
+        << ",\"classes\":" << result.classes
+        << ",\"classes_seen\":" << result.classes_seen
+        << ",\"checks\":{\"element_counts_match\":"
+        << (result.counts_match ? "true" : "false")
+        << ",\"induced_types_match\":" << (result.induced_types_match ? "true" : "false")
+        << "}}\n";
+    if (!json_path.empty()) {
+        sqtopology::write_text_file(json_path, out.str());
+    }
+    std::cout << out.str();
+    return 0;
+}
+
+int staged_command(int argc, char** argv) {
+    std::uint32_t square_count = 0;
+    std::uint32_t weight_max = 0;
+    std::string json_path;
+    for (int i = 2; i < argc; ++i) {
+        const std::string_view arg = argv[i];
+        if (i + 1 >= argc) {
+            throw std::invalid_argument(std::string(arg) + " requires a value");
+        }
+        const std::string_view value = argv[++i];
+        if (arg == "--n") {
+            square_count = parse_square_count(value, 6);
+        } else if (arg == "--weight") {
+            weight_max = parse_square_count(value, 16);
+        } else if (arg == "--json") {
+            json_path = std::string(value);
+        } else {
+            throw std::invalid_argument("unknown staged option: " + std::string(arg));
+        }
+    }
+    if (square_count == 0 || weight_max == 0) {
+        throw std::invalid_argument("staged requires --n and --weight");
+    }
+    const auto row = sqtopology::staged_quotient_counts(square_count, weight_max);
+    const auto emit = [&](std::ostringstream& out, const std::vector<std::string>& values) {
+        out << '[';
+        for (std::size_t index = 0; index < values.size(); ++index) {
+            if (index != 0) {
+                out << ',';
+            }
+            out << '"' << values[index] << '"';
+        }
+        out << ']';
+    };
+    std::ostringstream out;
+    out << "{\"schema\":\"sqtopology.staged-quotients.v1\""
+        << ",\"n\":" << row.square_count
+        << ",\"weight_max\":" << row.weight_max
+        << ",\"coefficients\":{\"local_only\":";
+    emit(out, row.local_only);
+    out << ",\"squares_only\":";
+    emit(out, row.squares_only);
+    out << ",\"local_and_squares\":";
+    emit(out, row.local_and_squares);
+    out << ",\"full\":";
+    emit(out, row.full);
+    out << "}}\n";
+    if (!json_path.empty()) {
+        sqtopology::write_text_file(json_path, out.str());
+    }
+    std::cout << out.str();
+    return 0;
 }
 
 }  // namespace
@@ -379,6 +520,15 @@ int main(int argc, char** argv) {
         }
         if (command == "matrix") {
             return matrix_command(argc, argv);
+        }
+        if (command == "wreath") {
+            return wreath_command(argc, argv);
+        }
+        if (command == "wreath-cross") {
+            return wreath_cross_command(argc, argv);
+        }
+        if (command == "staged") {
+            return staged_command(argc, argv);
         }
         usage();
         throw std::invalid_argument("unknown command: " + std::string(command));
