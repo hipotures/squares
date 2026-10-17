@@ -3,30 +3,126 @@
 Branch `work/topology-phase1-native`, parent note
 `docs/geometric-realizability-phase2c-2026-10-17.md`. This note (1) proves the
 general support decomposition theorem behind the Phase-2c cross-tabs,
-(2) corrects the `H_n` cache complexity statement, and (3) resolves the
-736-class wall-free V+duplicate question with an exact pair theorem, a
-tolerance-boundary counterexample family, and four newly verified feasible
-classes.
+(2) corrects the `H_n` cache complexity statement, and (3) studies the
+736-class wall-free V+duplicate question. The original revision incorrectly
+described four tolerance-accepted, slightly overlapping scenes as geometrically
+feasible. The erratum below supersedes that interpretation.
+
+## Erratum (2026-10-18): strict packing geometry versus numerical tolerance
+
+This section is authoritative and supersedes the affected claims in Sections 1,
+4, 6-8, 10-11 of the original Phase-2d revision.
+
+The campaign conflated two different notions:
+
+1. **Strict geometric realizability** `R_strict(Sigma)`: every square is
+   contained in the container and the interiors of distinct squares are
+   disjoint. For the SAT separation value used by the verifier this requires
+
+   ```
+   slack >= 0.
+   ```
+
+2. **Tolerance acceptance** `R_tau(Sigma)`: the current numerical verifier
+   accepts a pair whenever
+
+   ```
+   slack >= -overlap_tolerance,
+   overlap_tolerance = 1e-6.
+   ```
+
+   In the implementation this is
+   `SatResult::interior_disjoint = (slack >= -overlap_tolerance)`.
+
+The second relation is useful for floating-point robustness, but it is a
+*tolerance-expanded numerical acceptance relation*. It is not the mathematical
+non-overlap condition of square packing when the reported slack is negative.
+
+Consequently, the four crossed CS+CS V+duplicate scenes (classes 2585-2588)
+with SAT slack about `-2e-8` are **not strict geometric realizations**. Their
+interiors overlap by a small but positive amount. They must be described as
+`TOLERANCE_ACCEPTED` (or historical software status
+`VERIFIED_FEASIBLE` under the current verifier), not as counterexamples to
+strict packing geometry. They refute only the statement that the numerical
+tolerance verifier enforces strict non-overlap.
+
+This also means that historical corpus rows labelled `VERIFIED_FEASIBLE`
+should not automatically be read as strict packing certificates. A witness
+with non-negative SAT slack for every square pair is compatible with strict
+non-overlap; a witness with negative slack is not. A systematic strict-SAT
+audit of all previously accepted witnesses has not yet been recorded here, so
+this erratum does **not** silently relabel all earlier feasible counts.
+
+### Stronger strict pair theorem
+
+The original six-case theorem ("never exactly two pair contacts") is true for
+strict non-overlap, but it is weaker and more complicated than necessary.
+
+**Theorem.** Let `A` and `B` be two nondegenerate convex squares with
+disjoint interiors. Under the normalized exact contact semantics
+(CC/CS/positive-overlap SS with point events absorbed by an overlapping SS),
+the number of contacts extracted between that square pair is at most one.
+
+*Proof.* `A ∩ B` is convex because both squares are convex. Since their
+interiors are disjoint, `A ∩ B` has empty planar interior, hence it is either
+empty, one point, or one line segment.
+
+- Empty intersection gives no contact.
+- A one-point intersection gives one normalized point contact: CC if the point
+  is a corner of both squares, otherwise CS when one corner lies in the
+  relative interior of the other square's side. A transverse side-interior
+  crossing would create interior overlap and therefore cannot occur.
+- A nondegenerate segment contained in the boundary of a polygon lies in a
+  side of that polygon. Thus a segment intersection is a positive-overlap
+  side-side contact. Any endpoint CC/CS incidences on that same overlap are
+  removed by the normalization/absorption rule, leaving one SS event.
+
+Therefore every strictly non-overlapping square pair contributes 0 or 1
+normalized pair contact. QED.
+
+A direct corollary is stronger than the original V+duplicate statement:
+
+```
+for every square pair {i,j} in a strict packing:
+    normalized_pair_contact_count(i,j) <= 1.
+```
+
+Hence **every V+duplicate class is strictly geometrically unrealizable**,
+because its duplicated pair requires two normalized contacts. The four
+crossed-pair scenes do not refute this theorem: their negative SAT slack means
+they lie outside `R_strict`.
+
+### Corrected support-theorem wording
+
+The original Section 2 also contained a separate wording error. At support
+`2d`, full support forces all `d` events to be **square-square events on
+pairwise disjoint square pairs**. It does *not* force them all to be side-side
+events. The three single-event orbit types are the three unordered feature-kind
+(or ring-parity) types CC, CS, and SS. The resulting count
+
+```
+f_d(2d) = C(d+2,2)
+```
+
+is unchanged.
 
 ## 1. Scope and headline results
 
 - **Support decomposition theorem** (Section 2): the number `f_d(k)` of
-  canonical weight-`d` classes with support exactly `k` is `a_d(k) - a_d(k-1)`,
-  independent of `n` for `n >= k`. The Phase-2c tables
-  (`22/65/32`, `116/1295/1568`) are instances of one bijection, and the
-  wreath note's stabilization theorem is an immediate corollary.
+  canonical weight-`d` classes with support exactly `k` is
+  `a_d(k) - a_d(k-1)`, independent of `n` for `n >= k`. The Phase-2c
+  tables (`22/65/32`, `116/1295/1568`) are instances of one bijection, and
+  the wreath note's stabilization theorem is an immediate corollary.
 - **Corrected `H_n` cache asymptotics** (Section 3): memory
   `O(n! * 4^n * E(n))`, construction `O(n! * 8^n * E(n))`.
-- **V+duplicate** (Sections 4-7): *at exact level (`tau = 0`) two unit squares
-  can never have exactly two contact events between them* (case theorem over
-  all six kind-pairs). Therefore every wall-free V+dup class is exactly
-  impossible. At the production tolerance level the theorem is false by
-  exactly one mechanism - the crossed antiparallel CS+CS pair, which lives on
-  the absorption boundary with interior overlap at most the SAT tolerance -
-  and four V+dup classes (2585-2588) are **verified feasible** with explicit
-  witnesses. The corpus `NOT_FOUND` for those four is a demonstrated solver
-  false negative; whole-family impossibility is refuted, and the remaining
-  582 classes stay unresolved.
+- **Strict pair geometry** (Sections 4-6, corrected by the erratum): convexity
+  implies that two squares with disjoint interiors have at most one normalized
+  contact event between them. Therefore every V+duplicate class is strictly
+  unrealizable.
+- **Numerical tolerance artifact:** the current SAT verifier accepts
+  `slack >= -1e-6`. Four crossed CS+CS scenes have slack about `-2e-8` and
+  were historically reported as `VERIFIED_FEASIBLE`; they are
+  `TOLERANCE_ACCEPTED`, not strict packing realizations.
 
 ## 2. The support decomposition theorem
 
@@ -82,8 +178,8 @@ Proposition of the wreath note, section 5.3, now as an immediate consequence
 of a stronger statement. The increment identity
 `f_d(2d) = a_d(2d) - a_d(2d-1) = C(d+2, 2)` is the wreath note's proved
 classification of full-support classes at `n = 2d` (all `d` events are
-side-side events on disjoint pairs, classified by the multiset of three
-ring-parity types).
+square-square events on pairwise disjoint square pairs, classified by the
+multiset of the three unordered feature-kind/ring-parity types CC, CS, and SS).
 
 **Data.** The theorem reproduces every Phase-2c cross-tab exactly:
 
@@ -121,228 +217,246 @@ Two documented, unimplemented fixes (no current run needs `n > 3`): enumerate
 `H_n` directly as `S_n x C4^n x D4_container`, and stream permutations (the
 canonical branch key needs only a running minimum, not storage).
 
-## 4. The V+duplicate family: definition and census status
+## 4. The V+duplicate family: corrected strict/tolerance status
 
 A **V+duplicate** class is an `n = 3`, weight-3, support-3, wall-free class
 whose three square-square contacts occupy exactly two unordered square pairs
 sharing one square (the hub), with one pair carrying two contacts (the
-duplicated pair). Census (from the Phase-2c corpus, 736 classes):
+duplicated pair). There are exactly 736 such canonical classes.
 
-| duplicated pair | classes | feasible | proved | not found |
-| --- | --- | --- | --- | --- |
-| CC+CC | 68 | 0 | 36 | 32 |
-| CC+CS | 168 | 0 | 26 | 142 |
-| CC+SS | 64 | 0 | 0 | 64 |
-| CS+CS | 200 | 0 -> **4** | 52 | 148 -> **144** |
-| CS+SS | 168 | 0 | 0 | 168 |
-| SS+SS | 68 | 0 | 36 | 32 |
-| total | 736 | **4** | 150 | **582** |
+The original Phase-2d table mixed strict geometry with tolerance acceptance.
+The corrected interpretation is:
 
-The feasible column reflects this note: classes 2585-2588 verified feasible
-with explicit witnesses (Section 6); they were `NOT_FOUND` in the corpus.
+| duplicated pair | classes | strict realizable | tolerance-only witnesses found | production-filter proved | production NOT_FOUND after template |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CC+CC | 68 | 0 | 0 | 36 | 32 |
+| CC+CS | 168 | 0 | 0 | 26 | 142 |
+| CC+SS | 64 | 0 | 0 | 0 | 64 |
+| CS+CS | 200 | 0 | 4 | 52 | 144 |
+| CS+SS | 168 | 0 | 0 | 0 | 168 |
+| SS+SS | 68 | 0 | 0 | 36 | 32 |
+| **total** | **736** | **0** | **4** | **150** | **582** |
 
-## 5. The exact pair theorem
+The strict-realizable column is a theorem (Section 5), not a solver result.
+The last two columns retain the historical production-pipeline accounting:
+before the strict theorem was used as a general proof rule, only 150 classes
+were rejected by R1-R14 and 582 remained numerically unresolved. The four
+crossed CS+CS scenes are accepted only by the tolerance-expanded verifier and
+must not be counted as geometric counterexamples.
 
-Work at exact level (`tau = 0`): CC = exact corner coincidence, CS = corner
-in the open side, SS = exactly collinear sides with positive overlap, under
-the canonical convention that a point lying on both overlapping sides of a
-positive-overlap SS contact is absorbed by it (the production extractor's
-`absorbed_by_side_overlap`).
+## 5. Strict pair-contact theorem (strengthened by convexity)
 
-**Theorem.** Let `A` and `B` be unit squares with disjoint interiors. The
-extracted contact set between `A` and `B` never has exactly two events.
+The original revision proved by six contact-kind cases that two
+strictly non-overlapping unit squares cannot extract *exactly two* contacts.
+That statement is correct but unnecessarily weak.
 
-*Proof by kind-pair.* Write `l_i` / `m_j` for sides, `p_i` / `q_j` for
-corners of `A` / `B`.
+Work in strict packing geometry: closed unit squares may touch, but their
+interiors are disjoint. Use the normalized exact contact semantics: CC and CS
+for point intersections, positive-overlap SS for segment intersections, with
+CC/CS endpoint incidences absorbed when they lie on the positive SS overlap.
 
-- **SS+SS.** The two `A`-sides are distinct (a side cannot be collinear with
-  two distinct `B`-side lines) and likewise for `B`. If both pairs are
-  opposite sides, the two line pairs coincide, so `A = B` - interiors
-  coincide, excluded. If both pairs are adjacent, the two line intersections
-  give `p_i = q_j` - a CC event, so the set has at least three events
-  (CC + SS + SS). Mixed adjacency is impossible (perpendicular vs parallel
-  lines).
-- **CC+CC.** Coincident corner pairs have equal separations (`1` or `sqrt 2`).
-  Adjacent-adjacent: the two shared corners are the endpoints of one side of
-  `A` and one side of `B`, so those sides are collinear with overlap `1` - an
-  SS event whose absorption convention removes the two CC points, leaving one
-  event, never two. Diagonal-diagonal: the centers coincide, `A = B`,
-  excluded. Mixed separations are impossible.
-- **CC+SS.** If the CC corner `p_i` is not on the SS side `l_a`, then `p_i`
-  has distance `1` or `sqrt 2` from the line of `l_a` = line of `m_b`, but
-  `p_i = q_j` lies on that line: contradiction. So `p_i` is an endpoint of
-  `l_a`. Positive overlap then forces one of: `A`'s side covers `B`'s side
-  (the other endpoint is also a `B` corner - a second CC event), `A` extends
-  away from the segment (overlap zero, no SS), or `A`'s endpoint enters the
-  side interior (a CS event). In all cases the set is not `{CC, SS}`; the
-  same-side interior case additionally overlaps interiors.
-- **CS+CS.** If both `A`-corners lie on one `B`-side: adjacent corners at
-  distance `1` inside a unit segment must be its endpoints (two CC events);
-  diagonal distance `sqrt 2` cannot fit. On two distinct `B`-sides: adjacent
-  sides - the segment between the two contact points is a chord of `B`
-  through its interior; `A`'s interior lies on one side of the chord and
-  meets `B`'s interior on that side (both interiors occupy a one-sided
-  neighbourhood of the chord), an overlap; diagonal corners on adjacent sides
-  are at distance `sqrt 2` only at the far endpoints, giving CC events.
-  Opposite sides - the chord is perpendicular to both, and `A` either lies
-  inside `B` (overlap) or crosses it (overlap). The mixed orientation (an
-  `A`-corner on a `B`-side and a `B`-corner on an `A`-side) reduces to the
-  same alternatives: if the two points are distinct and on a common line the
-  sides are collinear (SS forced, then absorption or overlap); otherwise the
-  chord argument applies.
-- **CS+SS.** A CS corner on the SS side's own line is absorbed (it lies on
-  both overlapping sides) or produces a CC point; a CS corner on a different
-  `B`-side `m` has distance `0` or `1` from the SS line, and the case
-  analysis above forces either collinearity (absorption) or a coincident
-  corner (CC). No scene extracts exactly `{CS, SS}`.
-- **CC+CS.** The CC corner `p = q` is a `B` corner. A CS `A`-corner `r` on a
-  `B`-side: `|p - r|` is `1` (adjacent) or `sqrt 2` (diagonal). On the side
-  opposite `q` no point of `A` reaches at distance `1` in the interior
-  parameter range; on a side incident to `q`, the chord `p r` cuts the corner
-  triangle of `B`, and `A`'s interior, on either side of the chord line,
-  overlaps `B`'s interior. A CS `B`-corner on an `A`-side is symmetric.
-  Degenerate placements put `r` at a `B` corner (CC, absorbed by the SS that
-  the collinear sides create). *QED*
+**Theorem.** For any pair of strictly non-overlapping squares, the normalized
+pair-resolved contact set has cardinality at most one.
 
-A brute-force classifier over all 2,752 feature combinations and all six
-kind-pairs (analytic solution of the contact equations in the translation,
-dense theta scans, production extractor as ground truth) confirms: **no
-feature combination realizes an exact two-event pair set with disjoint
-interiors** (`CC+CC 0/240, CC+CS 0/512, CC+SS 0/256, CS+CS 0/992, CS+SS
-0/512, SS+SS 0/240`).
+*Proof.* Let the two closed squares be `A` and `B`. Their intersection
+`A ∩ B` is convex. Because their interiors are disjoint, this convex
+intersection has empty two-dimensional interior, so it can only be empty, a
+single point, or a line segment.
 
-Because extraction between two squares depends only on their two poses, the
-theorem transfers verbatim to `n`-square scenes: *in every exact scene, the
-pair-resolved contact set of any square pair has size different from 2.*
-Hence **no wall-free V+dup class is exactly realizable** - the duplicated
-pair would need exactly two events.
+- If it is empty, the pair has no contact.
+- If it is one point, the normalized geometry yields one point event. It is CC
+  when the point is a corner of both squares, otherwise CS when a corner lies
+  in the relative interior of the other square's side. Two side interiors
+  cannot cross transversely at that point without creating an open
+  neighbourhood of interior overlap.
+- If it is a nondegenerate segment, that segment lies in the boundary of each
+  square. A nondegenerate segment contained in the boundary of a square lies
+  in one of its sides, so the pair has one positive-overlap SS event. Any CC or
+  CS endpoint incidences on that same overlap are removed by the established
+  absorption normalization.
 
-## 6. The tolerance loophole: the crossed antiparallel pair
+Thus there are 0 or 1 normalized pair contacts. QED.
 
-At production tolerances (contact `1e-7`, CS interior margin `1e-6`, SAT
-overlap tolerance `1e-6`) the theorem fails in exactly one observed way. Take
-two squares with relative orientation `theta = pi + eps` (`|eps| ~ 7e-7`)
-positioned so that corner `p_0` of `A` lies within `1e-7` of side `m_0` of
-`B` and corner `q_0` of `B` lies within `1e-7` of side `l_0` of `A`, with
-interior overlap `~2e-8` (inside the SAT tolerance). At `eps = 0` the sides
-are collinear: SS fires and absorbs both corner events (one event). For
-`0 < |eps| less than the SS parallelism window but within the CS distance
-tolerance`, SS does not fire and both CS events survive: the pair extracts
-exactly `{CS, CS}`.
+**Corollary.** Any topology requiring two or more normalized contacts between
+the same unordered square pair is strictly unrealizable.
 
-This is not a curiosity: the Phase-2c corpus already contains two
-`VERIFIED_FEASIBLE` classes of this shape (`CS+CS` pair plus one wall event,
-classes 767/768 - the deletion-test witnesses, SAT slack `-2.1e-8`).
+This immediately proves strict unrealizability of all 736 V+duplicate classes:
+their duplicated pair has multiplicity two.
 
-**V+dup counterexamples.** Attaching a third square `C` to such a pair by an
-SS contact with partial overlap yields a full V+dup witness: the SS endpoint
-events are absorbed by the very same convention, and `C` clears the other
-pair square. Constructively (witness pair above, `C` placed on side 2 of the
-second square with shift `0.45` and zero gap):
+The earlier brute-force 2,752-feature classifier remains a useful numerical
+cross-check of the exact contact implementation, but it is no longer the
+mathematical proof and should not be described as needed to establish the
+theorem.
+
+## 6. The crossed antiparallel CS+CS window is a tolerance artifact
+
+The production verifier does not implement strict pairwise non-overlap. Its SAT
+test accepts
 
 ```
-class 2585  CS(0,1)+CS(1,0)+SS   VERIFIED_FEASIBLE (was NOT_FOUND)
-class 2586  CS(0,1)+CS(1,0)+SS   VERIFIED_FEASIBLE (was NOT_FOUND)
-class 2587  CS(0,1)+CS(1,0)+SS   VERIFIED_FEASIBLE (was NOT_FOUND)
-class 2588  CS(0,1)+CS(1,0)+SS   VERIFIED_FEASIBLE (was NOT_FOUND)
+slack >= -overlap_tolerance
 ```
 
-Each scene is contained in a container of side `< 2.9` with all three square
-pairs SAT-disjoint (within tolerance) and extracts exactly the class's three
-events; `verify_witness` accepts. The durable test
-`test_support_histograms_and_crossed_pair` pins the class-2587 witness.
+with `overlap_tolerance = 1e-6`. Therefore scenes with a small *negative*
+separating-axis gap can pass `verify_witness`.
 
-Consequences: (a) whole-family impossibility is **refuted**; (b) the four
-classes are **solver false negatives** - the production solver's generic
-starts never reach the `1e-6`-wide angular window; (c) among third-contact
-kinds, only SS is demonstrated feasible - the constructive search over CS and
-CC third-contact placements (all sides, both normals, corner and side
-interior attachments, all body spins and frame parities) found no witness for
-the remaining 144 unresolved CS+CS-dup classes.
+The crossed antiparallel construction found in this campaign does exactly that.
+Two squares are placed at relative orientation `pi + eps`
+(`|eps| ~ 7e-7`) so that each contributes a CS contact to the other while
+the otherwise collinear SS contact falls outside the extraction test. The
+reported SAT slack is approximately `-2e-8`: the interiors overlap slightly,
+although the overlap is below the numerical tolerance.
 
-## 7. Solver counterexample search and analytic starts
+At `eps = 0` the sides are collinear, SS is extracted, and its positive
+overlap absorbs the point events. At small nonzero `eps`, the tolerant
+extractor can keep both CS events while the tolerant SAT check still accepts
+the small interior penetration.
 
-- **4x budget sweep** (all 586 unresolved V+dup classes, `starts = 64`,
-  `max_solves = 1600`, 16 workers): **0 conversions**, 359,424 solves,
-  83 s wall / 16.8 min CPU. The generic solver cannot reach the boundary
-  family even with quadrupled effort.
-- **Analytic pair initializer** (the crossed antiparallel template plus
-  geometric third-square placements, all spins/parities/mirror): 148 CS+CS-dup
-  classes scanned in 20 s, **4 verified feasible**. As a deterministic start
-  family this is exactly the missing seed class: the configurations form a
-  `~1e-6`-wide neighbourhood of a collinear-degenerate pose, which random
-  starts hit with probability essentially zero. Production integration into
-  the solver's start generator is deferred (the constructive witnesses already
-  settle feasibility; wiring pair-specific seeds into the branch machinery is
-  a solver refactor with no further known conversions).
-- **Other duplicated kinds**: no tolerance-boundary template was found for
-  `CC+CC`, `CC+CS`, `CC+SS`, `CS+SS`, `SS+SS` duplicates; their forcing
-  arguments in Section 5 involve macroscopic violations (interior overlap of
-  fixed size, or events pinned at distance `>= 1 - O(tau)`), so no
-  `O(tau)`-evasion mechanism analogous to the crossed pair is available.
-  Empirically 0/536 feasible at 4x. This is evidence, not proof; no new
-  production filter is claimed for them.
+The four constructed V+duplicate scenes (classes 2585-2588) should therefore
+be recorded as:
 
-## 8. Corrected accounting (two layers, per the Phase-2d policy)
+```
+TOLERANCE_ACCEPTED
+```
 
-All-canonical layer (corpus solver output, unchanged):
+not as strict `VERIFIED_FEASIBLE` packing realizations. They are regression
+cases demonstrating that the numerical verifier's tolerance-expanded relation
+`R_tau` is strictly larger than the intended strict packing relation
+`R_strict`.
 
-| n | w | classes | feasible | not found | proved | resolved |
-| --- | --- | --- | --- | --- | --- | --- |
+The same warning applies to two earlier crossed CS+CS corpus witnesses
+(classes 767/768): their SAT slack is also negative (about `-2.1e-8`), so
+they are numerical-tolerance witnesses, not strict packing certificates.
+
+This is a semantics/certification issue, not a solver-discovery issue. The
+strict convexity theorem of Section 5 remains valid and is not refuted.
+
+## 7. Numerical counterexample search and analytic starts
+
+The campaign's search data remain useful, but they must be interpreted as
+search inside the tolerance-expanded verifier semantics rather than strict
+packing geometry.
+
+- **4x budget sweep** over the 586 production-`NOT_FOUND` V+duplicate
+  classes: 359,424 solves, 83 s wall at 16 workers, **0 additional tolerance
+  acceptances**.
+- **Crossed-pair analytic initializer:** scanning the 148 unresolved CS+CS-dup
+  classes found the four tolerance-accepted scenes described in Section 6.
+  The initializer is effective at reaching the approximately `1e-6)-wide
+  numerical boundary window that generic starts miss.
+- For the other duplicated kinds no analogous tolerance window was found.
+  This is irrelevant to strict geometry (Section 5 already proves all
+  duplicated-pair topologies impossible there), but it remains relevant if the
+  tolerance-expanded numerical relation is studied as a software robustness
+  problem.
+
+The analytic initializer should therefore not be described as finding a new
+physical realization family. It finds verifier boundary cases. Integrating it
+into the production solver is unnecessary for strict packing research unless
+the purpose is specifically to stress-test numerical tolerance semantics.
+
+## 8. Accounting after the erratum
+
+The following table is retained as **historical software output** from the
+tolerance-based verifier. In these rows, `VERIFIED_FEASIBLE` means
+"accepted by `verify_witness` under its configured tolerances"; it does not,
+by itself, certify strict non-overlap.
+
+| n | w | classes | verifier-accepted | not found | production-filter proved | historical resolved |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 2 | 2 | 87 | 25 | 40 | 22 | 54.0% |
 | 2 | 3 | 1,411 | 48 | 776 | 587 | 45.0% |
 | 3 | 2 | 119 | 54 | 43 | 22 | 63.9% |
 | 3 | 3 | 2,979 | 356 | 1,798 | 825 | 39.6% |
 
-Knowledge layer (adding the four constructive witnesses; the two n=2 false
-negatives of Phase-2c remain `NOT_FOUND` in the n=2 corpus but are known
-feasible):
+The four additional crossed V+duplicate constructions are *not* added to a
+strict-feasible count. They are tolerance-only regression witnesses.
 
-| corpus | feasible (known) | unknown | proved |
-| --- | --- | --- | --- |
-| n=3 w3, all classes | 360 | 1,794 | 825 |
-| n=3 w3, full support f_3(3)=1,568 | **313** | 1,017 | 238 |
+For strict geometry, the pair-contact theorem immediately upgrades the
+V+duplicate family:
 
-Full-support resolved fraction: 551/1,568 = 35.1%.
+```
+736 / 736 V+duplicate classes: strictly PROVED_INFEASIBLE.
+```
+
+Only 150 of those 736 had already been counted by the production filters, so
+the theorem adds 586 strict impossibility results beyond the historical corpus
+filter output. Consequently, for `n=3, weight=3` there are at least
+
+```
+825 + 586 = 1,411
+```
+
+strictly proved-infeasible classes. In the full-support slice the corresponding
+strict proved count is at least
+
+```
+238 + 586 = 824  out of 1,568.
+```
+
+No global strict-feasible count is asserted here. The 356 historical
+verifier-accepted `n=3,w=3` witnesses (and analogous accepted witnesses in
+other corpora) require a systematic audit of the sign of every pairwise SAT
+slack before they can be reported as strict packing certificates.
+
+Thus the original "knowledge layer" values `360 feasible` and `313
+full-support feasible` are **superseded as strict-geometric claims**. They
+remain valid only as tolerance-verifier accounting.
 
 ## 9. Tests, CI, runtime
 
-- New durable tests: support decomposition arithmetic (`d <= 6`, `n <= 12`);
-  support histograms by enumeration for five small `(n, d)`; the crossed-pair
-  V+dup witness; `support_histogram` pinned by the enumeration-only CTest
-  target. No large campaign in CI.
-- Full CTest suite: 12 targets green (Section 10 commit).
-- Runtime: pair classifier 101 s single-core; 4x V+dup sweep 83 s at 16
-  workers; constructive template scan 20 s single-core; `--count-only` with
-  histogram 13.4 s.
+- The support-decomposition and orbit-count tests remain valid and unaffected
+  by this erratum.
+- The crossed-pair durable test is now interpreted as a **numerical-tolerance
+  regression test**: it demonstrates that the current verifier accepts a
+  slightly overlapping scene. It is not evidence of strict realizability.
+- The existing CTest result recorded by the campaign remains historical:
+  12 targets green.
+- Runtime measurements are unchanged: pair classifier 101 s single-core; 4x
+  V+duplicate sweep 83 s at 16 workers; constructive tolerance-window scan
+  20 s single-core; `--count-only` with histogram 13.4 s.
 
-## 10. Limitations
+A future correctness pass should add an explicit strict verifier/check
+(`SAT slack >= 0`, with a separately documented floating-point certification
+policy) and audit every previously accepted witness.
 
-- The exact pair theorem is stated and proved at `tau = 0`; the tolerance
-  theory is a single observed evasion family, not a classification. A full
-  tolerance-level pair classification (which near-degenerate configurations
-  survive extraction) remains open.
-- 582 V+dup classes (and 1,017 full-support classes overall) are unresolved;
-  the Section 5 forcing arguments for the five non-CS+CS kinds rule out exact
-  scenes but not all tolerance-boundary scenes.
-- The four new witnesses rely on interior overlap `~2e-8` accepted by the SAT
-  tolerance; they are feasible by the campaign's definition (the verifier is
-  the ground truth) but are geometrically degenerate. A stricter verifier
-  (strict disjointness) would reject them - a definitional choice worth
-  recording.
-- The constructive template covers the crossed pattern and its D4/frame
-  parities; other near-degenerate pair families (if any exist) would need
-  their own templates.
+## 10. Limitations after correction
 
-## 11. Recommendation
+- The current `VERIFIED_FEASIBLE` software status uses tolerance-expanded SAT
+  acceptance and therefore is not, by itself, a strict packing certificate.
+- The four V+duplicate boundary scenes and the earlier crossed CS+CS witnesses
+  are known examples with negative SAT slack. They must not be counted as
+  strict realizations.
+- The strict pair-contact theorem settles the duplicated-pair question
+  mathematically, but the production filter layer does not yet encode this
+  general theorem.
+- A systematic strict-SAT audit of all historical accepted witnesses has not
+  yet been performed, so this report intentionally does not publish a corrected
+  global strict-feasible total.
+- Floating-point strict certification itself needs a policy: a tiny positive
+  computed slack is not automatically a formal exact-arithmetic proof. At
+  minimum, numerical witnesses should distinguish positive-margin,
+  near-boundary, and negative-slack cases.
+- The support decomposition theorem and the orbit-counting results are purely
+  combinatorial and unaffected by these geometric tolerance corrections.
 
-1. **Tolerance-level pair classification.** Enumerate the near-degenerate
-   extraction regimes (collinear-side windows, corner-near-endpoint windows)
-   systematically; this is the exact boundary between the pair theorem and
-   the verifier's acceptance semantics, and it decides whether the remaining
-   582 V+dup classes contain more feasible members.
-2. **Wire the crossed-pair start family into the solver** if further
-   boundary-family censuses are planned (weight 4 at `n = 2`, `a_4(2) =
-   26,620`, will contain duplicated-pair classes with the same issue).
-3. **Adopt the two-layer accounting** (all-canonical vs full-support) in all
-   future census reports, as mandated in the Phase-2d brief.
+## 11. Corrected recommendation
+
+1. **Separate strict geometry from tolerance diagnostics in code and schema.**
+   Introduce an explicit strict witness audit and stop using one
+   `VERIFIED_FEASIBLE` label for both `R_strict` and `R_tau`. A practical
+   schema could distinguish `STRICT_FEASIBLE`, `TOLERANCE_ACCEPTED`,
+   `NOT_FOUND`, and `PROVED_INFEASIBLE`.
+2. **Encode the convex pair-contact theorem as a general strict infeasibility
+   rule.** Any topology containing at least two normalized contacts between one
+   unordered square pair is strictly impossible. This subsumes the whole
+   V+duplicate strict-impossibility result and should be reusable at higher
+   weights.
+3. **Audit all historical accepted witnesses by SAT-slack sign** before using
+   feasible percentages as statements about physical square packings. Record
+   minimum pairwise slack and a near-boundary category.
+4. Treat tolerance-window classification (crossed CS+CS, endpoint/collinearity
+   windows) as a **numerical robustness study**, not as the main geometric
+   realizability program.
+5. Continue using the all-canonical/full-support decomposition for future
+   censuses; that combinatorial result is unaffected by the erratum.
