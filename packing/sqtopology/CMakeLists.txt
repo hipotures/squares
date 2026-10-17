@@ -122,6 +122,11 @@ target_compile_definitions(sqtopology_orbit_tests PRIVATE
     SQTOPOLOGY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME sqtopology_orbit_tests COMMAND sqtopology_orbit_tests)
 
+# Separate target for the n = 12 low-weight closure: |G_12| ~ 2.6e20 exceeds
+# 64 bits and one live class-aggregated run costs ~14 s, so it is kept out of
+# the ordinary suite while still running by default under ctest.
+add_test(NAME sqtopology_wreath_n12 COMMAND sqtopology_orbit_tests --wreath-n12)
+
 # Independent Python re-implementation of the n=1..n=3 Burnside counts. It
 # exists only as a differential validator for the C++ oracle and is skipped
 # when no Python 3 interpreter is available. The deep brute-force mode also

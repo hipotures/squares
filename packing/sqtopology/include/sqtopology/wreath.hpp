@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sqtopology/bigint.hpp"
 #include "sqtopology/orbit.hpp"
 
 #include <array>
@@ -26,10 +27,11 @@ namespace sqtopology {
 // event cycle type; the class size supplies the Burnside multiplicity.
 // ---------------------------------------------------------------------------
 
-// Largest square count supported by the class-aggregated counter. The class
-// size formula and the Burnside weights below stay inside 64 bits up to
-// n = 11 (|G_11| ~ 2.7e18); beyond that the module refuses to run.
-inline constexpr std::uint32_t kMaxWreathSquares = 11;
+// Largest square count supported by the class-aggregated counter. Class sizes,
+// Burnside weights, and the group order |G_12| ~ 2.6e20 are accumulated in
+// 128-bit integers; every consumer of the 64-bit wrappers below keeps its own
+// range check. n = 12 closes the low-weight d = 6 stabilization row.
+inline constexpr std::uint32_t kMaxWreathSquares = 12;
 
 enum class D4Class : std::uint8_t {
     Identity = 0,
@@ -71,7 +73,13 @@ struct GroupConjugacyType {
 [[nodiscard]] GroupConjugacyType wreath_type_of_element(const GroupElement& element);
 
 // Exact class size in G_n (including the container factor), from the class
-// formula validated against direct element enumeration for n <= 4.
+// formula validated against direct element enumeration for n <= 4. The wide
+// form is the primary implementation (128-bit, exact for every supported n);
+// the uint64 form is the historical interface and throws when a class size
+// exceeds 64 bits. Every class size fits 64 bits through n = 12 (the maximum,
+// reached at n = 12, is 1.37e18), so the guard is future-proofing for
+// extensions past the current square-count cap.
+[[nodiscard]] BigWide group_class_size_wide(const GroupConjugacyType& type);
 [[nodiscard]] std::uint64_t group_class_size(const GroupConjugacyType& type);
 
 // Canonical representative of the class: square permutation built from
@@ -93,18 +101,30 @@ struct WreathCountOptions {
 
 struct InducedTypeRecord {
     EventCycleType cycle_type;
-    std::uint64_t class_elements{0};  // summed class sizes
-    std::uint64_t classes{0};         // number of conjugacy classes
+    // Summed class size for this induced type. The 64-bit mirror is zero when
+    // the sum exceeds 64 bits (class sizes are positive, so a zero mirror
+    // always means "did not fit"), in which case class_elements_decimal is
+    // authoritative. No induced-type sum exceeds 64 bits through n = 12 (the
+    // maximum is 1.10e19); the split keeps the interface ready for larger n.
+    std::uint64_t class_elements{0};
+    std::string class_elements_decimal;
+    std::uint64_t classes{0};  // number of conjugacy classes
 };
 
 struct WreathCountResult {
     std::uint32_t square_count{0};
     std::uint64_t event_count{0};
+    // 64-bit mirror of |G_n|; zero when the order exceeds 64 bits (n = 12),
+    // in which case group_size_decimal is the authoritative value.
     std::uint64_t group_size{0};
+    std::string group_size_decimal;
     std::uint64_t wreath_conjugacy_types{0};
     std::uint64_t total_conjugacy_classes{0};
     std::uint64_t distinct_induced_cycle_types{0};
+    // 64-bit mirror of the class-size sum; zero when it exceeds 64 bits
+    // (n = 12), in which case class_size_sum_decimal is authoritative.
     std::uint64_t class_size_sum{0};
+    std::string class_size_sum_decimal;
     std::uint64_t low_weight_max{0};
     bool low_weight_only{false};
     std::vector<InducedTypeRecord> induced_types;

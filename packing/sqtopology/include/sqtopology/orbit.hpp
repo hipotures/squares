@@ -33,11 +33,17 @@ namespace sqtopology {
 
 using EventId = std::uint32_t;
 
-// Largest square count representable by the fixed-size group element below.
-// The direct brute-force paths stay comfortable through n = 4 and are capped by
-// their front ends; the class-aggregated wreath counter in wreath.hpp uses the
-// same representation up to n = 11.
-inline constexpr std::uint32_t kMaxOrbitSquares = 11;
+// Largest square count representable by the fixed-size group element arrays
+// below. The direct brute-force paths stay comfortable through n = 4 and are
+// capped by their front ends; the class-aggregated wreath counter in
+// wreath.hpp extends the same representation to n = 12.
+inline constexpr std::uint32_t kMaxOrbitSquares = 12;
+
+// Largest square count whose full group order |G_n| = n! * 8^n * 8 fits in
+// std::uint64_t. Every API that returns |G_n| or enumerates all |G_n| elements
+// as a 64-bit quantity must refuse larger n: at n = 12 the order is about
+// 2.6e20. The wreath counter keeps its class arithmetic in 128-bit instead.
+inline constexpr std::uint32_t kMaxElementEnumerationSquares = 11;
 
 enum class EventKind : std::uint8_t {
     SquareSquare = 0,

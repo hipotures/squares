@@ -25,6 +25,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace {
@@ -1531,11 +1532,11 @@ void test_wreath_low_weight_table() {
         extract_string_array(table_json, "a5"),
         extract_string_array(table_json, "a6"),
     };
-    expect(ns.size() == 11, "low-weight row count");
-    for (std::size_t index = 0; index < 11; ++index) {
+    expect(ns.size() == 12, "low-weight row count");
+    for (std::size_t index = 0; index < 12; ++index) {
         expect(ns[index] == index + 1, "low-weight n column");
         for (const auto& column : columns) {
-            expect(column.size() == 11, "low-weight column size");
+            expect(column.size() == 12, "low-weight column size");
         }
     }
 
@@ -1558,8 +1559,9 @@ void test_wreath_low_weight_table() {
     }
 
     // Stabilization structure: a_d(n) is non-decreasing in n and constant for
-    // n >= 2d (support of a d-event configuration spans at most 2d squares).
-    for (std::size_t index = 0; index < 11; ++index) {
+    // n >= 2d (support of a d-event configuration spans at most 2d squares);
+    // the n = 12 row closes this table through d = 6.
+    for (std::size_t index = 0; index < 12; ++index) {
         const std::uint32_t n = ns[index];
         for (std::size_t degree = 1; degree < 7; ++degree) {
             if (index > 0) {
@@ -1583,6 +1585,56 @@ void test_wreath_low_weight_table() {
     expect(columns[3][5] == "3660", "a_3 stabilizes at n=6");
     expect(columns[4][7] == "152283", "a_4 stabilizes at n=8");
     expect(columns[5][9] == "7646706", "a_5 stabilizes at n=10");
+    expect(columns[6][11] == "443748944", "a_6 stabilizes at n=12");
+}
+
+// n = 12 closes the low-weight table: the group order |G_12| ~ 2.6e20 exceeds
+// 64 bits, so the order and class-size sum travel as decimal strings, while
+// a_0..a_6 must reproduce the stabilized a_d(2d) values, including
+// a_6(12) = 443748944 (+28 over the n = 11 value 443748916). One live run
+// costs ~14 s because it induces cycle types for all 633650 classes, so this
+// check has its own CTest target (--wreath-n12) and is not part of the
+// ordinary orbit suite.
+void test_wreath_n12_low_weight() {
+    const auto result = wreath_burnside_count(12, low_weight_options(6));
+    expect(result.square_count == 12, "n=12 square count");
+    expect(result.event_count == 4608, "n=12 E");
+    expect(
+        result.coefficient_decimal
+            == std::vector<std::string>{
+                   "1", "5", "125", "3660", "152283", "7646706", "443748944"
+               },
+        "n=12 low-weight coefficients"
+    );
+    expect(result.group_size == 0, "n=12 group size exceeds u64");
+    expect(
+        result.group_size_decimal == "263333914461654220800",
+        "n=12 group order"
+    );
+    expect(result.class_size_sum == 0, "n=12 class size sum exceeds u64");
+    expect(
+        result.class_size_sum_decimal == result.group_size_decimal,
+        "n=12 class sizes sum to |G|"
+    );
+    expect(result.wreath_conjugacy_types == 126730, "n=12 wreath types");
+    expect(result.total_conjugacy_classes == 633650, "n=12 classes");
+    expect(result.distinct_induced_cycle_types == 62457, "n=12 induced types");
+    expect(result.checks_class_size_sum, "n=12 class-size sum check");
+    expect(result.checks_divisible, "n=12 divisibility");
+    expect(result.checks_positive, "n=12 positivity");
+    expect(result.checks_endpoints_unit, "n=12 endpoints");
+    // a_d(12) equals the stabilized a_d(2d) from the golden table columns.
+    const std::string table_json = read_source_file("tests/data/wreath-low-weight.json");
+    for (std::size_t degree = 1; degree < 7; ++degree) {
+        const auto column = extract_string_array(
+            table_json,
+            "a" + std::to_string(degree)
+        );
+        expect(
+            result.coefficient_decimal[degree] == column[2 * degree - 1],
+            "n=12 stabilization at d=" + std::to_string(degree)
+        );
+    }
 }
 
 void test_staged_quotients() {
@@ -1653,8 +1705,16 @@ void test_staged_quotients() {
 
 }  // namespace
 
-int main() {
+int main(int argc, char** argv) {
     try {
+        // The n = 12 closure run is the slow part of the wreath campaign
+        // (~14 s); it runs under its own CTest target so the ordinary suite
+        // stays fast.
+        if (argc > 1 && std::string_view(argv[1]) == "--wreath-n12") {
+            test_wreath_n12_low_weight();
+            std::cout << "sqtopology_orbit_tests: n=12 wreath regression passed\n";
+            return 0;
+        }
         test_event_layout();
         test_d4_elements();
         test_group_element_law();

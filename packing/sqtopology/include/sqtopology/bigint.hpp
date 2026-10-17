@@ -30,6 +30,17 @@ class BigUint {
         }
     }
 
+    // Wide constructor as a named factory: an additional numeric constructor
+    // would make integer literals ambiguous.
+    [[nodiscard]] static BigUint from_wide(BigWide value) {
+        BigUint result;
+        while (value > 0) {
+            result.limbs_.push_back(static_cast<std::uint32_t>(value % kBase));
+            value /= kBase;
+        }
+        return result;
+    }
+
     [[nodiscard]] bool is_zero() const noexcept { return limbs_.empty(); }
 
     [[nodiscard]] static BigUint power_of_two(unsigned exponent) {
@@ -78,6 +89,41 @@ class BigUint {
             limbs_.push_back(static_cast<std::uint32_t>(carry % kBase));
             carry /= kBase;
         }
+    }
+
+    // Schoolbook exact multiplication by an arbitrary big integer. Used by the
+    // class-aggregated counter once a Burnside class weight exceeds 64 bits
+    // (n = 12 and beyond); the small-factor fast path above is unchanged.
+    void mul_big(const BigUint& other) {
+        if (limbs_.empty() || other.limbs_.empty()) {
+            limbs_.clear();
+            return;
+        }
+        std::vector<std::uint32_t> product(
+            limbs_.size() + other.limbs_.size(),
+            0
+        );
+        for (std::size_t j = 0; j < other.limbs_.size(); ++j) {
+            BigWide carry = 0;
+            for (std::size_t i = 0; i < limbs_.size(); ++i) {
+                const BigWide current =
+                    static_cast<BigWide>(limbs_[i]) * other.limbs_[j]
+                    + product[i + j] + carry;
+                product[i + j] = static_cast<std::uint32_t>(current % kBase);
+                carry = current / kBase;
+            }
+            std::size_t position = limbs_.size() + j;
+            while (carry > 0) {
+                const BigWide current = product[position] + carry;
+                product[position] = static_cast<std::uint32_t>(current % kBase);
+                carry = current / kBase;
+                ++position;
+            }
+        }
+        while (!product.empty() && product.back() == 0) {
+            product.pop_back();
+        }
+        limbs_ = std::move(product);
     }
 
     // In-place exact division by a small positive divisor; returns the

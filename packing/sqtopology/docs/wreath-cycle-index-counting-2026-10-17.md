@@ -43,9 +43,11 @@ enumeration is still the wrong tool at `n = 5`, just less so by 25%.
   604 digits). Low-weight runs reach `n = 11` in 5.70 s / 132.3 MiB.
 - Low-weight structure: `a_d(n)` is non-decreasing in `n`, constant for
   `n >= 2d`, and the increment at the stabilization point is exactly
-  `C(d+2, 2)` (proved in section 5; verified for `d <= 5`). The `a_0..a_6`
-  table for `n = 1..11` is committed as a golden; `a_6` is still rising at
-  `n = 11`, and the theorem predicts `a_6(12) = 443,748,944`.
+  `C(d+2, 2)` (proved in section 5; verified for `d <= 6`). The widened build
+  (128-bit class-size intermediates, section 9) computes the `n = 12` row in
+  13.54 s / 269.6 MiB: `a_6(12) = 443,748,944 = 443,748,916 + 28`, confirming
+  the increment theorem's last open prediction and completing the committed
+  `a_0..a_6` table for `n = 1..12`.
 - Symmetry-subgroup compression is computed for `n <= 6` and weight `<= 4`
   under `D4^n`, `S_n x D4_container`, `D4 wr S_n`, and the full `G_n`.
   These are comparison quotients from related subgroups, not one four-step nested
@@ -138,8 +140,8 @@ a_d = (1/|G_n|) sum over classes tau of S(tau) * [x^d] prod_{cycles of the
 - `include/sqtopology/bigint.hpp` now owns the exact base-`10^9` `BigUint`
   previously local to `src/orbit.cpp`, with 128-bit intermediates in
   `mul_small` and `div_small` (section 8). `kMaxOrbitSquares` rises from 8 to
-  11; the direct front ends keep their own caps (`count <= 8`,
-  `wreath-cross <= 4`).
+  12; the direct front ends keep their own caps (`count <= 8`,
+  `wreath-cross <= 4`, direct element enumeration `<= 11`).
 - `src/orbit.cpp` computes induced event cycle types through the existing
   `ElementAction::map_event` instead of materializing a full event permutation
   per element; this makes the per-class cycle-type step cheap.
@@ -151,7 +153,7 @@ a_d = (1/|G_n|) sum over classes tau of S(tau) * [x^d] prod_{cycles of the
 - `src/orbit_main.cpp` adds three subcommands:
   `wreath --n N [--low-weight D] [--cycle-types] [--json FILE]`,
   `wreath-cross --n N`, and `staged --n N --weight D` (the `staged` cap is
-  `n <= 6`; `wreath` supports `n <= 11`).
+  `n <= 6`; `wreath` supports `n <= 12`).
 - Every full run checks six invariants internally: class sizes sum to `|G_n|`,
   every coefficient numerator is divisible by `|G_n|`, complement symmetry,
   the two totals (coefficient sum and `sum_g 2^{c(g)}`) agree, `a_0 = a_E = 1`,
@@ -159,7 +161,7 @@ a_d = (1/|G_n|) sum over classes tau of S(tau) * [x^d] prod_{cycles of the
   (class sizes, divisibility, positivity).
 - `tests/data/wreath-count-n5.json` is the committed `n = 5` golden;
   `tests/data/wreath-low-weight.json` is a compact single-line golden with
-  columns `a_0..a_6` for `n = 1..11`.
+  columns `a_0..a_6` for `n = 1..12`.
 
 ## 3. Validation
 
@@ -308,19 +310,20 @@ Complement symmetry means the popular `a_d` for small `d` have mirror twins
 
 ### 5.1 The table
 
-Exact `a_d(n)` for `d = 0..6` and `n = 1..11`
+Exact `a_d(n)` for `d = 0..6` and `n = 1..12`
 (`tests/data/wreath-low-weight.json`; all entries recomputed live in the
-test suite for `n` in `{1,2,3,4,5,6,7,8,10}`):
+test suite for `n` in `{1,2,3,4,5,6,7,8,10}` and, under the dedicated
+`sqtopology_wreath_n12` CTest target, for `n = 12`):
 
-| d | n=1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| 1 | 2 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
-| 2 | 22 | 87 | 119 | 125 | 125 | 125 | 125 | 125 | 125 | 125 | 125 |
-| 3 | 116 | 1411 | 2979 | 3560 | 3650 | 3660 | 3660 | 3660 | 3660 | 3660 | 3660 |
-| 4 | 744 | 26620 | 92770 | 137549 | 150193 | 152092 | 152268 | 152283 | 152283 | 152283 | 152283 |
-| 5 | 3568 | 481126 | 2985882 | 5938772 | 7288314 | 7599740 | 7642376 | 7646395 | 7646685 | 7646706 | 7646706 |
-| 6 | 15454 | 8133610 | 94975858 | 268405879 | 391975513 | 434321891 | 442602511 | 443646723 | 443741543 | 443748484 | 443748916 |
+| d | n=1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| 1 | 2 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
+| 2 | 22 | 87 | 119 | 125 | 125 | 125 | 125 | 125 | 125 | 125 | 125 | 125 |
+| 3 | 116 | 1411 | 2979 | 3560 | 3650 | 3660 | 3660 | 3660 | 3660 | 3660 | 3660 | 3660 |
+| 4 | 744 | 26620 | 92770 | 137549 | 150193 | 152092 | 152268 | 152283 | 152283 | 152283 | 152283 | 152283 |
+| 5 | 3568 | 481126 | 2985882 | 5938772 | 7288314 | 7599740 | 7642376 | 7646395 | 7646685 | 7646706 | 7646706 | 7646706 |
+| 6 | 15454 | 8133610 | 94975858 | 268405879 | 391975513 | 434321891 | 442602511 | 443646723 | 443741543 | 443748484 | 443748916 | 443748944 |
 
 ### 5.2 The `a_1` formula (proved)
 
@@ -365,13 +368,13 @@ each wall event one, so its support spans at most `2d` squares.
    unordered ring-parity pairs (3 possibilities per event, and local `D4`s are
    transitive on each parity class of rings), giving `C(d+2, 2)` multisets.
 
-Data check (`d = 1..5`): increments `3, 6, 10, 15, 21 = C(3,2), C(4,2),
-C(5,2), C(6,2), C(7,2)`, with stabilization visible in the table at
-`n = 2, 4, 6, 8, 10`. For `d = 6` the last computed column is `n = 11 < 12`,
-and the still-increasing row matches: `443,748,916` at `n = 11` and the
-theorem predicts `a_6(12) = 443,748,916 + C(8,2) = 443,748,944`. The current
-module caps `n` at 11 because class sizes and Burnside weights must fit in
-64 bits; verifying the prediction needs a widened (n = 12) build.
+Data check (`d = 1..6`): increments `3, 6, 10, 15, 21, 28 = C(3,2), C(4,2),
+C(5,2), C(6,2), C(7,2), C(8,2)`, with stabilization visible in the table at
+`n = 2, 4, 6, 8, 10, 12`. The `d = 6` increment closes the row: `a_6` rises
+from `443,748,916` at `n = 11` to exactly `443,748,944` at `n = 12`, matching
+the theorem's prediction. The widened build (section 9) supports `n = 12`;
+the prediction recorded in the first revision of this note is now an exact
+computation.
 
 ### 5.4 What is not claimed
 
@@ -569,13 +572,33 @@ Memory stays under 20 MiB at `n = 8` because the state is the class table and
 one `BigUint` polynomial, not the 5.4 * 10^12 group elements (the direct
 oracle needs 291.7 MiB for `n = 5` alone).
 
-Low-weight prefix runs (`--low-weight 6`) scale to `n = 11` (the 64-bit cap of
-the class-size formula):
+Low-weight prefix runs (`--low-weight 6`) scale to `n = 12` after the
+class-size widening (below):
 
-| n | 9 | 10 | 11 |
-|---:|---:|---:|---:|
-| wall | 0.88 s | 2.32 s | 5.70 s |
-| peak RSS | 31.0 MiB | 64.1 MiB | 132.3 MiB |
+| n | 9 | 10 | 11 | 12 |
+|---:|---:|---:|---:|---:|
+| total | 0.88 s | 2.32 s | 5.70 s | 13.54 s |
+| peak RSS | 31.0 MiB | 64.1 MiB | 132.3 MiB | 269.6 MiB |
+
+At `n = 12` the run visits `5 * 126,730 = 633,650` classes and induces 62,457
+distinct event cycle types (up from 34,357 at `n = 11`); the event-cycle step
+costs 13.05 s of the 13.54 s total (96.4%), class generation 0.019 s, and the
+`BigUint` polynomial accumulation 0.47 s. The largest single induced-type
+aggregate is `1.10 * 10^19`, just under the 64-bit ceiling, so induced-type
+`class_elements` values stay JSON numbers; only the group order and the
+class-size sum (`2.63333914461654220800 * 10^20`) switch to decimal strings.
+
+**Widening to `n = 12` (this revision).** `|G_12| ~ 2.633 * 10^20` exceeds
+`std::uint64_t`, so the class-size product and the Burnside weight accumulation
+now use `unsigned __int128` intermediates (`BigWide` in `wreath.hpp`) and exact
+big-integer multiplication (`BigUint::mul_big`); the division by `|G_n|` is
+performed factor by factor (`n!`, then `8^(n+1)`), each an exact 64-bit
+division when the full quotient is exact. The direct element-enumeration APIs
+(`group_element_count`, `decode_group_element`, the `count` command) remain
+capped at `n <= 11` by a separate constant, since their result genuinely
+overflows 64 bits; the class-aggregated counter is the only `n = 12` path.
+Results for `n <= 11` are byte-for-byte unchanged (all four pre-existing CTest
+targets pass without golden updates).
 
 The committed `n = 8` full run (19.7 s) and the direct `n = 5` oracle
 (93.5 s) are one-off validations, not part of CTest.
@@ -583,11 +606,13 @@ The committed `n = 8` full run (19.7 s) and the direct `n = 5` oracle
 ## 10. Reproducibility
 
 ~~~bash
-# n = 5 golden and the low-weight table
+# n = 5 golden and the low-weight table (n = 12 row needs the widened build)
 ./build/sqtopology_orbit wreath --n 5 --json tests/data/wreath-count-n5.json
-for n in $(seq 1 11); do
+for n in $(seq 1 12); do
   ./build/sqtopology_orbit wreath --n "$n" --low-weight 6 --json /tmp/lw$n.json
 done
+# n = 12 regression used by the dedicated CTest target
+./build/sqtopology_orbit_tests --wreath-n12
 
 # direct element cross-checks and staged tables
 ./build/sqtopology_orbit wreath-cross --n 4
@@ -602,12 +627,17 @@ python3 tools/wreath_reference.py --check-tool build/sqtopology_orbit \
 python3 tools/wreath_stabilizer_spectrum.py --n1-full --n2-max-weight 3
 ~~~
 
-`ctest --test-dir build` runs four targets: production `sqtopology_tests`
-(1.42 s), `sqtopology_orbit_tests` (7.11 s, includes the wreath suite),
-`sqtopology_orbit_reference` (8.72 s), and `sqtopology_wreath_reference`
-(2.10 s); total 19.36 s, all passing at the documentation commit. The orbit
-test suite deliberately avoids enumerating all `n = 5` elements: it uses the
+`ctest --test-dir build` runs five targets: production `sqtopology_tests`
+(1.40 s), `sqtopology_orbit_tests` (6.96 s, includes the wreath suite),
+`sqtopology_wreath_n12` (13.58 s, the `--wreath-n12` regression described
+below), `sqtopology_orbit_reference` (8.74 s), and
+`sqtopology_wreath_reference` (2.21 s); total 32.93 s, all passing at the
+documentation commit. The ordinary orbit test suite deliberately avoids
+enumerating all `n = 5` elements and keeps the `n = 12` run out: it uses the
 committed golden plus the live `n = 6` recomputation (about 1.2 s) instead.
+The dedicated `sqtopology_wreath_n12` target live-recomputes the `n = 12`
+row and asserts the stabilized `a_d(12) = a_d(2d)` values for `d <= 6`, the
+128-bit group order `263333914461654220800`, and every internal check.
 
 ## 11. What is theorem, what is exact computation, what is empirical
 
@@ -620,26 +650,29 @@ committed golden plus the live `n = 6` recomputation (about 1.2 s) instead.
   trivial-stabilizer bound `n <= 2d`; and the `a_1` formula.
 - **Exact arithmetic results:** all coefficients and totals for `n = 5`
   (committed golden) and `n = 6` (live-pinned); the one-off `n = 7, 8` full
-  polynomials with all internal checks; the `a_0..a_6` table for `n = 1..11`;
-  the staged tables for `n <= 6`, weight `<= 4`; the `n = 1` full
-  trivial-stabilizer spectrum and the `n = 2, d <= 3` counts. The Python
-  differential independently confirms the machinery for `n <= 3`; `n >= 4`
-  rests on one implementation plus its six internal checks and the shared
-  structural tests.
+  polynomials with all internal checks; the `a_0..a_6` table for `n = 1..12`
+  (the `n = 12` row live-pinned by the dedicated CTest target); the staged
+  tables for `n <= 6`, weight `<= 4`; the `n = 1` full trivial-stabilizer
+  spectrum and the `n = 2, d <= 3` counts. The Python differential
+  independently confirms the machinery for `n <= 3`; `n >= 4` rests on one
+  implementation plus its six internal checks and the shared structural tests.
 - **Empirical / implementation:** all timings and memory figures; the exact
   growth of digit counts (a random-subset heuristic `digits(N_n) ~
   E * log10(2) - log10|G_n|` agrees within one digit for `n = 1..8` but is not
   used as a theorem).
-- **Prediction (from the increment theorem, not yet computed):**
-  `a_6(12) = 443,748,944`, and the same increment rule for every `d` once
-  `n = 2d` is reachable.
+- **Verified prediction:** the increment theorem predicted
+  `a_6(12) = 443,748,944` before the widened build existed, and the `n = 12`
+  run produces exactly that value; for `d >= 7` the same rule remains the
+  theorem's prediction until a build supporting `n >= 14` exists.
 
 ## 12. Limitations
 
-- `wreath` supports `n <= 11` only: class sizes and Burnside weights are held
-  in 64 bits. `n = 12` (where `|G_12| ~ 2.6 * 10^20`) needs a wider
-  class-size path; until then the `a_6` row stops one step short of its
-  stabilization point.
+- The `wreath` counter now supports `n <= 12` (128-bit class sizes, exact
+  big-integer multiplication, factor-wise division by `|G_n|`); extending the
+  low-weight table beyond `d = 6` needs `n >= 14` rows, each a larger one-off
+  run. The direct element-enumeration APIs (`group_element_count`,
+  `decode_group_element`, the `count` command) remain capped at `n <= 11`
+  because `|G_12|` itself exceeds `std::uint64_t`.
 - The `n = 7` and `n = 8` full polynomials are one-off validation runs and are
   not committed as goldens; only the computed values recorded in this note
   (section 4) and in the run outputs represent them.
@@ -658,15 +691,15 @@ committed golden plus the live `n = 6` recomputation (about 1.2 s) instead.
 
 ## 13. Recommended next direction
 
-- **A. Widen to `n = 12` and close the `a_6` row.** Promote the class-size
-  path (and Burnside weight accumulation) to 128-bit and run the `n = 12`
-  low-weight computation. It is a small, well-scoped change that verifies the
-  increment theorem's first unverified prediction and completes the low-weight
-  table through `d = 6`.
-- **B. One-off full `n = 9..11` runs.** Already supported by the current cap;
-  extrapolating the polynomial step (about proportional to `T(n) * E(n)^2`)
-  gives roughly 10-25 minutes for `n = 11`, so all three are feasible in one
-  session and would extend the total-orbit-count record without code changes.
+- **A. Widen to `n = 12` and close the `a_6` row (executed in this revision).**
+  The class-size path and Burnside weight accumulation now use 128-bit
+  intermediates; the `n = 12` run verified `a_6(12) = 443,748,944` and the
+  stabilized `a_d(12) = a_d(2d)` values for `d <= 6`, and the row is pinned by
+  the committed golden plus the `sqtopology_wreath_n12` CTest target.
+- **B. One-off full `n = 9..11` runs.** Still supported; extrapolating the
+  polynomial step (about proportional to `T(n) * E(n)^2`) gives roughly
+  10-25 minutes for `n = 11`, so all three are feasible in one session and
+  would extend the total-orbit-count record without code changes.
 - **C. Geometric realizability (Phase 2).** The strategic question remains
   which canonical contact-topology classes are realizable as square packings;
   class-aggregated counting is now cheap enough that filtering experiments no
@@ -674,7 +707,6 @@ committed golden plus the live `n = 6` recomputation (about 1.2 s) instead.
 - **D. Production canonicalization.** Still orthogonal; no evidence from this
   campaign that the canonicalizer needs changes.
 
-**Recommendation: A, then B as budget allows.** A closes the only outstanding
-row of the low-weight structure with a minimal, testable change; B is a pure
-measurement. C remains the program's destination, and nothing in this note
-suggests reordering it earlier than the next counting milestone.
+**Recommendation: C, with B as an optional measurement.** A is executed; B is
+a pure record-extension; C is the destination identified in the previous note
+and the counting wall is no longer in its way.

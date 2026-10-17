@@ -57,6 +57,52 @@ std::uint64_t small_binomial(std::uint32_t total, std::uint32_t chosen) {
     return result;
 }
 
+// 128-bit mirrors of the small helpers. The class-size path already computes
+// in 128 bits; these keep the group-order and Burnside-weight arithmetic in
+// the same domain once n = 12 pushes |G_n| past 64 bits. Both stay far below
+// the 128-bit range for every supported n (n! <= 20! and 8^n <= 8^20 fit).
+WideUint wide_factorial(std::uint32_t n) {
+    WideUint result = 1;
+    for (std::uint32_t value = 2; value <= n; ++value) {
+        result *= value;
+    }
+    return result;
+}
+
+WideUint wide_power(std::uint64_t base, std::uint32_t exponent) {
+    WideUint result = 1;
+    for (std::uint32_t step = 0; step < exponent; ++step) {
+        result *= base;
+    }
+    return result;
+}
+
+bool wide_fits_uint64(WideUint value) {
+    return value <= static_cast<WideUint>(~std::uint64_t{0});
+}
+
+BigUint big_from_wide(WideUint value) {
+    return BigUint::from_wide(value);
+}
+
+// Exact division by |G_n| = n! * 8^(n+1), performed factor by factor with a
+// 64-bit divisor each time. If the full product divides the value
+// (mathematically |G_n| * a_d), every sequential step is exact as well, so a
+// nonzero remainder at any step flags a broken numerator. This replaces the
+// single div_small(|G_n|) call that required |G_n| to fit in 64 bits.
+bool divide_by_group_order(BigUint& value, std::uint32_t n) {
+    bool ok = true;
+    if (value.div_small(factorial(n)) != 0) {
+        ok = false;
+    }
+    for (std::uint32_t step = 0; step <= n; ++step) {
+        if (value.div_small(8) != 0) {
+            ok = false;
+        }
+    }
+    return ok;
+}
+
 // Deterministic packed key of an event cycle type (2 bytes per length).
 std::string pack_cycle_type(const EventCycleType& type) {
     std::string key;
@@ -390,19 +436,19 @@ GroupConjugacyType wreath_type_of_element(const GroupElement& element) {
     return type;
 }
 
-std::uint64_t group_class_size(const GroupConjugacyType& type) {
-    const WideUint value = wreath_class_size_numerator(type);
+BigWide group_class_size_wide(const GroupConjugacyType& type) {
+    WideUint value = wreath_class_size_numerator(type);
     if (type.container != D4Class::Identity) {
-        // The container factor multiplies the wreath class size; recompute the
-        // full expression to keep the arithmetic exact.
-        const WideUint container_factor = d4_class_size(type.container);
-        const WideUint scaled = value * container_factor;
-        if (scaled > static_cast<WideUint>(~std::uint64_t{0})) {
-            throw std::overflow_error("class size does not fit in 64 bits");
-        }
-        return static_cast<std::uint64_t>(scaled);
+        // The container factor multiplies the wreath class size; keep the
+        // multiplication in the wide domain so n = 12 class sizes work.
+        value *= d4_class_size(type.container);
     }
-    if (value > static_cast<WideUint>(~std::uint64_t{0})) {
+    return value;
+}
+
+std::uint64_t group_class_size(const GroupConjugacyType& type) {
+    const WideUint value = group_class_size_wide(type);
+    if (!wide_fits_uint64(value)) {
         throw std::overflow_error("class size does not fit in 64 bits");
     }
     return static_cast<std::uint64_t>(value);
@@ -463,7 +509,7 @@ WreathCountResult wreath_burnside_count(
     const auto total_started = Clock::now();
     const EventSetLayout layout = EventSetLayout::for_square_count(n);
     const std::uint64_t event_count = layout.event_count;
-    const std::uint64_t group_size = group_element_count(n);
+    const WideUint group_order = wide_factorial(n) * wide_power(8, n) * WideUint{8};
     if (options.low_weight_only && options.low_weight_max == 0) {
         throw std::invalid_argument("low-weight mode needs a positive bound");
     }
@@ -471,22 +517,25 @@ WreathCountResult wreath_burnside_count(
     WreathCountResult result;
     result.square_count = n;
     result.event_count = event_count;
-    result.group_size = group_size;
+    result.group_size = wide_fits_uint64(group_order)
+        ? static_cast<std::uint64_t>(group_order)
+        : 0;
+    result.group_size_decimal = big_from_wide(group_order).to_decimal();
     result.low_weight_only = options.low_weight_only;
     result.low_weight_max = options.low_weight_max;
 
     // --- Class generation: wreath classes with exact sizes. ----------------
     const auto generation_started = Clock::now();
     const std::vector<GroupConjugacyType> wreath_types = enumerate_group_conjugacy_types(n);
-    std::vector<std::uint64_t> wreath_sizes(wreath_types.size(), 0);
-    std::uint64_t wreath_size_sum = 0;
+    std::vector<WideUint> wreath_sizes(wreath_types.size(), 0);
+    WideUint wreath_size_sum = 0;
     for (std::size_t index = 0; index < wreath_types.size(); ++index) {
-        wreath_sizes[index] = group_class_size(wreath_types[index]);
+        wreath_sizes[index] = group_class_size_wide(wreath_types[index]);
         wreath_size_sum += wreath_sizes[index];
     }
     result.wreath_conjugacy_types = wreath_types.size();
     result.total_conjugacy_classes = kD4ClassCount * wreath_types.size();
-    const std::uint64_t wreath_group_size = factorial(n) * small_power(8, n);
+    const WideUint wreath_group_size = wide_factorial(n) * wide_power(8, n);
     if (wreath_size_sum != wreath_group_size) {
         result.checks_class_size_sum = false;
     }
@@ -496,18 +545,18 @@ WreathCountResult wreath_burnside_count(
     const auto event_cycles_started = Clock::now();
     struct Aggregate {
         EventCycleType cycle_type;
-        std::uint64_t weight{0};
+        WideUint weight{0};
         std::uint64_t classes{0};
     };
     std::map<std::string, Aggregate> aggregates;
-    std::uint64_t class_size_sum = 0;
+    WideUint class_size_sum = 0;
     for (const auto& wreath_type : wreath_types) {
-        const std::uint64_t wreath_size = group_class_size(wreath_type);
+        const WideUint wreath_size = group_class_size_wide(wreath_type);
         for (std::uint32_t container_index = 0; container_index < kD4ClassCount;
              ++container_index) {
             GroupConjugacyType full = wreath_type;
             full.container = static_cast<D4Class>(container_index);
-            const std::uint64_t class_size =
+            const WideUint class_size =
                 wreath_size * d4_class_size(full.container);
             class_size_sum += class_size;
             const GroupElement element = representative_group_element(full);
@@ -521,8 +570,11 @@ WreathCountResult wreath_burnside_count(
             position->second.classes += 1;
         }
     }
-    result.class_size_sum = class_size_sum;
-    if (class_size_sum != group_size) {
+    result.class_size_sum = wide_fits_uint64(class_size_sum)
+        ? static_cast<std::uint64_t>(class_size_sum)
+        : 0;
+    result.class_size_sum_decimal = big_from_wide(class_size_sum).to_decimal();
+    if (class_size_sum != group_order) {
         result.checks_class_size_sum = false;
     }
     result.distinct_induced_cycle_types = aggregates.size();
@@ -551,12 +603,20 @@ WreathCountResult wreath_burnside_count(
         }
         for (std::uint32_t index = 0; index <= max_degree; ++index) {
             BigUint term = polynomial[index];
-            term.mul_small(aggregate.weight);
+            if (wide_fits_uint64(aggregate.weight)) {
+                term.mul_small(static_cast<std::uint64_t>(aggregate.weight));
+            } else {
+                term.mul_big(big_from_wide(aggregate.weight));
+            }
             coefficient_sums[index].add_into(term);
         }
         if (!options.low_weight_only) {
             BigUint element_count = BigUint::power_of_two(aggregate.cycle_type.cycle_count());
-            element_count.mul_small(aggregate.weight);
+            if (wide_fits_uint64(aggregate.weight)) {
+                element_count.mul_small(static_cast<std::uint64_t>(aggregate.weight));
+            } else {
+                element_count.mul_big(big_from_wide(aggregate.weight));
+            }
             total_from_cycle_counts.add_into(element_count);
         }
     }
@@ -568,8 +628,7 @@ WreathCountResult wreath_burnside_count(
         numerator_total.add_into(coefficient);
     }
     if (!options.low_weight_only) {
-        const std::uint64_t remainder = numerator_total.div_small(group_size);
-        if (remainder != 0) {
+        if (!divide_by_group_order(numerator_total, n)) {
             result.checks_divisible = false;
         }
         result.total_orbit_count_decimal = numerator_total.to_decimal();
@@ -579,8 +638,7 @@ WreathCountResult wreath_burnside_count(
     result.coefficient_decimal.reserve(coefficient_sums.size());
     for (auto& coefficient : coefficient_sums) {
         BigUint value = coefficient;
-        const std::uint64_t remainder = value.div_small(group_size);
-        if (remainder != 0) {
+        if (!divide_by_group_order(value, n)) {
             result.checks_divisible = false;
         }
         result.coefficient_sum_decimal.push_back(coefficient.to_decimal());
@@ -588,8 +646,7 @@ WreathCountResult wreath_burnside_count(
     }
 
     if (!options.low_weight_only) {
-        const std::uint64_t remainder = total_from_cycle_counts.div_small(group_size);
-        if (remainder != 0) {
+        if (!divide_by_group_order(total_from_cycle_counts, n)) {
             result.checks_divisible = false;
         }
         result.total_from_cycle_counts_decimal = total_from_cycle_counts.to_decimal();
@@ -623,11 +680,14 @@ WreathCountResult wreath_burnside_count(
     if (options.emit_cycle_type_table) {
         result.induced_types.reserve(aggregates.size());
         for (const auto& [key, aggregate] : aggregates) {
-            result.induced_types.push_back(InducedTypeRecord{
-                .cycle_type = aggregate.cycle_type,
-                .class_elements = aggregate.weight,
-                .classes = aggregate.classes,
-            });
+            InducedTypeRecord record;
+            record.cycle_type = aggregate.cycle_type;
+            record.class_elements = wide_fits_uint64(aggregate.weight)
+                ? static_cast<std::uint64_t>(aggregate.weight)
+                : 0;
+            record.class_elements_decimal = big_from_wide(aggregate.weight).to_decimal();
+            record.classes = aggregate.classes;
+            result.induced_types.push_back(std::move(record));
         }
         std::sort(
             result.induced_types.begin(),
@@ -650,18 +710,26 @@ WreathCountResult wreath_burnside_count(
 }
 
 std::string wreath_count_to_json(const WreathCountResult& result) {
+    // The group order and class-size sum are emitted as JSON numbers while they
+    // fit in 64 bits and as decimal strings above that (n = 12), matching the
+    // repository convention of decimal strings for big integers.
+    const auto uint64_or_decimal_json = [](std::uint64_t mirror, const std::string& decimal) {
+        return mirror != 0 ? std::to_string(mirror) : "\"" + decimal + "\"";
+    };
     std::ostringstream out;
     out << std::setprecision(17);
     out << '{'
         << "\"schema\":\"sqtopology.wreath-count.v1\","
         << "\"n\":" << result.square_count << ','
         << "\"event_count\":" << result.event_count << ','
-        << "\"group_size\":" << result.group_size << ','
+        << "\"group_size\":"
+        << uint64_or_decimal_json(result.group_size, result.group_size_decimal) << ','
         << "\"group_order_formula\":\"n! * 8^n * 8\","
         << "\"wreath_conjugacy_types\":" << result.wreath_conjugacy_types << ','
         << "\"total_conjugacy_classes\":" << result.total_conjugacy_classes << ','
         << "\"distinct_induced_cycle_types\":" << result.distinct_induced_cycle_types << ','
-        << "\"class_size_sum\":" << result.class_size_sum << ','
+        << "\"class_size_sum\":"
+        << uint64_or_decimal_json(result.class_size_sum, result.class_size_sum_decimal) << ','
         << "\"mode\":\"" << (result.low_weight_only ? "low_weight" : "full") << "\","
         << "\"low_weight_max\":" << result.low_weight_max << ','
         << "\"coefficients\":[";
@@ -691,7 +759,11 @@ std::string wreath_count_to_json(const WreathCountResult& result) {
             out << "{\"cycle_type\":\"" << record.cycle_type.to_compact_string() << '"'
                 << ",\"cycles\":" << record.cycle_type.cycle_count()
                 << ",\"classes\":" << record.classes
-                << ",\"class_elements\":" << record.class_elements
+                << ",\"class_elements\":"
+                << uint64_or_decimal_json(
+                       record.class_elements,
+                       record.class_elements_decimal
+                   )
                 << '}';
         }
         out << "],";

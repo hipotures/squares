@@ -245,8 +245,10 @@ std::string d4_conjugacy_class_name(const D4Element& element) {
 // ---------------------------------------------------------------------------
 
 std::uint64_t group_element_count(std::uint32_t n) {
-    if (n == 0 || n > kMaxOrbitSquares) {
-        throw std::invalid_argument("group requires 1 <= square_count <= kMaxOrbitSquares");
+    if (n == 0 || n > kMaxElementEnumerationSquares) {
+        throw std::invalid_argument(
+            "group order requires 1 <= square_count <= kMaxElementEnumerationSquares"
+        );
     }
     std::uint64_t size = 8;  // container D4
     for (std::uint32_t square = 0; square < n; ++square) {
