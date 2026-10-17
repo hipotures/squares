@@ -160,6 +160,24 @@ void test_validation() {
     expect(incidence_rejected,
            "the checked incidence entry point must reject out-of-range feature kinds");
 
+    bool ring_rejected = false;
+    try {
+        (void)feature_ring_index(FeatureRef{0, static_cast<FeatureKind>(200), 0});
+    } catch (const std::invalid_argument&) {
+        ring_rejected = true;
+    }
+    expect(ring_rejected,
+           "feature_ring_index must reject invalid feature kinds rather than coerce them");
+
+    bool index_rejected = false;
+    try {
+        (void)feature_ring_index(FeatureRef{0, FeatureKind::Corner, 4});
+    } catch (const std::invalid_argument&) {
+        index_rejected = true;
+    }
+    expect(index_rejected,
+           "feature_ring_index must reject out-of-range feature indices");
+
     Topology bad_contact_kind(2);
     bad_contact_kind.add_contact(Contact{
         .kind = static_cast<ContactKind>(200),
@@ -169,6 +187,34 @@ void test_validation() {
     });
     expect(!bad_contact_kind.validate().ok(),
            "out-of-range contact kinds must be rejected");
+
+    // A wall-shaped contact with an unknown kind must be rejected by the explicit
+    // kind check, not only by the square-square endpoint consistency fallback.
+    Topology bad_wall_kind(1);
+    bad_wall_kind.add_contact(Contact{
+        .kind = static_cast<ContactKind>(200),
+        .a = FeatureRef{0, FeatureKind::Side, 0},
+        .b = std::nullopt,
+        .wall = 0,
+    });
+    expect(!bad_wall_kind.validate().ok(),
+           "out-of-range wall contact kinds must be rejected");
+}
+
+void test_textual_encoding_version() {
+    using namespace sqtopology;
+
+    expect(
+        canonical_encoding(make_fixture("grid-3x3")).starts_with("SQT2|"),
+        "the human-facing canonical encoding must carry the current SQT2 version"
+    );
+    // The textual form is a per-build inspection artifact. The exact search key
+    // is a different namespace with its own version marker.
+    expect(
+        canonical_key_hex(canonical_key(make_fixture("grid-3x3"), CanonicalBackend::Traces))
+            .starts_with("SQK5HEX:"),
+        "the exact search key must carry its own SQK5HEX marker"
+    );
 }
 
 void test_square_permutation_invariance() {
@@ -541,27 +587,31 @@ void test_binary_key_matches_textual_equivalence() {
 
         expect(
             canonical_key_hex(binary_keys.front()).starts_with("SQK5HEX:"),
-            "retained binary key text must carry the SQK2HEX version marker"
+            "retained binary key text must carry the current SQK5HEX version marker"
         );
     }
 }
 
-void test_search_key_equivalence_relation_is_gadget_invariant() {
+// Deterministic rewrite corpus spanning the fixtures, several depths, and a
+// bounded breadth per level. Used by the gadget-equivalence differential.
+std::vector<sqtopology::Topology> equivalence_corpus(
+    std::size_t max_corpus,
+    std::size_t breadth,
+    int depth
+) {
     using namespace sqtopology;
-
     std::vector<Topology> corpus;
-    constexpr std::size_t max_corpus = 4000;
-    const RewriteOptions options{.max_additions = 48};
+    const RewriteOptions options{.max_additions = 64};
     for (const auto* name : {"grid-2x2", "grid-3x3", "disjoint-2", "corner-side-2",
                              "side-side-2", "corner-corner-2", "isolated-1",
                              "grid-4x4-minus-one"}) {
         const auto base = make_fixture(name);
         std::vector<Topology> level{base};
         corpus.push_back(base);
-        for (int depth = 0; depth < 2 && corpus.size() < max_corpus; ++depth) {
+        for (int step = 0; step < depth && corpus.size() < max_corpus; ++step) {
             std::vector<Topology> next;
             for (const auto& parent : level) {
-                if (next.size() >= 400) break;
+                if (next.size() >= breadth) break;
                 for (auto& rewrite : generate_rewrites(parent, options)) {
                     next.push_back(std::move(rewrite.topology));
                 }
@@ -571,29 +621,112 @@ void test_search_key_equivalence_relation_is_gadget_invariant() {
             if (level.empty()) break;
         }
     }
+    return corpus;
+}
 
+// Append square permutations, one local D4 relabeling per square, and a container
+// D4 relabeling for the first `limit` corpus members. Every appended image is
+// equivalent to its source, so a faithful gadget must place both in one class.
+void append_equivalence_images(
+    std::vector<sqtopology::Topology>& corpus,
+    std::size_t limit
+) {
+    using namespace sqtopology;
+    const std::size_t base_count = std::min(limit, corpus.size());
+    std::vector<Topology> images;
+    images.reserve(base_count * 3);
+    for (std::size_t i = 0; i < base_count; ++i) {
+        const auto& topology = corpus[i];
+        const auto squares = topology.square_count();
+        if (squares == 0) continue;
+
+        std::vector<SquareId> rotation(squares);
+        for (SquareId old = 0; old < squares; ++old) {
+            rotation[old] = (old + 1U) % squares;
+        }
+        images.push_back(permute_squares(topology, rotation));
+
+        images.push_back(relabel_square(
+            topology,
+            0,
+            D4Transform{.rotation = 1, .reflected = true}
+        ));
+        images.push_back(relabel_container(
+            topology,
+            D4Transform{.rotation = 3, .reflected = false}
+        ));
+    }
+    corpus.insert(
+        corpus.end(),
+        std::make_move_iterator(images.begin()),
+        std::make_move_iterator(images.end())
+    );
+}
+
+// The required relation: reference_key(A) == reference_key(B) iff
+// production_key(A) == production_key(B). Checking that the induced partitions
+// are a bijection is exactly that statement; equal class counts alone are not.
+void expect_gadget_partition_bijection(
+    const std::vector<sqtopology::Topology>& corpus,
+    sqtopology::CanonicalBackend backend,
+    const std::string& label
+) {
+    using namespace sqtopology;
     std::map<std::string, std::string> reference_to_production;
     std::map<std::string, std::string> production_to_reference;
     for (const auto& topology : corpus) {
         const auto reference = canonical_key_colored_graph(
             reference_incidence_graph(topology),
-            CanonicalBackend::Traces
+            backend
         ).bytes;
-        const auto production = canonical_key(topology, CanonicalBackend::Traces).bytes;
+        const auto production = canonical_key_colored_graph(
+            to_incidence_graph(topology),
+            backend
+        ).bytes;
 
-        const auto [ref_it, ref_new] = reference_to_production.emplace(reference, production);
+        const auto [ref_it, ref_new] =
+            reference_to_production.emplace(reference, production);
         expect(ref_new || ref_it->second == production,
-               "one reference gadget class must map to exactly one production class");
+               label + ": one reference gadget class must map to one production class");
 
-        const auto [prod_it, prod_new] = production_to_reference.emplace(production, reference);
+        const auto [prod_it, prod_new] =
+            production_to_reference.emplace(production, reference);
         expect(prod_new || prod_it->second == reference,
-               "one production class must map to exactly one reference gadget class");
+               label + ": one production class must map to one reference gadget class");
     }
 
     expect(reference_to_production.size() == production_to_reference.size(),
-           "the production gadget must induce the historical exact-key equivalence relation");
+           label + ": the production gadget must induce the historical equivalence relation");
     expect(production_to_reference.size() > 100,
-           "the gadget equivalence test needs a non-trivial corpus");
+           label + ": the gadget equivalence test needs a non-trivial corpus");
+}
+
+void test_search_key_equivalence_relation_is_gadget_invariant() {
+    using namespace sqtopology;
+
+    auto corpus = equivalence_corpus(40000, 2000, 4);
+    append_equivalence_images(corpus, 2000);
+    expect_gadget_partition_bijection(
+        corpus,
+        CanonicalBackend::Traces,
+        "production gadget (Traces, large corpus)"
+    );
+}
+
+void test_gadget_invariance_across_backends() {
+    using namespace sqtopology;
+
+    auto corpus = equivalence_corpus(2500, 200, 2);
+    append_equivalence_images(corpus, 300);
+    for (const auto backend : {CanonicalBackend::DenseNauty,
+                               CanonicalBackend::SparseNauty,
+                               CanonicalBackend::Traces}) {
+        expect_gadget_partition_bijection(
+            corpus,
+            backend,
+            std::string("production gadget across backends/") + std::string(to_string(backend))
+        );
+    }
 }
 
 void test_compact_binary_key_layout() {
@@ -751,7 +884,7 @@ void test_search_canonical_microprofile() {
     );
     expect(
         result.stats.canonical_encoding_seconds == 0.0,
-        "search binary-key path must not build textual SQT1 encodings"
+        "search binary-key path must not build textual SQT2 encodings"
     );
 }
 
@@ -865,6 +998,7 @@ void test_canonical_equality_uses_encoding() {
 int main() {
     try {
         test_validation();
+        test_textual_encoding_version();
         test_square_permutation_invariance();
         test_local_d4_invariance();
         test_container_d4_invariance();
@@ -881,6 +1015,7 @@ int main() {
         test_backend_names();
         test_binary_key_matches_textual_equivalence();
         test_search_key_equivalence_relation_is_gadget_invariant();
+        test_gadget_invariance_across_backends();
         test_compact_binary_key_layout();
         test_key_endpoint_width_boundary();
         test_canonical_microprofile_preserves_semantics();
