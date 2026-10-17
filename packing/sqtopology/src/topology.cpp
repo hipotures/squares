@@ -57,8 +57,14 @@ ContactKind inferred_kind(FeatureKind a, FeatureKind b) {
     return ContactKind::CornerSide;
 }
 
+bool valid_feature_kind(FeatureKind kind) {
+    return kind == FeatureKind::Corner || kind == FeatureKind::Side;
+}
+
 bool valid_feature(const FeatureRef& feature, std::uint32_t square_count) {
-    return feature.square < square_count && feature.index < 4;
+    return valid_feature_kind(feature.kind)
+        && feature.square < square_count
+        && feature.index < 4;
 }
 
 }  // namespace
@@ -242,6 +248,9 @@ std::vector<D4Transform> all_d4_transforms() {
 }
 
 std::uint8_t feature_ring_index(FeatureRef feature) {
+    if (!valid_feature_kind(feature.kind)) {
+        throw std::invalid_argument("feature kind must be corner or side");
+    }
     if (feature.index >= 4) {
         throw std::invalid_argument("feature index must be in 0..3");
     }

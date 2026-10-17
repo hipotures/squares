@@ -138,6 +138,37 @@ void test_validation() {
     duplicate.add_contact(contact);
     duplicate.add_contact(contact);
     expect(!duplicate.validate().ok(), "duplicate contact events must be rejected");
+
+    // FeatureKind and ContactKind are enum classes with a uint8_t base, so a
+    // caller can still form out-of-range values. They must be rejected rather
+    // than silently coerced to a corner.
+    Topology bad_feature_kind(2);
+    bad_feature_kind.add_contact(
+        make_square_contact(
+            FeatureRef{0, static_cast<FeatureKind>(200), 0},
+            FeatureRef{1, FeatureKind::Corner, 1}
+        )
+    );
+    expect(!bad_feature_kind.validate().ok(),
+           "out-of-range feature kinds must be rejected");
+    bool incidence_rejected = false;
+    try {
+        (void)to_incidence_graph(bad_feature_kind);
+    } catch (const std::invalid_argument&) {
+        incidence_rejected = true;
+    }
+    expect(incidence_rejected,
+           "the checked incidence entry point must reject out-of-range feature kinds");
+
+    Topology bad_contact_kind(2);
+    bad_contact_kind.add_contact(Contact{
+        .kind = static_cast<ContactKind>(200),
+        .a = FeatureRef{0, FeatureKind::Corner, 0},
+        .b = FeatureRef{1, FeatureKind::Corner, 1},
+        .wall = std::nullopt,
+    });
+    expect(!bad_contact_kind.validate().ok(),
+           "out-of-range contact kinds must be rejected");
 }
 
 void test_square_permutation_invariance() {
